@@ -18,6 +18,7 @@ def _get_kwargs(
     period_start_at: datetime.datetime,
     period_end_at: datetime.datetime,
 ) -> dict[str, Any]:
+
     params: dict[str, Any] = {}
 
     json_area = area.value

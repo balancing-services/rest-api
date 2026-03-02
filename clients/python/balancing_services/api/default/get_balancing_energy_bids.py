@@ -22,6 +22,7 @@ def _get_kwargs(
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
 ) -> dict[str, Any]:
+
     params: dict[str, Any] = {}
 
     json_area = area.value
