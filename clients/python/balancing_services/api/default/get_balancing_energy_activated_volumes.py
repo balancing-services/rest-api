@@ -20,6 +20,7 @@ def _get_kwargs(
     period_end_at: datetime.datetime,
     reserve_type: ReserveType,
 ) -> dict[str, Any]:
+
     params: dict[str, Any] = {}
 
     json_area = area.value

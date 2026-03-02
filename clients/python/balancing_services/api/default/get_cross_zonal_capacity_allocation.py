@@ -7,7 +7,9 @@ import httpx
 from ... import errors
 from ...client import AuthenticatedClient, Client
 from ...models.area import Area
-from ...models.cross_zonal_capacity_allocation_response import CrossZonalCapacityAllocationResponse
+from ...models.cross_zonal_capacity_allocation_response import (
+    CrossZonalCapacityAllocationResponse,
+)
 from ...models.problem import Problem
 from ...models.reserve_type import ReserveType
 from ...types import UNSET, Response
@@ -20,6 +22,7 @@ def _get_kwargs(
     period_end_at: datetime.datetime,
     reserve_type: ReserveType,
 ) -> dict[str, Any]:
+
     params: dict[str, Any] = {}
 
     json_area = area.value

@@ -1866,6 +1866,7 @@ components:
       description: Currency code
       enum:
         - BGN
+        - CHF
         - EUR
         - HUF
         - PLN

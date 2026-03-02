@@ -121,6 +121,7 @@ class TestEnums:
         """Test Currency enum."""
         assert Currency.EUR == "EUR"
         assert Currency.BGN == "BGN"
+        assert Currency.CHF == "CHF"
 
     def test_activation_type_enum(self):
         """Test ActivationType enum."""
