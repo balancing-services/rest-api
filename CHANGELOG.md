@@ -7,8 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.0] - 2026-03-02
+
 ### Added
 - Support for CHF (Swiss Franc) currency
+- Document price units (currency/MWh, currency/MW per hour) in endpoint descriptions
 
 ## [1.6.0] - 2026-01-30
 
@@ -89,7 +92,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - UTC timestamp-based period filtering
 - OpenAPI 3.0.3 specification
 
-[Unreleased]: https://github.com/balancing-services/rest-api/compare/v1.6.0...HEAD
+[Unreleased]: https://github.com/balancing-services/rest-api/compare/v1.7.0...HEAD
+[1.7.0]: https://github.com/balancing-services/rest-api/compare/v1.6.0...v1.7.0
 [1.6.0]: https://github.com/balancing-services/rest-api/compare/v1.5.1...v1.6.0
 [1.5.1]: https://github.com/balancing-services/rest-api/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/balancing-services/rest-api/compare/v1.4.1...v1.5.0
