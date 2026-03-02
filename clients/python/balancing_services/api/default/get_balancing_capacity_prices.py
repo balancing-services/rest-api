@@ -117,7 +117,7 @@ def sync_detailed(
     """Get balancing capacity prices
 
      Returns balancing capacity prices for the specified area and reserve type within the given time
-    period. Only paid prices are returned.
+    period. Prices are in the specified currency per MW per hour.
 
     Args:
         area (Area): Area code
@@ -158,7 +158,7 @@ def sync(
     """Get balancing capacity prices
 
      Returns balancing capacity prices for the specified area and reserve type within the given time
-    period. Only paid prices are returned.
+    period. Prices are in the specified currency per MW per hour.
 
     Args:
         area (Area): Area code
@@ -194,7 +194,7 @@ async def asyncio_detailed(
     """Get balancing capacity prices
 
      Returns balancing capacity prices for the specified area and reserve type within the given time
-    period. Only paid prices are returned.
+    period. Prices are in the specified currency per MW per hour.
 
     Args:
         area (Area): Area code
@@ -233,7 +233,7 @@ async def asyncio(
     """Get balancing capacity prices
 
      Returns balancing capacity prices for the specified area and reserve type within the given time
-    period. Only paid prices are returned.
+    period. Prices are in the specified currency per MW per hour.
 
     Args:
         area (Area): Area code

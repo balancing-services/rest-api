@@ -124,8 +124,8 @@ def sync_detailed(
 ) -> Response[BalancingEnergyBidsResponse | Problem]:
     """Get balancing energy bids
 
-     Returns balancing energy bids for the specified area within the given time period. Supports cursor-
-    based pagination for large result sets.
+     Returns balancing energy bids for the specified area within the given time period. Prices are in the
+    specified currency per MWh. Supports cursor-based pagination for large result sets.
 
     Args:
         area (Area): Area code
@@ -171,8 +171,8 @@ def sync(
 ) -> BalancingEnergyBidsResponse | Problem | None:
     """Get balancing energy bids
 
-     Returns balancing energy bids for the specified area within the given time period. Supports cursor-
-    based pagination for large result sets.
+     Returns balancing energy bids for the specified area within the given time period. Prices are in the
+    specified currency per MWh. Supports cursor-based pagination for large result sets.
 
     Args:
         area (Area): Area code
@@ -213,8 +213,8 @@ async def asyncio_detailed(
 ) -> Response[BalancingEnergyBidsResponse | Problem]:
     """Get balancing energy bids
 
-     Returns balancing energy bids for the specified area within the given time period. Supports cursor-
-    based pagination for large result sets.
+     Returns balancing energy bids for the specified area within the given time period. Prices are in the
+    specified currency per MWh. Supports cursor-based pagination for large result sets.
 
     Args:
         area (Area): Area code
@@ -258,8 +258,8 @@ async def asyncio(
 ) -> BalancingEnergyBidsResponse | Problem | None:
     """Get balancing energy bids
 
-     Returns balancing energy bids for the specified area within the given time period. Supports cursor-
-    based pagination for large result sets.
+     Returns balancing energy bids for the specified area within the given time period. Prices are in the
+    specified currency per MWh. Supports cursor-based pagination for large result sets.
 
     Args:
         area (Area): Area code

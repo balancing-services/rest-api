@@ -17,7 +17,7 @@ paths:
   /imbalance/prices:
     get:
       summary: Get imbalance prices for an area
-      description: Returns imbalance prices for the specified area within the given time period
+      description: Returns imbalance prices for the specified area within the given time period. Prices are in the specified currency per MWh.
       operationId: getImbalancePrices
       parameters:
         - name: area
@@ -436,7 +436,7 @@ paths:
   /balancing/energy/prices:
     get:
       summary: Get balancing energy prices
-      description: Returns balancing energy prices for the specified area and reserve type within the given time period
+      description: Returns balancing energy prices for the specified area and reserve type within the given time period. Prices are in the specified currency per MWh.
       operationId: getBalancingEnergyPrices
       parameters:
         - name: area
@@ -543,7 +543,7 @@ paths:
   /balancing/energy/bids:
     get:
       summary: Get balancing energy bids
-      description: Returns balancing energy bids for the specified area within the given time period. Supports cursor-based pagination for large result sets.
+      description: Returns balancing energy bids for the specified area within the given time period. Prices are in the specified currency per MWh. Supports cursor-based pagination for large result sets.
       operationId: getBalancingEnergyBids
       parameters:
         - name: area
@@ -667,7 +667,7 @@ paths:
   /balancing/capacity/bids:
     get:
       summary: Get balancing capacity bids
-      description: Returns balancing capacity bids for the specified area within the given time period. Supports cursor-based pagination for large result sets.
+      description: Returns balancing capacity bids for the specified area within the given time period. Prices are in the specified currency per MW per hour. Supports cursor-based pagination for large result sets.
       operationId: getBalancingCapacityBids
       parameters:
         - name: area
@@ -791,7 +791,7 @@ paths:
   /balancing/capacity/prices:
     get:
       summary: Get balancing capacity prices
-      description: Returns balancing capacity prices for the specified area and reserve type within the given time period. Only paid prices are returned.
+      description: Returns balancing capacity prices for the specified area and reserve type within the given time period. Prices are in the specified currency per MW per hour.
       operationId: getBalancingCapacityPrices
       parameters:
         - name: area

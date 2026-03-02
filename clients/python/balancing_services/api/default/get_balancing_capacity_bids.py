@@ -124,8 +124,8 @@ def sync_detailed(
 ) -> Response[BalancingCapacityBidsResponse | Problem]:
     """Get balancing capacity bids
 
-     Returns balancing capacity bids for the specified area within the given time period. Supports
-    cursor-based pagination for large result sets.
+     Returns balancing capacity bids for the specified area within the given time period. Prices are in
+    the specified currency per MW per hour. Supports cursor-based pagination for large result sets.
 
     Args:
         area (Area): Area code
@@ -171,8 +171,8 @@ def sync(
 ) -> BalancingCapacityBidsResponse | Problem | None:
     """Get balancing capacity bids
 
-     Returns balancing capacity bids for the specified area within the given time period. Supports
-    cursor-based pagination for large result sets.
+     Returns balancing capacity bids for the specified area within the given time period. Prices are in
+    the specified currency per MW per hour. Supports cursor-based pagination for large result sets.
 
     Args:
         area (Area): Area code
@@ -213,8 +213,8 @@ async def asyncio_detailed(
 ) -> Response[BalancingCapacityBidsResponse | Problem]:
     """Get balancing capacity bids
 
-     Returns balancing capacity bids for the specified area within the given time period. Supports
-    cursor-based pagination for large result sets.
+     Returns balancing capacity bids for the specified area within the given time period. Prices are in
+    the specified currency per MW per hour. Supports cursor-based pagination for large result sets.
 
     Args:
         area (Area): Area code
@@ -258,8 +258,8 @@ async def asyncio(
 ) -> BalancingCapacityBidsResponse | Problem | None:
     """Get balancing capacity bids
 
-     Returns balancing capacity bids for the specified area within the given time period. Supports
-    cursor-based pagination for large result sets.
+     Returns balancing capacity bids for the specified area within the given time period. Prices are in
+    the specified currency per MW per hour. Supports cursor-based pagination for large result sets.
 
     Args:
         area (Area): Area code
