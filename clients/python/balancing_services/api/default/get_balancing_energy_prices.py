@@ -116,7 +116,8 @@ def sync_detailed(
 ) -> Response[BalancingEnergyPricesResponse | Problem]:
     """Get balancing energy prices
 
-     Returns balancing energy prices for the specified area and reserve type within the given time period
+     Returns balancing energy prices for the specified area and reserve type within the given time
+    period. Prices are in the specified currency per MWh.
 
     Args:
         area (Area): Area code
@@ -156,7 +157,8 @@ def sync(
 ) -> BalancingEnergyPricesResponse | Problem | None:
     """Get balancing energy prices
 
-     Returns balancing energy prices for the specified area and reserve type within the given time period
+     Returns balancing energy prices for the specified area and reserve type within the given time
+    period. Prices are in the specified currency per MWh.
 
     Args:
         area (Area): Area code
@@ -191,7 +193,8 @@ async def asyncio_detailed(
 ) -> Response[BalancingEnergyPricesResponse | Problem]:
     """Get balancing energy prices
 
-     Returns balancing energy prices for the specified area and reserve type within the given time period
+     Returns balancing energy prices for the specified area and reserve type within the given time
+    period. Prices are in the specified currency per MWh.
 
     Args:
         area (Area): Area code
@@ -229,7 +232,8 @@ async def asyncio(
 ) -> BalancingEnergyPricesResponse | Problem | None:
     """Get balancing energy prices
 
-     Returns balancing energy prices for the specified area and reserve type within the given time period
+     Returns balancing energy prices for the specified area and reserve type within the given time
+    period. Prices are in the specified currency per MWh.
 
     Args:
         area (Area): Area code
