@@ -50,7 +50,14 @@ from balancing_services_cli.commands.version import check_update
 def cli(
     ctx: click.Context, token: str | None, base_url: str, output: str | None, fmt: str | None, verbose: bool
 ) -> None:
-    """Balancing Services CLI - access European electricity balancing market data."""
+    """Balancing Services CLI - access European electricity balancing market data.
+
+    \b
+    Exit codes:
+      0   Success
+      1   General error (auth, validation, server error, etc.)
+      29  Rate limited (HTTP 429) after automatic retries exhausted
+    """
     if verbose:
         handler = logging.StreamHandler(sys.stderr)
         handler.setFormatter(logging.Formatter("%(name)s: %(message)s"))

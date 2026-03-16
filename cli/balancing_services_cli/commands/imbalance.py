@@ -12,6 +12,7 @@ from balancing_services.models import Area
 from balancing_services_cli.client_factory import make_client
 from balancing_services_cli.flatten import IMBALANCE_PRICES, IMBALANCE_VOLUMES, flatten_response
 from balancing_services_cli.output import format_api_error, write_rows
+from balancing_services_cli.retry import call_with_retry
 from balancing_services_cli.types import ISO8601
 
 log = logging.getLogger(__name__)
@@ -33,7 +34,8 @@ def imbalance_prices(ctx: click.Context, area: str, start: datetime, end: dateti
     """Fetch imbalance prices."""
     client = make_client(ctx)
     log.debug("GET /imbalance/prices area=%s start=%s end=%s", area, start, end)
-    response = get_imbalance_prices.sync_detailed(
+    response = call_with_retry(
+        get_imbalance_prices.sync_detailed,
         client=client,
         area=Area(area),
         period_start_at=start,
@@ -62,7 +64,8 @@ def imbalance_volumes(ctx: click.Context, area: str, start: datetime, end: datet
     """Fetch imbalance total volumes."""
     client = make_client(ctx)
     log.debug("GET /imbalance/total-volumes area=%s start=%s end=%s", area, start, end)
-    response = get_imbalance_total_volumes.sync_detailed(
+    response = call_with_retry(
+        get_imbalance_total_volumes.sync_detailed,
         client=client,
         area=Area(area),
         period_start_at=start,

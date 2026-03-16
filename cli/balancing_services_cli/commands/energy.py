@@ -24,6 +24,7 @@ from balancing_services_cli.flatten import (
 )
 from balancing_services_cli.output import format_api_error, write_rows
 from balancing_services_cli.pagination import fetch_all_pages, fetch_first_page
+from balancing_services_cli.retry import call_with_retry
 from balancing_services_cli.types import ISO8601
 
 log = logging.getLogger(__name__)
@@ -55,7 +56,8 @@ def energy_activated(ctx: click.Context, area: str, start: datetime, end: dateti
         "GET /balancing/energy/activated-volumes area=%s start=%s end=%s reserve_type=%s",
         area, start, end, reserve_type,
     )
-    response = get_balancing_energy_activated_volumes.sync_detailed(
+    response = call_with_retry(
+        get_balancing_energy_activated_volumes.sync_detailed,
         client=client,
         area=Area(area),
         period_start_at=start,
@@ -94,7 +96,8 @@ def energy_offered(ctx: click.Context, area: str, start: datetime, end: datetime
         "GET /balancing/energy/offered-volumes area=%s start=%s end=%s reserve_type=%s",
         area, start, end, reserve_type,
     )
-    response = get_balancing_energy_offered_volumes.sync_detailed(
+    response = call_with_retry(
+        get_balancing_energy_offered_volumes.sync_detailed,
         client=client,
         area=Area(area),
         period_start_at=start,
@@ -133,7 +136,8 @@ def energy_prices(ctx: click.Context, area: str, start: datetime, end: datetime,
         "GET /balancing/energy/prices area=%s start=%s end=%s reserve_type=%s",
         area, start, end, reserve_type,
     )
-    response = get_balancing_energy_prices.sync_detailed(
+    response = call_with_retry(
+        get_balancing_energy_prices.sync_detailed,
         client=client,
         area=Area(area),
         period_start_at=start,

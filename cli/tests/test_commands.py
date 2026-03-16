@@ -13,6 +13,7 @@ from urllib.error import URLError
 from balancing_services.models import Problem
 from balancing_services.models.problem_type import ProblemType
 from click.testing import CliRunner
+from conftest import StubResponse
 
 from balancing_services_cli.main import cli
 
@@ -56,13 +57,6 @@ class StubImbalancePricesGroup:
 class StubQueriedPeriod:
     start_at: datetime
     end_at: datetime
-
-
-@dataclass
-class StubResponse:
-    status_code: int
-    parsed: Any = None
-    content: bytes = b""
 
 
 @dataclass

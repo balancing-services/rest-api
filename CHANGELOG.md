@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- CLI: handle rate limiting (HTTP 429) with automatic retries using the Retry-After header
+
 ## [1.7.0] - 2026-03-02
 
 ### Added

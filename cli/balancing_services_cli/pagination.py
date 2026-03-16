@@ -7,6 +7,7 @@ from collections.abc import Callable
 from typing import Any
 
 from balancing_services_cli.output import format_api_error
+from balancing_services_cli.retry import call_with_retry
 
 log = logging.getLogger(__name__)
 
@@ -32,7 +33,7 @@ def fetch_all_pages(
         if cursor is not None:
             kwargs["cursor"] = cursor
         log.debug("Fetching page %d...", page)
-        response = fetch_fn(**kwargs)
+        response = call_with_retry(fetch_fn, **kwargs)
 
         if response.status_code != 200:
             raise SystemExit(format_api_error(response))
@@ -67,7 +68,7 @@ def fetch_first_page(
         List of data items from the first page only.
     """
     log.debug("Fetching first page only...")
-    response = fetch_fn(**kwargs)
+    response = call_with_retry(fetch_fn, **kwargs)
 
     if response.status_code != 200:
         raise SystemExit(format_api_error(response))
