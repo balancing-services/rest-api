@@ -88,6 +88,17 @@ paths:
                   $ref: '#/components/examples/problem-not-found'
         '429':
           description: Too many requests
+          headers:
+            Retry-After:
+              description: Number of seconds to wait before retrying
+              schema:
+                type: integer
+                example: 12
+            X-RateLimit-Limit:
+              description: Maximum number of requests allowed per minute
+              schema:
+                type: integer
+                example: 60
           content:
             application/problem+json:
               schema:
@@ -188,6 +199,17 @@ paths:
                   $ref: '#/components/examples/problem-not-found'
         '429':
           description: Too many requests
+          headers:
+            Retry-After:
+              description: Number of seconds to wait before retrying
+              schema:
+                type: integer
+                example: 12
+            X-RateLimit-Limit:
+              description: Maximum number of requests allowed per minute
+              schema:
+                type: integer
+                example: 60
           content:
             application/problem+json:
               schema:
@@ -295,6 +317,17 @@ paths:
                   $ref: '#/components/examples/problem-not-found'
         '429':
           description: Too many requests
+          headers:
+            Retry-After:
+              description: Number of seconds to wait before retrying
+              schema:
+                type: integer
+                example: 12
+            X-RateLimit-Limit:
+              description: Maximum number of requests allowed per minute
+              schema:
+                type: integer
+                example: 60
           content:
             application/problem+json:
               schema:
@@ -407,6 +440,17 @@ paths:
                   $ref: '#/components/examples/problem-not-found'
         '429':
           description: Too many requests
+          headers:
+            Retry-After:
+              description: Number of seconds to wait before retrying
+              schema:
+                type: integer
+                example: 12
+            X-RateLimit-Limit:
+              description: Maximum number of requests allowed per minute
+              schema:
+                type: integer
+                example: 60
           content:
             application/problem+json:
               schema:
@@ -514,6 +558,17 @@ paths:
                   $ref: '#/components/examples/problem-not-found'
         '429':
           description: Too many requests
+          headers:
+            Retry-After:
+              description: Number of seconds to wait before retrying
+              schema:
+                type: integer
+                example: 12
+            X-RateLimit-Limit:
+              description: Maximum number of requests allowed per minute
+              schema:
+                type: integer
+                example: 60
           content:
             application/problem+json:
               schema:
@@ -638,6 +693,17 @@ paths:
                   $ref: '#/components/examples/problem-not-found'
         '429':
           description: Too many requests
+          headers:
+            Retry-After:
+              description: Number of seconds to wait before retrying
+              schema:
+                type: integer
+                example: 12
+            X-RateLimit-Limit:
+              description: Maximum number of requests allowed per minute
+              schema:
+                type: integer
+                example: 60
           content:
             application/problem+json:
               schema:
@@ -762,6 +828,17 @@ paths:
                   $ref: '#/components/examples/problem-not-found'
         '429':
           description: Too many requests
+          headers:
+            Retry-After:
+              description: Number of seconds to wait before retrying
+              schema:
+                type: integer
+                example: 12
+            X-RateLimit-Limit:
+              description: Maximum number of requests allowed per minute
+              schema:
+                type: integer
+                example: 60
           content:
             application/problem+json:
               schema:
@@ -869,6 +946,17 @@ paths:
                   $ref: '#/components/examples/problem-not-found'
         '429':
           description: Too many requests
+          headers:
+            Retry-After:
+              description: Number of seconds to wait before retrying
+              schema:
+                type: integer
+                example: 12
+            X-RateLimit-Limit:
+              description: Maximum number of requests allowed per minute
+              schema:
+                type: integer
+                example: 60
           content:
             application/problem+json:
               schema:
@@ -981,6 +1069,17 @@ paths:
                   $ref: '#/components/examples/problem-not-found'
         '429':
           description: Too many requests
+          headers:
+            Retry-After:
+              description: Number of seconds to wait before retrying
+              schema:
+                type: integer
+                example: 12
+            X-RateLimit-Limit:
+              description: Maximum number of requests allowed per minute
+              schema:
+                type: integer
+                example: 60
           content:
             application/problem+json:
               schema:
@@ -1088,6 +1187,17 @@ paths:
                   $ref: '#/components/examples/problem-not-found'
         '429':
           description: Too many requests
+          headers:
+            Retry-After:
+              description: Number of seconds to wait before retrying
+              schema:
+                type: integer
+                example: 12
+            X-RateLimit-Limit:
+              description: Maximum number of requests allowed per minute
+              schema:
+                type: integer
+                example: 60
           content:
             application/problem+json:
               schema:
