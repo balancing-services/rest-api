@@ -5,6 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
+from conftest import StubResponse
+
 from balancing_services_cli.pagination import fetch_all_pages, fetch_first_page
 
 
@@ -13,13 +15,6 @@ class StubParsed:
     data: list[Any]
     has_more: bool
     next_cursor: str | None = None
-
-
-@dataclass
-class StubResponse:
-    status_code: int
-    parsed: StubParsed | None = None
-    content: bytes = b""
 
 
 def test_single_page():
