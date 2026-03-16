@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.1] - 2026-03-16
+
 ### Added
 - CLI: handle rate limiting (HTTP 429) with automatic retries using the Retry-After header
 - Document `Retry-After` and `X-RateLimit-Limit` response headers on 429 responses in OpenAPI spec
@@ -96,7 +98,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - UTC timestamp-based period filtering
 - OpenAPI 3.0.3 specification
 
-[Unreleased]: https://github.com/balancing-services/rest-api/compare/v1.7.0...HEAD
+[Unreleased]: https://github.com/balancing-services/rest-api/compare/v1.7.1...HEAD
+[1.7.1]: https://github.com/balancing-services/rest-api/compare/v1.7.0...v1.7.1
 [1.7.0]: https://github.com/balancing-services/rest-api/compare/v1.6.0...v1.7.0
 [1.6.0]: https://github.com/balancing-services/rest-api/compare/v1.5.1...v1.6.0
 [1.5.1]: https://github.com/balancing-services/rest-api/compare/v1.5.0...v1.5.1
