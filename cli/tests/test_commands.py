@@ -245,7 +245,7 @@ def test_naive_datetime_assumed_utc():
     assert call_kwargs["period_end_at"] == datetime(2025, 1, 2, tzinfo=timezone.utc)
 
 
-BID_COMMANDS = ["energy-bids", "capacity-bids"]
+BID_COMMANDS = ["energy-bids", "energy-cbpm", "capacity-bids"]
 COMMON_BID_ARGS = ["--area", "EE", "--start", "2025-01-01", "--end", "2025-01-02", "--reserve-type", "aFRR"]
 
 
@@ -309,6 +309,26 @@ def test_capacity_bids_first_page_flag():
     assert result.exit_code == 0, result.output
 
 
+def test_energy_cbpm_all_flag():
+    runner = CliRunner()
+    with patch(
+        "balancing_services_cli.commands.energy.get_cross_border_marginal_prices.sync_detailed",
+        return_value=_make_bids_response(),
+    ):
+        result = runner.invoke(cli, ["--token", "test-token", "energy-cbpm", "--all", *COMMON_BID_ARGS])
+    assert result.exit_code == 0, result.output
+
+
+def test_energy_cbpm_first_page_flag():
+    runner = CliRunner()
+    with patch(
+        "balancing_services_cli.commands.energy.get_cross_border_marginal_prices.sync_detailed",
+        return_value=_make_bids_response(),
+    ):
+        result = runner.invoke(cli, ["--token", "test-token", "energy-cbpm", "--first-page", *COMMON_BID_ARGS])
+    assert result.exit_code == 0, result.output
+
+
 def test_all_subcommands_listed():
     runner = CliRunner()
     result = runner.invoke(cli, ["--help"])
@@ -319,6 +339,7 @@ def test_all_subcommands_listed():
         "energy-offered",
         "energy-prices",
         "energy-bids",
+        "energy-cbpm",
         "capacity-bids",
         "capacity-prices",
         "capacity-procured",

@@ -117,3 +117,9 @@ CAPACITY_CROSS_ZONAL = EndpointConfig(
     items_field="volumes",
     item_fields=("period", "volume"),
 )
+
+ENERGY_CBPM = EndpointConfig(
+    group_fields=("area", "eic_code", "reserve_type", "direction", "currency"),
+    items_field="prices",
+    item_fields=("period", "price"),
+)
