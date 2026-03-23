@@ -12,10 +12,11 @@ from balancing_services import AuthenticatedClient
 from balancing_services.api.default import (
     get_balancing_energy_bids,
     get_balancing_energy_offered_volumes,
+    get_cross_border_marginal_prices,
     get_cross_zonal_capacity_allocation,
     get_imbalance_prices,
 )
-from balancing_services.models import Area, ReserveType
+from balancing_services.models import Area, Direction, ReserveType
 
 
 @pytest.fixture
@@ -420,6 +421,110 @@ async def test_async_get_cross_zonal_capacity_allocation(authenticated_client, m
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
         reserve_type=ReserveType.AFRR
+    )
+
+    assert response.status_code == 200
+    assert response.parsed is not None
+    assert len(response.parsed.data) == 1
+
+
+@pytest.fixture
+def mock_cross_border_marginal_prices_response():
+    """Mock response data for cross-border marginal prices."""
+    return {
+        "queriedPeriod": {
+            "startAt": "2026-03-01T00:00:00Z",
+            "endAt": "2026-03-01T01:00:00Z"
+        },
+        "hasMore": True,
+        "nextCursor": "v1:AAAAAYwBAgMEBQYHCAkKCw==",
+        "data": [
+            {
+                "area": "AT",
+                "eicCode": "10YAT-APG------L",
+                "reserveType": "aFRR",
+                "direction": "up",
+                "currency": "EUR",
+                "prices": [
+                    {
+                        "period": {
+                            "startAt": "2026-03-01T00:00:00Z",
+                            "endAt": "2026-03-01T00:15:00Z"
+                        },
+                        "price": 45.50
+                    }
+                ]
+            }
+        ]
+    }
+
+
+@respx.mock
+def test_get_cross_border_marginal_prices_success(authenticated_client, mock_cross_border_marginal_prices_response):
+    """Test successful cross-border marginal prices request."""
+    respx.get(
+        "https://api.balancing.services/v1/balancing/energy/cross-border-marginal-prices"
+    ).mock(return_value=Response(200, json=mock_cross_border_marginal_prices_response))
+
+    response = get_cross_border_marginal_prices.sync_detailed(
+        client=authenticated_client,
+        area=Area.AT,
+        period_start_at=datetime(2026, 3, 1, 0, 0, 0, tzinfo=timezone.utc),
+        period_end_at=datetime(2026, 3, 1, 1, 0, 0, tzinfo=timezone.utc),
+        reserve_type=ReserveType.AFRR,
+    )
+
+    assert response.status_code == 200
+    assert response.parsed is not None
+    assert response.parsed.has_more is True
+    assert response.parsed.next_cursor == "v1:AAAAAYwBAgMEBQYHCAkKCw=="
+    assert len(response.parsed.data) == 1
+    assert response.parsed.data[0].area == Area.AT
+    assert response.parsed.data[0].direction == Direction.UP
+    assert response.parsed.data[0].prices[0].price == 45.50
+
+
+@respx.mock
+def test_get_cross_border_marginal_prices_unauthorized(authenticated_client):
+    """Test unauthorized response (401) for cross-border marginal prices."""
+    error_response = {
+        "type": "unauthorized",
+        "title": "Unauthorized",
+        "status": 401,
+        "detail": "Invalid or missing authentication token"
+    }
+
+    respx.get(
+        "https://api.balancing.services/v1/balancing/energy/cross-border-marginal-prices"
+    ).mock(return_value=Response(401, json=error_response))
+
+    response = get_cross_border_marginal_prices.sync_detailed(
+        client=authenticated_client,
+        area=Area.AT,
+        period_start_at=datetime(2026, 3, 1, 0, 0, 0, tzinfo=timezone.utc),
+        period_end_at=datetime(2026, 3, 1, 1, 0, 0, tzinfo=timezone.utc),
+        reserve_type=ReserveType.AFRR,
+    )
+
+    assert response.status_code == 401
+    assert response.parsed is not None
+    assert response.parsed.status == 401
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_async_get_cross_border_marginal_prices(authenticated_client, mock_cross_border_marginal_prices_response):
+    """Test async request for cross-border marginal prices."""
+    respx.get(
+        "https://api.balancing.services/v1/balancing/energy/cross-border-marginal-prices"
+    ).mock(return_value=Response(200, json=mock_cross_border_marginal_prices_response))
+
+    response = await get_cross_border_marginal_prices.asyncio_detailed(
+        client=authenticated_client,
+        area=Area.AT,
+        period_start_at=datetime(2026, 3, 1, 0, 0, 0, tzinfo=timezone.utc),
+        period_end_at=datetime(2026, 3, 1, 1, 0, 0, tzinfo=timezone.utc),
+        reserve_type=ReserveType.AFRR,
     )
 
     assert response.status_code == 200

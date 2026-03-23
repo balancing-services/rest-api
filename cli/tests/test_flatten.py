@@ -7,6 +7,7 @@ from stubs import (
     StubBidItem,
     StubCapacityBidItem,
     StubCapacityBidsGroup,
+    StubCBPMGroup,
     StubCrossZonalGroup,
     StubEnergyBidsGroup,
     StubEnergyPricesGroup,
@@ -24,6 +25,7 @@ from balancing_services_cli.flatten import (
     CAPACITY_CROSS_ZONAL,
     ENERGY_ACTIVATED,
     ENERGY_BIDS,
+    ENERGY_CBPM,
     ENERGY_PRICES,
     IMBALANCE_PRICES,
     IMBALANCE_VOLUMES,
@@ -156,6 +158,27 @@ def test_flatten_cross_zonal():
     assert rows[0]["from_area"] == "A"
     assert rows[0]["to_area"] == "B"
     assert rows[0]["volume"] == 200.0
+
+
+def test_flatten_energy_cbpm():
+    groups = [
+        StubCBPMGroup(
+            area=StubEnum.VALUE_A,
+            eic_code="10X",
+            reserve_type=StubEnum.VALUE_B,
+            direction=StubEnum.VALUE_A,
+            currency=StubEnum.VALUE_B,
+            prices=[StubPriceItem(period=PERIOD, price=42.0)],
+        )
+    ]
+    rows = flatten_response(groups, ENERGY_CBPM)
+    assert len(rows) == 1
+    assert rows[0]["area"] == "A"
+    assert rows[0]["reserve_type"] == "B"
+    assert rows[0]["direction"] == "A"
+    assert rows[0]["currency"] == "B"
+    assert rows[0]["price"] == 42.0
+    assert rows[0]["periodStartAt"] == "2025-01-01T00:00:00+00:00"
 
 
 def test_flatten_empty_data():

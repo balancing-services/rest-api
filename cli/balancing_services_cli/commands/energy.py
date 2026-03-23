@@ -11,6 +11,7 @@ from balancing_services.api.default import (
     get_balancing_energy_bids,
     get_balancing_energy_offered_volumes,
     get_balancing_energy_prices,
+    get_cross_border_marginal_prices,
 )
 from balancing_services.models import Area, ReserveType
 
@@ -18,6 +19,7 @@ from balancing_services_cli.client_factory import make_client
 from balancing_services_cli.flatten import (
     ENERGY_ACTIVATED,
     ENERGY_BIDS,
+    ENERGY_CBPM,
     ENERGY_OFFERED,
     ENERGY_PRICES,
     flatten_response,
@@ -191,5 +193,47 @@ def energy_bids(
         reserve_type=ReserveType(reserve_type),
     )
     rows = flatten_response(data, ENERGY_BIDS)
+    log.debug("Flattened to %d row(s)", len(rows))
+    write_rows(rows, ctx.obj["output"], ctx.obj["fmt"])
+
+
+@click.command("energy-cbpm")
+@click.option(
+    "--area",
+    required=True,
+    type=click.Choice(AREA_CHOICES, case_sensitive=False),
+    help="Area code.",
+)
+@click.option("--start", required=True, type=ISO8601, help="Period start (ISO 8601).")
+@click.option("--end", required=True, type=ISO8601, help="Period end (ISO 8601).")
+@click.option(
+    "--reserve-type",
+    required=True,
+    type=click.Choice(RESERVE_TYPE_CHOICES, case_sensitive=False),
+    help="Reserve type.",
+)
+@click.option("--all/--first-page", "fetch_all", default=None, help="Fetch all pages or only the first page.")
+@click.pass_context
+def energy_cbpm(
+    ctx: click.Context, area: str, start: datetime, end: datetime, reserve_type: str, fetch_all: bool | None,
+) -> None:
+    """Fetch cross-border marginal prices (CBPMs)."""
+    if fetch_all is None:
+        raise click.UsageError("You must specify either --all or --first-page.")
+    client = make_client(ctx)
+    log.debug(
+        "GET /balancing/energy/cross-border-marginal-prices area=%s start=%s end=%s reserve_type=%s",
+        area, start, end, reserve_type,
+    )
+    fetch = fetch_all_pages if fetch_all else fetch_first_page
+    data = fetch(
+        get_cross_border_marginal_prices.sync_detailed,
+        client=client,
+        area=Area(area),
+        period_start_at=start,
+        period_end_at=end,
+        reserve_type=ReserveType(reserve_type),
+    )
+    rows = flatten_response(data, ENERGY_CBPM)
     log.debug("Flattened to %d row(s)", len(rows))
     write_rows(rows, ctx.obj["output"], ctx.obj["fmt"])

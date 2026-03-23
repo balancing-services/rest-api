@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Balancing Services REST API
-  version: 1.7.1
+  version: 1.8.0
   description: REST API for balancing services data
   contact:
     name: Balancing Services Team
@@ -1224,6 +1224,145 @@ paths:
                 not-implemented:
                   $ref: '#/components/examples/problem-not-implemented'
 
+  /balancing/energy/cross-border-marginal-prices:
+    get:
+      summary: Get cross-border marginal prices
+      description: |
+        **Experimental** - This endpoint is under active development and may change without notice.
+
+        Returns cross-border purchased marginal prices (CBPMs) for the specified area and reserve type within the given time period.
+        Supports cursor-based pagination for large result sets.
+      operationId: getCrossBorderMarginalPrices
+      parameters:
+        - name: area
+          in: query
+          description: The area for which to retrieve data
+          required: true
+          schema:
+            $ref: '#/components/schemas/Area'
+          example: 'AT'
+        - name: period-start-at
+          in: query
+          description: Start of the time period (UTC)
+          required: true
+          schema:
+            type: string
+            format: date-time
+            example: '2026-03-01T00:00:00Z'
+        - name: period-end-at
+          in: query
+          description: End of the time period (UTC)
+          required: true
+          schema:
+            type: string
+            format: date-time
+            example: '2026-03-01T01:00:00Z'
+        - name: reserve-type
+          in: query
+          description: Filter by reserve type
+          required: true
+          schema:
+            $ref: '#/components/schemas/ReserveType'
+          example: 'aFRR'
+        - name: cursor
+          in: query
+          description: Pagination cursor from previous response. Omit to start from the beginning.
+          required: false
+          schema:
+            type: string
+            example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
+        - name: limit
+          in: query
+          description: Maximum number of results to return (default 1000, max 10000)
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 10000
+            default: 1000
+            example: 1000
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CrossBorderMarginalPricesResponse'
+        '400':
+          description: Bad request
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                invalid-parameter:
+                  $ref: '#/components/examples/problem-invalid-parameter'
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                unauthorized:
+                  $ref: '#/components/examples/problem-unauthorized'
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                forbidden:
+                  $ref: '#/components/examples/problem-forbidden'
+        '404':
+          description: Not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                not-found:
+                  $ref: '#/components/examples/problem-not-found'
+        '429':
+          description: Too many requests
+          headers:
+            Retry-After:
+              description: Number of seconds to wait before retrying
+              schema:
+                type: integer
+                example: 12
+            X-RateLimit-Limit:
+              description: Maximum number of requests allowed per minute
+              schema:
+                type: integer
+                example: 60
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                rate-limited:
+                  $ref: '#/components/examples/problem-rate-limited'
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                internal-error:
+                  $ref: '#/components/examples/problem-internal-error'
+        '501':
+          description: Not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                not-implemented:
+                  $ref: '#/components/examples/problem-not-implemented'
+
 components:
   securitySchemes:
     BearerAuth:
@@ -2075,3 +2214,64 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/BalancingCapacityVolume'
+
+    CrossBorderMarginalPricesResponse:
+      type: object
+      required:
+        - queriedPeriod
+        - data
+        - hasMore
+      properties:
+        queriedPeriod:
+          $ref: '#/components/schemas/Period'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/CrossBorderMarginalPrices'
+        nextCursor:
+          type: string
+          description: Cursor to fetch the next page of results. Null if no more results.
+          example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
+          nullable: true
+        hasMore:
+          type: boolean
+          description: Indicates whether there are more results available
+          example: true
+
+    CrossBorderMarginalPrices:
+      type: object
+      required:
+        - area
+        - eicCode
+        - reserveType
+        - direction
+        - currency
+        - prices
+      properties:
+        area:
+          $ref: '#/components/schemas/Area'
+        eicCode:
+          $ref: '#/components/schemas/EicCode'
+        reserveType:
+          $ref: '#/components/schemas/ReserveType'
+        direction:
+          $ref: '#/components/schemas/Direction'
+        currency:
+          $ref: '#/components/schemas/Currency'
+        prices:
+          type: array
+          items:
+            $ref: '#/components/schemas/CrossBorderMarginalPrice'
+
+    CrossBorderMarginalPrice:
+      type: object
+      required:
+        - period
+        - price
+      properties:
+        period:
+          $ref: '#/components/schemas/Period'
+        price:
+          type: number
+          description: Marginal price per MWh in the specified currency
+          example: 45.50

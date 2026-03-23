@@ -139,6 +139,16 @@ class StubCapacityVolumesGroup:
 
 
 @dataclass
+class StubCBPMGroup:
+    area: StubEnum
+    eic_code: str
+    reserve_type: StubEnum
+    direction: StubEnum
+    currency: StubEnum
+    prices: list[StubPriceItem]
+
+
+@dataclass
 class StubCrossZonalGroup:
     from_area: StubEnum
     from_eic_code: str
