@@ -161,3 +161,17 @@ class TestClientConfiguration:
         assert client.token == "test_token_12345"
         assert client.prefix == "Bearer"
         assert client.auth_header_name == "Authorization"
+
+    def test_client_requests_gzip_encoding(self):
+        """Test that client sends Accept-Encoding: gzip header."""
+        client = Client(base_url="https://api.balancing.services/v1")
+        httpx_client = client.get_httpx_client()
+        assert "gzip" in httpx_client.headers.get("accept-encoding", "")
+
+    def test_authenticated_client_requests_gzip_encoding(self):
+        """Test that authenticated client sends Accept-Encoding: gzip header."""
+        client = AuthenticatedClient(
+            base_url="https://api.balancing.services/v1", token="test_token"
+        )
+        httpx_client = client.get_httpx_client()
+        assert "gzip" in httpx_client.headers.get("accept-encoding", "")
