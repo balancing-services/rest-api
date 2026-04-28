@@ -26,6 +26,7 @@ from balancing_services_cli.flatten import (
     ENERGY_ACTIVATED,
     ENERGY_BIDS,
     ENERGY_CBPM,
+    ENERGY_CROSS_BORDER_VOLUMES,
     ENERGY_PRICES,
     IMBALANCE_PRICES,
     IMBALANCE_VOLUMES,
@@ -158,6 +159,26 @@ def test_flatten_cross_zonal():
     assert rows[0]["from_area"] == "A"
     assert rows[0]["to_area"] == "B"
     assert rows[0]["volume"] == 200.0
+
+
+def test_flatten_energy_cross_border_volumes():
+    groups = [
+        StubCrossZonalGroup(
+            from_area=StubEnum.VALUE_A,
+            from_eic_code="10X_FROM",
+            to_area=StubEnum.VALUE_B,
+            to_eic_code="10X_TO",
+            reserve_type=StubEnum.VALUE_A,
+            volumes=[StubVolumeItem(period=PERIOD, volume=250.5)],
+        )
+    ]
+    rows = flatten_response(groups, ENERGY_CROSS_BORDER_VOLUMES)
+    assert len(rows) == 1
+    assert rows[0]["from_area"] == "A"
+    assert rows[0]["to_area"] == "B"
+    assert rows[0]["reserve_type"] == "A"
+    assert rows[0]["volume"] == 250.5
+    assert rows[0]["periodStartAt"] == "2025-01-01T00:00:00+00:00"
 
 
 def test_flatten_energy_cbpm():

@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Experimental endpoint for cross-border balancing energy volumes (`/balancing/energy/cross-border-volumes`)
+
 ## [1.8.0] - 2026-03-23
 
 ### Added

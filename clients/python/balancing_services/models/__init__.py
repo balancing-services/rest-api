@@ -20,6 +20,8 @@ from .balancing_energy_volumes import BalancingEnergyVolumes
 from .balancing_energy_volumes_response import BalancingEnergyVolumesResponse
 from .bid_status import BidStatus
 from .capacity_bid import CapacityBid
+from .cross_border_energy_volumes import CrossBorderEnergyVolumes
+from .cross_border_energy_volumes_response import CrossBorderEnergyVolumesResponse
 from .cross_border_marginal_price import CrossBorderMarginalPrice
 from .cross_border_marginal_prices import CrossBorderMarginalPrices
 from .cross_border_marginal_prices_response import CrossBorderMarginalPricesResponse
@@ -65,6 +67,8 @@ __all__ = (
     "BalancingEnergyVolumesResponse",
     "BidStatus",
     "CapacityBid",
+    "CrossBorderEnergyVolumes",
+    "CrossBorderEnergyVolumesResponse",
     "CrossBorderMarginalPrice",
     "CrossBorderMarginalPrices",
     "CrossBorderMarginalPricesResponse",

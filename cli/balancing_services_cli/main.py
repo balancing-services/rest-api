@@ -18,6 +18,7 @@ from balancing_services_cli.commands.energy import (
     energy_activated,
     energy_bids,
     energy_cbpm,
+    energy_cross_border_volumes,
     energy_offered,
     energy_prices,
 )
@@ -80,6 +81,7 @@ cli.add_command(energy_offered)
 cli.add_command(energy_prices)
 cli.add_command(energy_bids)
 cli.add_command(energy_cbpm)
+cli.add_command(energy_cross_border_volumes)
 cli.add_command(capacity_bids)
 cli.add_command(capacity_prices)
 cli.add_command(capacity_procured)

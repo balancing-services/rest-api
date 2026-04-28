@@ -340,6 +340,7 @@ def test_all_subcommands_listed():
         "energy-prices",
         "energy-bids",
         "energy-cbpm",
+        "energy-cross-border-volumes",
         "capacity-bids",
         "capacity-prices",
         "capacity-procured",

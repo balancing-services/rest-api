@@ -18,7 +18,7 @@ class BalancingEnergyVolume:
     """
     Attributes:
         period (Period):
-        volume (float): Volume in MWh Example: 250.5.
+        volume (float): Average power in MW over the period Example: 250.5.
     """
 
     period: Period
