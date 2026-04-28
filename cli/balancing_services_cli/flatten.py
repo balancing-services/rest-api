@@ -123,3 +123,9 @@ ENERGY_CBPM = EndpointConfig(
     items_field="prices",
     item_fields=("period", "price"),
 )
+
+ENERGY_CROSS_BORDER_VOLUMES = EndpointConfig(
+    group_fields=("from_area", "from_eic_code", "to_area", "to_eic_code", "reserve_type"),
+    items_field="volumes",
+    item_fields=("period", "volume"),
+)

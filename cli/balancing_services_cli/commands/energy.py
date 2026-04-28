@@ -11,6 +11,7 @@ from balancing_services.api.default import (
     get_balancing_energy_bids,
     get_balancing_energy_offered_volumes,
     get_balancing_energy_prices,
+    get_cross_border_energy_volumes,
     get_cross_border_marginal_prices,
 )
 from balancing_services.models import Area, ReserveType
@@ -20,6 +21,7 @@ from balancing_services_cli.flatten import (
     ENERGY_ACTIVATED,
     ENERGY_BIDS,
     ENERGY_CBPM,
+    ENERGY_CROSS_BORDER_VOLUMES,
     ENERGY_OFFERED,
     ENERGY_PRICES,
     flatten_response,
@@ -235,5 +237,47 @@ def energy_cbpm(
         reserve_type=ReserveType(reserve_type),
     )
     rows = flatten_response(data, ENERGY_CBPM)
+    log.debug("Flattened to %d row(s)", len(rows))
+    write_rows(rows, ctx.obj["output"], ctx.obj["fmt"])
+
+
+@click.command("energy-cross-border-volumes")
+@click.option(
+    "--area",
+    required=True,
+    type=click.Choice(AREA_CHOICES, case_sensitive=False),
+    help="Area code (matches either from or to area).",
+)
+@click.option("--start", required=True, type=ISO8601, help="Period start (ISO 8601).")
+@click.option("--end", required=True, type=ISO8601, help="Period end (ISO 8601).")
+@click.option(
+    "--reserve-type",
+    required=True,
+    type=click.Choice(RESERVE_TYPE_CHOICES, case_sensitive=False),
+    help="Reserve type.",
+)
+@click.pass_context
+def energy_cross_border_volumes(
+    ctx: click.Context, area: str, start: datetime, end: datetime, reserve_type: str,
+) -> None:
+    """Fetch cross-border balancing energy volumes."""
+    client = make_client(ctx)
+    log.debug(
+        "GET /balancing/energy/cross-border-volumes area=%s start=%s end=%s reserve_type=%s",
+        area, start, end, reserve_type,
+    )
+    response = call_with_retry(
+        get_cross_border_energy_volumes.sync_detailed,
+        client=client,
+        area=Area(area),
+        period_start_at=start,
+        period_end_at=end,
+        reserve_type=ReserveType(reserve_type),
+    )
+    if response.status_code != 200:
+        raise SystemExit(format_api_error(response))
+    n_groups = len(response.parsed.data) if response.parsed else 0
+    log.debug("Response: HTTP %d, %d group(s)", response.status_code, n_groups)
+    rows = flatten_response(response.parsed.data, ENERGY_CROSS_BORDER_VOLUMES)
     log.debug("Flattened to %d row(s)", len(rows))
     write_rows(rows, ctx.obj["output"], ctx.obj["fmt"])

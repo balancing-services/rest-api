@@ -12,6 +12,7 @@ from balancing_services import AuthenticatedClient
 from balancing_services.api.default import (
     get_balancing_energy_bids,
     get_balancing_energy_offered_volumes,
+    get_cross_border_energy_volumes,
     get_cross_border_marginal_prices,
     get_cross_zonal_capacity_allocation,
     get_imbalance_prices,
@@ -522,6 +523,109 @@ async def test_async_get_cross_border_marginal_prices(authenticated_client, mock
     response = await get_cross_border_marginal_prices.asyncio_detailed(
         client=authenticated_client,
         area=Area.AT,
+        period_start_at=datetime(2026, 3, 1, 0, 0, 0, tzinfo=timezone.utc),
+        period_end_at=datetime(2026, 3, 1, 1, 0, 0, tzinfo=timezone.utc),
+        reserve_type=ReserveType.AFRR,
+    )
+
+    assert response.status_code == 200
+    assert response.parsed is not None
+    assert len(response.parsed.data) == 1
+
+
+@pytest.fixture
+def mock_cross_border_energy_volumes_response():
+    """Mock response data for cross-border balancing energy volumes."""
+    return {
+        "queriedPeriod": {
+            "startAt": "2026-03-01T00:00:00Z",
+            "endAt": "2026-03-01T01:00:00Z"
+        },
+        "hasMore": False,
+        "data": [
+            {
+                "fromArea": "EE",
+                "fromEicCode": "10Y1001A1001A39I",
+                "toArea": "FI",
+                "toEicCode": "10YFI-1--------U",
+                "reserveType": "aFRR",
+                "volumes": [
+                    {
+                        "period": {
+                            "startAt": "2026-03-01T00:00:00Z",
+                            "endAt": "2026-03-01T00:15:00Z"
+                        },
+                        "volume": 250.5
+                    }
+                ]
+            }
+        ]
+    }
+
+
+@respx.mock
+def test_get_cross_border_energy_volumes_success(authenticated_client, mock_cross_border_energy_volumes_response):
+    """Test successful cross-border balancing energy volumes request."""
+    respx.get(
+        "https://api.balancing.services/v1/balancing/energy/cross-border-volumes"
+    ).mock(return_value=Response(200, json=mock_cross_border_energy_volumes_response))
+
+    response = get_cross_border_energy_volumes.sync_detailed(
+        client=authenticated_client,
+        area=Area.FI,
+        period_start_at=datetime(2026, 3, 1, 0, 0, 0, tzinfo=timezone.utc),
+        period_end_at=datetime(2026, 3, 1, 1, 0, 0, tzinfo=timezone.utc),
+        reserve_type=ReserveType.AFRR,
+    )
+
+    assert response.status_code == 200
+    assert response.parsed is not None
+    assert response.parsed.has_more is False
+    assert len(response.parsed.data) == 1
+    assert response.parsed.data[0].from_area == Area.EE
+    assert response.parsed.data[0].to_area == Area.FI
+    assert response.parsed.data[0].reserve_type == ReserveType.AFRR
+    assert response.parsed.data[0].volumes[0].volume == 250.5
+
+
+@respx.mock
+def test_get_cross_border_energy_volumes_unauthorized(authenticated_client):
+    """Test unauthorized response (401) for cross-border balancing energy volumes."""
+    error_response = {
+        "type": "unauthorized",
+        "title": "Unauthorized",
+        "status": 401,
+        "detail": "Invalid or missing authentication token"
+    }
+
+    respx.get(
+        "https://api.balancing.services/v1/balancing/energy/cross-border-volumes"
+    ).mock(return_value=Response(401, json=error_response))
+
+    response = get_cross_border_energy_volumes.sync_detailed(
+        client=authenticated_client,
+        area=Area.FI,
+        period_start_at=datetime(2026, 3, 1, 0, 0, 0, tzinfo=timezone.utc),
+        period_end_at=datetime(2026, 3, 1, 1, 0, 0, tzinfo=timezone.utc),
+        reserve_type=ReserveType.AFRR,
+    )
+
+    assert response.status_code == 401
+    assert response.parsed is not None
+    assert response.parsed.status == 401
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_async_get_cross_border_energy_volumes(authenticated_client, mock_cross_border_energy_volumes_response):
+    """Test async request for cross-border balancing energy volumes."""
+    respx.get(
+        "https://api.balancing.services/v1/balancing/energy/cross-border-volumes"
+    ).mock(return_value=Response(200, json=mock_cross_border_energy_volumes_response))
+
+    response = await get_cross_border_energy_volumes.asyncio_detailed(
+        client=authenticated_client,
+        area=Area.FI,
         period_start_at=datetime(2026, 3, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2026, 3, 1, 1, 0, 0, tzinfo=timezone.utc),
         reserve_type=ReserveType.AFRR,
