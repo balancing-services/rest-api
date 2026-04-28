@@ -1607,7 +1607,7 @@ components:
           $ref: '#/components/schemas/Period'
         volume:
           type: number
-          description: Volume in MWh
+          description: Average power in MW over the period
           example: 250.5
 
     BalancingEnergyPricesResponse:
