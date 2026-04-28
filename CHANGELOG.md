@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.0] - 2026-04-28
+
 ### Added
 - Experimental endpoint for cross-border balancing energy volumes (`/balancing/energy/cross-border-volumes`)
 
@@ -106,7 +108,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - UTC timestamp-based period filtering
 - OpenAPI 3.0.3 specification
 
-[Unreleased]: https://github.com/balancing-services/rest-api/compare/v1.7.1...HEAD
+[Unreleased]: https://github.com/balancing-services/rest-api/compare/v1.9.0...HEAD
+[1.9.0]: https://github.com/balancing-services/rest-api/compare/v1.8.0...v1.9.0
 [1.7.1]: https://github.com/balancing-services/rest-api/compare/v1.7.0...v1.7.1
 [1.7.0]: https://github.com/balancing-services/rest-api/compare/v1.6.0...v1.7.0
 [1.6.0]: https://github.com/balancing-services/rest-api/compare/v1.5.1...v1.6.0
