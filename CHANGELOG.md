@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.10.0] - 2026-04-30
+
 ### Changed
 - Cross-border balancing energy volumes endpoint (`/balancing/energy/cross-border-volumes`) now splits results by activation type — for mFRR, `direct` and `scheduled` activations are returned as separate entries; non-mFRR reserve types use `not_applicable`
 
@@ -111,7 +113,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - UTC timestamp-based period filtering
 - OpenAPI 3.0.3 specification
 
-[Unreleased]: https://github.com/balancing-services/rest-api/compare/v1.9.0...HEAD
+[Unreleased]: https://github.com/balancing-services/rest-api/compare/v1.10.0...HEAD
+[1.10.0]: https://github.com/balancing-services/rest-api/compare/v1.9.0...v1.10.0
 [1.9.0]: https://github.com/balancing-services/rest-api/compare/v1.8.0...v1.9.0
 [1.7.1]: https://github.com/balancing-services/rest-api/compare/v1.7.0...v1.7.1
 [1.7.0]: https://github.com/balancing-services/rest-api/compare/v1.6.0...v1.7.0
