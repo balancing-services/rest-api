@@ -17,7 +17,7 @@ from balancing_services.api.default import (
     get_cross_zonal_capacity_allocation,
     get_imbalance_prices,
 )
-from balancing_services.models import Area, Direction, ReserveType
+from balancing_services.models import ActivationType, Area, Direction, ReserveType
 
 
 @pytest.fixture
@@ -549,6 +549,7 @@ def mock_cross_border_energy_volumes_response():
                 "toArea": "FI",
                 "toEicCode": "10YFI-1--------U",
                 "reserveType": "aFRR",
+                "activationType": "not_applicable",
                 "volumes": [
                     {
                         "period": {
@@ -585,6 +586,7 @@ def test_get_cross_border_energy_volumes_success(authenticated_client, mock_cros
     assert response.parsed.data[0].from_area == Area.EE
     assert response.parsed.data[0].to_area == Area.FI
     assert response.parsed.data[0].reserve_type == ReserveType.AFRR
+    assert response.parsed.data[0].activation_type == ActivationType.NOT_APPLICABLE
     assert response.parsed.data[0].volumes[0].volume == 250.5
 
 

@@ -158,6 +158,17 @@ class StubCrossZonalGroup:
     volumes: list[StubVolumeItem]
 
 
+@dataclass
+class StubCrossBorderVolumesGroup:
+    from_area: StubEnum
+    from_eic_code: str
+    to_area: StubEnum
+    to_eic_code: str
+    reserve_type: StubEnum
+    activation_type: StubEnum
+    volumes: list[StubVolumeItem]
+
+
 # ── Helpers ──────────────────────────────────────────────────────────────
 
 PERIOD = StubPeriod(

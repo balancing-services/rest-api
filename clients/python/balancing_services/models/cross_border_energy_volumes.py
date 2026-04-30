@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any, TypeVar
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
+from ..models.activation_type import ActivationType
 from ..models.area import Area
 from ..models.eic_code import EicCode
 from ..models.reserve_type import ReserveType
@@ -26,6 +27,7 @@ class CrossBorderEnergyVolumes:
         to_area (Area): Area code
         to_eic_code (EicCode): Energy Identification Code (EIC)
         reserve_type (ReserveType): Reserve type
+        activation_type (ActivationType): Activation type (only applicable for mFRR)
         volumes (list[BalancingEnergyVolume]):
     """
 
@@ -34,6 +36,7 @@ class CrossBorderEnergyVolumes:
     to_area: Area
     to_eic_code: EicCode
     reserve_type: ReserveType
+    activation_type: ActivationType
     volumes: list[BalancingEnergyVolume]
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
@@ -47,6 +50,8 @@ class CrossBorderEnergyVolumes:
         to_eic_code = self.to_eic_code.value
 
         reserve_type = self.reserve_type.value
+
+        activation_type = self.activation_type.value
 
         volumes = []
         for volumes_item_data in self.volumes:
@@ -62,6 +67,7 @@ class CrossBorderEnergyVolumes:
                 "toArea": to_area,
                 "toEicCode": to_eic_code,
                 "reserveType": reserve_type,
+                "activationType": activation_type,
                 "volumes": volumes,
             }
         )
@@ -83,6 +89,8 @@ class CrossBorderEnergyVolumes:
 
         reserve_type = ReserveType(d.pop("reserveType"))
 
+        activation_type = ActivationType(d.pop("activationType"))
+
         volumes = []
         _volumes = d.pop("volumes")
         for volumes_item_data in _volumes:
@@ -96,6 +104,7 @@ class CrossBorderEnergyVolumes:
             to_area=to_area,
             to_eic_code=to_eic_code,
             reserve_type=reserve_type,
+            activation_type=activation_type,
             volumes=volumes,
         )
 
