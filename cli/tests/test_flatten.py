@@ -8,6 +8,7 @@ from stubs import (
     StubCapacityBidItem,
     StubCapacityBidsGroup,
     StubCBPMGroup,
+    StubCrossBorderVolumesGroup,
     StubCrossZonalGroup,
     StubEnergyBidsGroup,
     StubEnergyPricesGroup,
@@ -163,12 +164,13 @@ def test_flatten_cross_zonal():
 
 def test_flatten_energy_cross_border_volumes():
     groups = [
-        StubCrossZonalGroup(
+        StubCrossBorderVolumesGroup(
             from_area=StubEnum.VALUE_A,
             from_eic_code="10X_FROM",
             to_area=StubEnum.VALUE_B,
             to_eic_code="10X_TO",
             reserve_type=StubEnum.VALUE_A,
+            activation_type=StubEnum.VALUE_B,
             volumes=[StubVolumeItem(period=PERIOD, volume=250.5)],
         )
     ]
@@ -177,6 +179,7 @@ def test_flatten_energy_cross_border_volumes():
     assert rows[0]["from_area"] == "A"
     assert rows[0]["to_area"] == "B"
     assert rows[0]["reserve_type"] == "A"
+    assert rows[0]["activation_type"] == "B"
     assert rows[0]["volume"] == 250.5
     assert rows[0]["periodStartAt"] == "2025-01-01T00:00:00+00:00"
 

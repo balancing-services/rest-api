@@ -1369,7 +1369,7 @@ paths:
       description: |
         **EXPERIMENTAL**: Returns cross-border balancing energy volumes for the specified area and reserve type within the given time period.
         Returns both imports (where area is the destination) and exports (where area is the source). Volumes are expressed as average power in MW
-        and aggregated across activation types.
+        and split by activation type — for mFRR, DIRECT and SCHEDULED activations are returned as separate entries.
 
         This endpoint is experimental and may be changed or removed without a deprecation period.
       operationId: getCrossBorderEnergyVolumes
@@ -2431,6 +2431,7 @@ components:
         - toArea
         - toEicCode
         - reserveType
+        - activationType
         - volumes
       properties:
         fromArea:
@@ -2443,6 +2444,8 @@ components:
           $ref: '#/components/schemas/EicCode'
         reserveType:
           $ref: '#/components/schemas/ReserveType'
+        activationType:
+          $ref: '#/components/schemas/ActivationType'
         volumes:
           type: array
           items:

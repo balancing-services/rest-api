@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Cross-border balancing energy volumes endpoint (`/balancing/energy/cross-border-volumes`) now splits results by activation type — for mFRR, `direct` and `scheduled` activations are returned as separate entries; non-mFRR reserve types use `not_applicable`
+
 ## [1.9.0] - 2026-04-28
 
 ### Added
