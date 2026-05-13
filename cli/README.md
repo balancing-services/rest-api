@@ -59,6 +59,9 @@ bs-cli capacity-bids --area EE --start 2025-01-01T00:00:00Z --end 2025-01-02T00:
 | `energy-offered` | Balancing energy offered volumes |
 | `energy-prices` | Balancing energy prices |
 | `energy-bids` | Balancing energy bids (auto-paginates) |
+| `energy-cbpm` | Cross-border purchased marginal prices (auto-paginates) |
+| `energy-cross-border-volumes` | Cross-border balancing energy volumes |
+| `energy-day-ahead-prices` | Day-ahead wholesale energy prices (EXPERIMENTAL, auto-paginates) |
 | `capacity-bids` | Balancing capacity bids (auto-paginates) |
 | `capacity-prices` | Balancing capacity prices |
 | `capacity-procured` | Balancing capacity procured volumes |

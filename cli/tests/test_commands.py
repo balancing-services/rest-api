@@ -248,6 +248,8 @@ def test_naive_datetime_assumed_utc():
 BID_COMMANDS = ["energy-bids", "energy-cbpm", "capacity-bids"]
 COMMON_BID_ARGS = ["--area", "EE", "--start", "2025-01-01", "--end", "2025-01-02", "--reserve-type", "aFRR"]
 
+DAY_AHEAD_ARGS = ["--area", "FI", "--start", "2025-01-01", "--end", "2025-01-02"]
+
 
 @dataclass
 class StubBidsParsed:
@@ -267,6 +269,14 @@ def test_bids_commands_require_all_or_first_page():
         result = runner.invoke(cli, ["--token", "test-token", cmd, *COMMON_BID_ARGS])
         assert result.exit_code != 0, f"{cmd} should fail without --all/--first-page"
         assert "--all" in result.output or "--first-page" in result.output
+
+
+def test_energy_day_ahead_prices_requires_all_or_first_page():
+    """energy-day-ahead-prices must fail without --all or --first-page."""
+    runner = CliRunner()
+    result = runner.invoke(cli, ["--token", "test-token", "energy-day-ahead-prices", *DAY_AHEAD_ARGS])
+    assert result.exit_code != 0
+    assert "--all" in result.output or "--first-page" in result.output
 
 
 def test_energy_bids_all_flag():
@@ -329,6 +339,98 @@ def test_energy_cbpm_first_page_flag():
     assert result.exit_code == 0, result.output
 
 
+# ── Day-ahead energy prices tests ────────────────────────────────────────
+
+
+@dataclass
+class StubDayAheadPricesGroup:
+    area: Any
+    eic_code: str
+    currency: Any
+    prices: list[StubPriceItem]
+
+
+@dataclass
+class StubParsedDayAheadPrices:
+    data: list[StubDayAheadPricesGroup]
+    has_more: bool = False
+    next_cursor: str | None = None
+
+
+def _make_day_ahead_prices_response():
+    return StubResponse(
+        status_code=200,
+        parsed=StubParsedDayAheadPrices(
+            data=[
+                StubDayAheadPricesGroup(
+                    area=StubArea("EE"),
+                    eic_code="10YFI-1--------U",
+                    currency=StubCurrency("EUR"),
+                    prices=[StubPriceItem(period=PERIOD, price=45.67)],
+                ),
+            ],
+        ),
+    )
+
+
+def test_energy_day_ahead_prices_help():
+    runner = CliRunner()
+    result = runner.invoke(cli, ["energy-day-ahead-prices", "--help"])
+    assert result.exit_code == 0
+    assert "--area" in result.output
+    assert "--start" in result.output
+    assert "--end" in result.output
+    assert "--all" in result.output or "--first-page" in result.output
+
+
+def test_energy_day_ahead_prices_first_page_flag():
+    runner = CliRunner()
+    with patch(
+        "balancing_services_cli.commands.energy.get_day_ahead_energy_prices.sync_detailed",
+        return_value=_make_day_ahead_prices_response(),
+    ):
+        result = runner.invoke(
+            cli, ["--token", "test-token", "energy-day-ahead-prices", "--first-page", *DAY_AHEAD_ARGS],
+        )
+    assert result.exit_code == 0, result.output
+    assert "area" in result.output
+    assert "EE" in result.output
+    assert "EUR" in result.output
+    assert "45.67" in result.output
+
+
+def test_energy_day_ahead_prices_all_flag():
+    runner = CliRunner()
+    with patch(
+        "balancing_services_cli.commands.energy.get_day_ahead_energy_prices.sync_detailed",
+        return_value=_make_day_ahead_prices_response(),
+    ):
+        result = runner.invoke(
+            cli, ["--token", "test-token", "energy-day-ahead-prices", "--all", *DAY_AHEAD_ARGS],
+        )
+    assert result.exit_code == 0, result.output
+
+
+def test_energy_day_ahead_prices_api_error():
+    runner = CliRunner()
+    problem = Problem(
+        type_=ProblemType.NOT_IMPLEMENTED,
+        title="Not Implemented",
+        status=501,
+        detail="Day-ahead prices are not available for this bidding zone.",
+    )
+    with patch(
+        "balancing_services_cli.commands.energy.get_day_ahead_energy_prices.sync_detailed",
+        return_value=StubResponse(status_code=501, parsed=problem),
+    ):
+        result = runner.invoke(
+            cli, ["--token", "test-token", "energy-day-ahead-prices", "--first-page", *DAY_AHEAD_ARGS],
+        )
+    assert result.exit_code != 0
+    assert "Not Implemented" in result.output
+    assert "bidding zone" in result.output
+
+
 def test_all_subcommands_listed():
     runner = CliRunner()
     result = runner.invoke(cli, ["--help"])
@@ -341,6 +443,7 @@ def test_all_subcommands_listed():
         "energy-bids",
         "energy-cbpm",
         "energy-cross-border-volumes",
+        "energy-day-ahead-prices",
         "capacity-bids",
         "capacity-prices",
         "capacity-procured",

@@ -129,3 +129,9 @@ ENERGY_CROSS_BORDER_VOLUMES = EndpointConfig(
     items_field="volumes",
     item_fields=("period", "volume"),
 )
+
+ENERGY_DAY_AHEAD_PRICES = EndpointConfig(
+    group_fields=("area", "eic_code", "currency"),
+    items_field="prices",
+    item_fields=("period", "price"),
+)

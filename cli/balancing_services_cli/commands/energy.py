@@ -13,6 +13,7 @@ from balancing_services.api.default import (
     get_balancing_energy_prices,
     get_cross_border_energy_volumes,
     get_cross_border_marginal_prices,
+    get_day_ahead_energy_prices,
 )
 from balancing_services.models import Area, ReserveType
 
@@ -22,6 +23,7 @@ from balancing_services_cli.flatten import (
     ENERGY_BIDS,
     ENERGY_CBPM,
     ENERGY_CROSS_BORDER_VOLUMES,
+    ENERGY_DAY_AHEAD_PRICES,
     ENERGY_OFFERED,
     ENERGY_PRICES,
     flatten_response,
@@ -279,5 +281,44 @@ def energy_cross_border_volumes(
     n_groups = len(response.parsed.data) if response.parsed else 0
     log.debug("Response: HTTP %d, %d group(s)", response.status_code, n_groups)
     rows = flatten_response(response.parsed.data, ENERGY_CROSS_BORDER_VOLUMES)
+    log.debug("Flattened to %d row(s)", len(rows))
+    write_rows(rows, ctx.obj["output"], ctx.obj["fmt"])
+
+
+@click.command("energy-day-ahead-prices")
+@click.option(
+    "--area",
+    required=True,
+    type=click.Choice(AREA_CHOICES, case_sensitive=False),
+    help="Bidding zone code.",
+)
+@click.option("--start", required=True, type=ISO8601, help="Period start (ISO 8601).")
+@click.option("--end", required=True, type=ISO8601, help="Period end (ISO 8601).")
+@click.option("--all/--first-page", "fetch_all", default=None, help="Fetch all pages or only the first page.")
+@click.pass_context
+def energy_day_ahead_prices(
+    ctx: click.Context, area: str, start: datetime, end: datetime, fetch_all: bool | None,
+) -> None:
+    """Fetch day-ahead energy prices (EXPERIMENTAL).
+
+    Coverage is limited to bidding zones whose day-ahead prices are published
+    under CC BY 4.0 or an equivalently permissive license.
+    """
+    if fetch_all is None:
+        raise click.UsageError("You must specify either --all or --first-page.")
+    client = make_client(ctx)
+    log.debug(
+        "GET /energy/day-ahead/prices area=%s start=%s end=%s",
+        area, start, end,
+    )
+    fetch = fetch_all_pages if fetch_all else fetch_first_page
+    data = fetch(
+        get_day_ahead_energy_prices.sync_detailed,
+        client=client,
+        area=Area(area),
+        period_start_at=start,
+        period_end_at=end,
+    )
+    rows = flatten_response(data, ENERGY_DAY_AHEAD_PRICES)
     log.debug("Flattened to %d row(s)", len(rows))
     write_rows(rows, ctx.obj["output"], ctx.obj["fmt"])

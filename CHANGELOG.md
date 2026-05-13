@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Experimental endpoint for day-ahead energy prices (`/energy/day-ahead/prices`)
+
 ## [1.10.0] - 2026-04-30
 
 ### Changed
