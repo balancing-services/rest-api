@@ -30,6 +30,9 @@ from .cross_zonal_capacity_allocation_response import (
 )
 from .cross_zonal_volumes import CrossZonalVolumes
 from .currency import Currency
+from .day_ahead_energy_price import DayAheadEnergyPrice
+from .day_ahead_energy_prices import DayAheadEnergyPrices
+from .day_ahead_energy_prices_response import DayAheadEnergyPricesResponse
 from .direction import Direction
 from .eic_code import EicCode
 from .energy_bid import EnergyBid
@@ -75,6 +78,9 @@ __all__ = (
     "CrossZonalCapacityAllocationResponse",
     "CrossZonalVolumes",
     "Currency",
+    "DayAheadEnergyPrice",
+    "DayAheadEnergyPrices",
+    "DayAheadEnergyPricesResponse",
     "Direction",
     "EicCode",
     "EnergyBid",

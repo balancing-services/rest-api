@@ -7,12 +7,9 @@ import httpx
 from ... import errors
 from ...client import AuthenticatedClient, Client
 from ...models.area import Area
-from ...models.cross_border_energy_volumes_response import (
-    CrossBorderEnergyVolumesResponse,
-)
+from ...models.day_ahead_energy_prices_response import DayAheadEnergyPricesResponse
 from ...models.problem import Problem
-from ...models.reserve_type import ReserveType
-from ...types import UNSET, Response
+from ...types import UNSET, Response, Unset
 
 
 def _get_kwargs(
@@ -20,7 +17,8 @@ def _get_kwargs(
     area: Area,
     period_start_at: datetime.datetime,
     period_end_at: datetime.datetime,
-    reserve_type: ReserveType,
+    cursor: str | Unset = UNSET,
+    limit: int | Unset = 100,
 ) -> dict[str, Any]:
 
     params: dict[str, Any] = {}
@@ -34,14 +32,15 @@ def _get_kwargs(
     json_period_end_at = period_end_at.isoformat()
     params["period-end-at"] = json_period_end_at
 
-    json_reserve_type = reserve_type.value
-    params["reserve-type"] = json_reserve_type
+    params["cursor"] = cursor
+
+    params["limit"] = limit
 
     params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
     _kwargs: dict[str, Any] = {
         "method": "get",
-        "url": "/balancing/energy/cross-border-volumes",
+        "url": "/energy/day-ahead/prices",
         "params": params,
     }
 
@@ -50,9 +49,9 @@ def _get_kwargs(
 
 def _parse_response(
     *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> CrossBorderEnergyVolumesResponse | Problem | None:
+) -> DayAheadEnergyPricesResponse | Problem | None:
     if response.status_code == 200:
-        response_200 = CrossBorderEnergyVolumesResponse.from_dict(response.json())
+        response_200 = DayAheadEnergyPricesResponse.from_dict(response.json())
 
         return response_200
 
@@ -99,7 +98,7 @@ def _parse_response(
 
 def _build_response(
     *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> Response[CrossBorderEnergyVolumesResponse | Problem]:
+) -> Response[DayAheadEnergyPricesResponse | Problem]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -114,16 +113,18 @@ def sync_detailed(
     area: Area,
     period_start_at: datetime.datetime,
     period_end_at: datetime.datetime,
-    reserve_type: ReserveType,
-) -> Response[CrossBorderEnergyVolumesResponse | Problem]:
-    """Get cross-border balancing energy volumes
+    cursor: str | Unset = UNSET,
+    limit: int | Unset = 100,
+) -> Response[DayAheadEnergyPricesResponse | Problem]:
+    """Get day-ahead energy prices
 
-     **EXPERIMENTAL**: Returns cross-border balancing energy volumes for the specified area and reserve
-    type within the given time period.
-    Returns both imports (where area is the destination) and exports (where area is the source). Volumes
-    are expressed as average power in MW
-    and split by activation type — for mFRR, DIRECT and SCHEDULED activations are returned as separate
-    entries.
+     **EXPERIMENTAL**: Returns day-ahead wholesale electricity prices for the specified bidding zone
+    within the given time period. Prices are returned in the bidding zone's native currency per MWh,
+    as published by the relevant power exchange. Supports cursor-based pagination for large result
+    sets.
+
+    Coverage is limited to bidding zones whose day-ahead prices are published under CC BY 4.0
+    or an equivalently permissive license that allows redistribution.
 
     This endpoint is experimental and may be changed or removed without a deprecation period.
 
@@ -131,21 +132,23 @@ def sync_detailed(
         area (Area): Area code
         period_start_at (datetime.datetime):  Example: 2025-01-01T00:00:00Z.
         period_end_at (datetime.datetime):  Example: 2025-01-02T00:00:00Z.
-        reserve_type (ReserveType): Reserve type
+        cursor (str | Unset):  Example: v1:AAAAAYwBAgMEBQYHCAkKCw==.
+        limit (int | Unset):  Default: 100. Example: 100.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[CrossBorderEnergyVolumesResponse | Problem]
+        Response[DayAheadEnergyPricesResponse | Problem]
     """
 
     kwargs = _get_kwargs(
         area=area,
         period_start_at=period_start_at,
         period_end_at=period_end_at,
-        reserve_type=reserve_type,
+        cursor=cursor,
+        limit=limit,
     )
 
     response = client.get_httpx_client().request(
@@ -161,16 +164,18 @@ def sync(
     area: Area,
     period_start_at: datetime.datetime,
     period_end_at: datetime.datetime,
-    reserve_type: ReserveType,
-) -> CrossBorderEnergyVolumesResponse | Problem | None:
-    """Get cross-border balancing energy volumes
+    cursor: str | Unset = UNSET,
+    limit: int | Unset = 100,
+) -> DayAheadEnergyPricesResponse | Problem | None:
+    """Get day-ahead energy prices
 
-     **EXPERIMENTAL**: Returns cross-border balancing energy volumes for the specified area and reserve
-    type within the given time period.
-    Returns both imports (where area is the destination) and exports (where area is the source). Volumes
-    are expressed as average power in MW
-    and split by activation type — for mFRR, DIRECT and SCHEDULED activations are returned as separate
-    entries.
+     **EXPERIMENTAL**: Returns day-ahead wholesale electricity prices for the specified bidding zone
+    within the given time period. Prices are returned in the bidding zone's native currency per MWh,
+    as published by the relevant power exchange. Supports cursor-based pagination for large result
+    sets.
+
+    Coverage is limited to bidding zones whose day-ahead prices are published under CC BY 4.0
+    or an equivalently permissive license that allows redistribution.
 
     This endpoint is experimental and may be changed or removed without a deprecation period.
 
@@ -178,14 +183,15 @@ def sync(
         area (Area): Area code
         period_start_at (datetime.datetime):  Example: 2025-01-01T00:00:00Z.
         period_end_at (datetime.datetime):  Example: 2025-01-02T00:00:00Z.
-        reserve_type (ReserveType): Reserve type
+        cursor (str | Unset):  Example: v1:AAAAAYwBAgMEBQYHCAkKCw==.
+        limit (int | Unset):  Default: 100. Example: 100.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        CrossBorderEnergyVolumesResponse | Problem
+        DayAheadEnergyPricesResponse | Problem
     """
 
     return sync_detailed(
@@ -193,7 +199,8 @@ def sync(
         area=area,
         period_start_at=period_start_at,
         period_end_at=period_end_at,
-        reserve_type=reserve_type,
+        cursor=cursor,
+        limit=limit,
     ).parsed
 
 
@@ -203,16 +210,18 @@ async def asyncio_detailed(
     area: Area,
     period_start_at: datetime.datetime,
     period_end_at: datetime.datetime,
-    reserve_type: ReserveType,
-) -> Response[CrossBorderEnergyVolumesResponse | Problem]:
-    """Get cross-border balancing energy volumes
+    cursor: str | Unset = UNSET,
+    limit: int | Unset = 100,
+) -> Response[DayAheadEnergyPricesResponse | Problem]:
+    """Get day-ahead energy prices
 
-     **EXPERIMENTAL**: Returns cross-border balancing energy volumes for the specified area and reserve
-    type within the given time period.
-    Returns both imports (where area is the destination) and exports (where area is the source). Volumes
-    are expressed as average power in MW
-    and split by activation type — for mFRR, DIRECT and SCHEDULED activations are returned as separate
-    entries.
+     **EXPERIMENTAL**: Returns day-ahead wholesale electricity prices for the specified bidding zone
+    within the given time period. Prices are returned in the bidding zone's native currency per MWh,
+    as published by the relevant power exchange. Supports cursor-based pagination for large result
+    sets.
+
+    Coverage is limited to bidding zones whose day-ahead prices are published under CC BY 4.0
+    or an equivalently permissive license that allows redistribution.
 
     This endpoint is experimental and may be changed or removed without a deprecation period.
 
@@ -220,21 +229,23 @@ async def asyncio_detailed(
         area (Area): Area code
         period_start_at (datetime.datetime):  Example: 2025-01-01T00:00:00Z.
         period_end_at (datetime.datetime):  Example: 2025-01-02T00:00:00Z.
-        reserve_type (ReserveType): Reserve type
+        cursor (str | Unset):  Example: v1:AAAAAYwBAgMEBQYHCAkKCw==.
+        limit (int | Unset):  Default: 100. Example: 100.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[CrossBorderEnergyVolumesResponse | Problem]
+        Response[DayAheadEnergyPricesResponse | Problem]
     """
 
     kwargs = _get_kwargs(
         area=area,
         period_start_at=period_start_at,
         period_end_at=period_end_at,
-        reserve_type=reserve_type,
+        cursor=cursor,
+        limit=limit,
     )
 
     response = await client.get_async_httpx_client().request(**kwargs)
@@ -248,16 +259,18 @@ async def asyncio(
     area: Area,
     period_start_at: datetime.datetime,
     period_end_at: datetime.datetime,
-    reserve_type: ReserveType,
-) -> CrossBorderEnergyVolumesResponse | Problem | None:
-    """Get cross-border balancing energy volumes
+    cursor: str | Unset = UNSET,
+    limit: int | Unset = 100,
+) -> DayAheadEnergyPricesResponse | Problem | None:
+    """Get day-ahead energy prices
 
-     **EXPERIMENTAL**: Returns cross-border balancing energy volumes for the specified area and reserve
-    type within the given time period.
-    Returns both imports (where area is the destination) and exports (where area is the source). Volumes
-    are expressed as average power in MW
-    and split by activation type — for mFRR, DIRECT and SCHEDULED activations are returned as separate
-    entries.
+     **EXPERIMENTAL**: Returns day-ahead wholesale electricity prices for the specified bidding zone
+    within the given time period. Prices are returned in the bidding zone's native currency per MWh,
+    as published by the relevant power exchange. Supports cursor-based pagination for large result
+    sets.
+
+    Coverage is limited to bidding zones whose day-ahead prices are published under CC BY 4.0
+    or an equivalently permissive license that allows redistribution.
 
     This endpoint is experimental and may be changed or removed without a deprecation period.
 
@@ -265,14 +278,15 @@ async def asyncio(
         area (Area): Area code
         period_start_at (datetime.datetime):  Example: 2025-01-01T00:00:00Z.
         period_end_at (datetime.datetime):  Example: 2025-01-02T00:00:00Z.
-        reserve_type (ReserveType): Reserve type
+        cursor (str | Unset):  Example: v1:AAAAAYwBAgMEBQYHCAkKCw==.
+        limit (int | Unset):  Default: 100. Example: 100.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        CrossBorderEnergyVolumesResponse | Problem
+        DayAheadEnergyPricesResponse | Problem
     """
 
     return (
@@ -281,6 +295,7 @@ async def asyncio(
             area=area,
             period_start_at=period_start_at,
             period_end_at=period_end_at,
-            reserve_type=reserve_type,
+            cursor=cursor,
+            limit=limit,
         )
     ).parsed

@@ -15,6 +15,7 @@ from balancing_services.api.default import (
     get_balancing_energy_prices,
     get_cross_border_energy_volumes,
     get_cross_border_marginal_prices,
+    get_day_ahead_energy_prices,
     get_imbalance_prices,
     get_imbalance_total_volumes,
 )
@@ -86,6 +87,13 @@ class TestAPIEndpointsExist:
         assert hasattr(get_balancing_capacity_prices, "asyncio_detailed")
         assert hasattr(get_balancing_capacity_procured_volumes, "sync_detailed")
         assert hasattr(get_balancing_capacity_procured_volumes, "asyncio_detailed")
+
+    def test_day_ahead_energy_endpoints_exist(self):
+        """Test that day-ahead energy endpoints are available."""
+        assert hasattr(get_day_ahead_energy_prices, "sync_detailed")
+        assert hasattr(get_day_ahead_energy_prices, "asyncio_detailed")
+        assert hasattr(get_day_ahead_energy_prices, "sync")
+        assert hasattr(get_day_ahead_energy_prices, "asyncio")
 
 
 class TestEnums:

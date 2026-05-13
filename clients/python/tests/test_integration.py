@@ -15,9 +15,10 @@ from balancing_services.api.default import (
     get_cross_border_energy_volumes,
     get_cross_border_marginal_prices,
     get_cross_zonal_capacity_allocation,
+    get_day_ahead_energy_prices,
     get_imbalance_prices,
 )
-from balancing_services.models import ActivationType, Area, Direction, ReserveType
+from balancing_services.models import ActivationType, Area, Currency, Direction, ReserveType
 
 
 @pytest.fixture
@@ -636,3 +637,182 @@ async def test_async_get_cross_border_energy_volumes(authenticated_client, mock_
     assert response.status_code == 200
     assert response.parsed is not None
     assert len(response.parsed.data) == 1
+
+
+@pytest.fixture
+def mock_day_ahead_energy_prices_response():
+    """Mock response data for day-ahead energy prices."""
+    return {
+        "queriedPeriod": {
+            "startAt": "2025-01-01T00:00:00Z",
+            "endAt": "2025-01-02T00:00:00Z"
+        },
+        "hasMore": False,
+        "data": [
+            {
+                "area": "FI",
+                "eicCode": "10YFI-1--------U",
+                "currency": "EUR",
+                "prices": [
+                    {
+                        "period": {
+                            "startAt": "2025-01-01T00:00:00Z",
+                            "endAt": "2025-01-01T01:00:00Z"
+                        },
+                        "price": 45.67
+                    },
+                    {
+                        "period": {
+                            "startAt": "2025-01-01T01:00:00Z",
+                            "endAt": "2025-01-01T02:00:00Z"
+                        },
+                        "price": 38.21
+                    }
+                ]
+            }
+        ]
+    }
+
+
+@respx.mock
+def test_get_day_ahead_energy_prices_success(authenticated_client, mock_day_ahead_energy_prices_response):
+    """Test successful day-ahead energy prices request."""
+    respx.get(
+        "https://api.balancing.services/v1/energy/day-ahead/prices"
+    ).mock(return_value=Response(200, json=mock_day_ahead_energy_prices_response))
+
+    response = get_day_ahead_energy_prices.sync_detailed(
+        client=authenticated_client,
+        area=Area.FI,
+        period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
+        period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
+    )
+
+    assert response.status_code == 200
+    assert response.parsed is not None
+    assert response.parsed.has_more is False
+    assert len(response.parsed.data) == 1
+    assert response.parsed.data[0].area == Area.FI
+    assert response.parsed.data[0].currency == Currency.EUR
+    assert len(response.parsed.data[0].prices) == 2
+    assert response.parsed.data[0].prices[0].price == 45.67
+    assert response.parsed.data[0].prices[1].price == 38.21
+
+
+@respx.mock
+def test_get_day_ahead_energy_prices_pagination(authenticated_client):
+    """Test day-ahead energy prices pagination - response with nextCursor."""
+    paginated_response = {
+        "queriedPeriod": {
+            "startAt": "2025-01-01T00:00:00Z",
+            "endAt": "2025-01-08T00:00:00Z"
+        },
+        "hasMore": True,
+        "nextCursor": "v1:AAAAAYwBAgMEBQYHCAkKCw==",
+        "data": [
+            {
+                "area": "FI",
+                "eicCode": "10YFI-1--------U",
+                "currency": "EUR",
+                "prices": [
+                    {
+                        "period": {
+                            "startAt": "2025-01-01T00:00:00Z",
+                            "endAt": "2025-01-01T01:00:00Z"
+                        },
+                        "price": 45.67
+                    }
+                ]
+            }
+        ]
+    }
+
+    respx.get(
+        "https://api.balancing.services/v1/energy/day-ahead/prices"
+    ).mock(return_value=Response(200, json=paginated_response))
+
+    response = get_day_ahead_energy_prices.sync_detailed(
+        client=authenticated_client,
+        area=Area.FI,
+        period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
+        period_end_at=datetime(2025, 1, 8, 0, 0, 0, tzinfo=timezone.utc),
+        limit=100,
+    )
+
+    assert response.status_code == 200
+    assert response.parsed is not None
+    assert response.parsed.has_more is True
+    assert response.parsed.next_cursor == "v1:AAAAAYwBAgMEBQYHCAkKCw=="
+
+
+@respx.mock
+def test_get_day_ahead_energy_prices_unauthorized(authenticated_client):
+    """Test unauthorized response (401) for day-ahead energy prices."""
+    error_response = {
+        "type": "unauthorized",
+        "title": "Unauthorized",
+        "status": 401,
+        "detail": "Invalid or missing authentication token"
+    }
+
+    respx.get(
+        "https://api.balancing.services/v1/energy/day-ahead/prices"
+    ).mock(return_value=Response(401, json=error_response))
+
+    response = get_day_ahead_energy_prices.sync_detailed(
+        client=authenticated_client,
+        area=Area.FI,
+        period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
+        period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
+    )
+
+    assert response.status_code == 401
+    assert response.parsed is not None
+    assert response.parsed.status == 401
+
+
+@respx.mock
+def test_get_day_ahead_energy_prices_not_implemented(authenticated_client):
+    """Test not implemented response (501) when area has no CC-4 licensed data."""
+    error_response = {
+        "type": "not-implemented",
+        "title": "Not Implemented",
+        "status": 501,
+        "detail": "Day-ahead prices are not available for this bidding zone"
+    }
+
+    respx.get(
+        "https://api.balancing.services/v1/energy/day-ahead/prices"
+    ).mock(return_value=Response(501, json=error_response))
+
+    response = get_day_ahead_energy_prices.sync_detailed(
+        client=authenticated_client,
+        area=Area.EE,
+        period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
+        period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
+    )
+
+    assert response.status_code == 501
+    assert response.parsed is not None
+    assert response.parsed.status == 501
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_async_get_day_ahead_energy_prices(authenticated_client, mock_day_ahead_energy_prices_response):
+    """Test async request for day-ahead energy prices."""
+    respx.get(
+        "https://api.balancing.services/v1/energy/day-ahead/prices"
+    ).mock(return_value=Response(200, json=mock_day_ahead_energy_prices_response))
+
+    response = await get_day_ahead_energy_prices.asyncio_detailed(
+        client=authenticated_client,
+        area=Area.FI,
+        period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
+        period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
+    )
+
+    assert response.status_code == 200
+    assert response.parsed is not None
+    assert len(response.parsed.data) == 1
+    assert response.parsed.data[0].area == Area.FI
