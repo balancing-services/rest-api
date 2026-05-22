@@ -2,3 +2,9 @@ project_name_override: "balancing-services"
 package_name_override: "balancing_services"
 python_version: "3.10"
 use_union_operator: true
+# Format generated code at 88 columns (black's width) rather than letting
+# `ruff format` pick up the project's line-length of 120. Keeps the generated
+# client stable across regenerations regardless of the formatter's default.
+post_hooks:
+  - "ruff check --fix ."
+  - "ruff format --line-length 88 ."
