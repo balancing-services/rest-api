@@ -639,6 +639,40 @@ async def test_async_get_cross_border_energy_volumes(authenticated_client, mock_
     assert len(response.parsed.data) == 1
 
 
+@respx.mock
+def test_get_cross_border_energy_volumes_pagination(authenticated_client, mock_cross_border_energy_volumes_response):
+    """Test cross-border balancing energy volumes pagination - cursor/limit sent, nextCursor parsed."""
+    paginated_response = {
+        **mock_cross_border_energy_volumes_response,
+        "hasMore": True,
+        "nextCursor": "v1:AAAAAYwBAgMEBQYHCAkKCw==",
+    }
+
+    route = respx.get(
+        "https://api.balancing.services/v1/balancing/energy/cross-border-volumes"
+    ).mock(return_value=Response(200, json=paginated_response))
+
+    response = get_cross_border_energy_volumes.sync_detailed(
+        client=authenticated_client,
+        area=Area.FI,
+        period_start_at=datetime(2026, 3, 1, 0, 0, 0, tzinfo=timezone.utc),
+        period_end_at=datetime(2026, 3, 1, 1, 0, 0, tzinfo=timezone.utc),
+        reserve_type=ReserveType.AFRR,
+        cursor="v1:AAAAAYwBAgMEBQYHCAkKCw==",
+        limit=100,
+    )
+
+    assert response.status_code == 200
+    assert response.parsed is not None
+    assert response.parsed.has_more is True
+    assert response.parsed.next_cursor == "v1:AAAAAYwBAgMEBQYHCAkKCw=="
+    # The cursor/limit must actually be transmitted as query params (the cursor
+    # is what disambiguates the from->to / to->from union halves for this endpoint).
+    sent_url = route.calls.last.request.url
+    assert sent_url.params["cursor"] == "v1:AAAAAYwBAgMEBQYHCAkKCw=="
+    assert sent_url.params["limit"] == "100"
+
+
 @pytest.fixture
 def mock_day_ahead_energy_prices_response():
     """Mock response data for day-ahead energy prices."""

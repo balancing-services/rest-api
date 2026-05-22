@@ -12,7 +12,7 @@ from ...models.cross_border_energy_volumes_response import (
 )
 from ...models.problem import Problem
 from ...models.reserve_type import ReserveType
-from ...types import UNSET, Response
+from ...types import UNSET, Response, Unset
 
 
 def _get_kwargs(
@@ -21,6 +21,8 @@ def _get_kwargs(
     period_start_at: datetime.datetime,
     period_end_at: datetime.datetime,
     reserve_type: ReserveType,
+    cursor: str | Unset = UNSET,
+    limit: int | Unset = UNSET,
 ) -> dict[str, Any]:
 
     params: dict[str, Any] = {}
@@ -36,6 +38,10 @@ def _get_kwargs(
 
     json_reserve_type = reserve_type.value
     params["reserve-type"] = json_reserve_type
+
+    params["cursor"] = cursor
+
+    params["limit"] = limit
 
     params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
@@ -115,6 +121,8 @@ def sync_detailed(
     period_start_at: datetime.datetime,
     period_end_at: datetime.datetime,
     reserve_type: ReserveType,
+    cursor: str | Unset = UNSET,
+    limit: int | Unset = UNSET,
 ) -> Response[CrossBorderEnergyVolumesResponse | Problem]:
     """Get cross-border balancing energy volumes
 
@@ -124,6 +132,16 @@ def sync_detailed(
     are expressed as average power in MW
     and split by activation type — for mFRR, DIRECT and SCHEDULED activations are returned as separate
     entries.
+    Supports cursor-based pagination for large result sets.
+
+    **Deprecated:** The non-paginated mode — omitting both `cursor` and `limit` to receive the full
+    result set in a single
+    response (bounded to a 32-day period) — is deprecated. In the next major version `limit` will take a
+    default value when
+    omitted, so requests that omit `cursor` and `limit` will be paginated automatically (returning the
+    first page) instead of
+    returning the full result set. Opt into pagination now by passing `limit` and following
+    `nextCursor`.
 
     This endpoint is experimental and may be changed or removed without a deprecation period.
 
@@ -132,6 +150,8 @@ def sync_detailed(
         period_start_at (datetime.datetime):  Example: 2025-01-01T00:00:00Z.
         period_end_at (datetime.datetime):  Example: 2025-01-02T00:00:00Z.
         reserve_type (ReserveType): Reserve type
+        cursor (str | Unset):  Example: v1:AAAAAYwBAgMEBQYHCAkKCw==.
+        limit (int | Unset):  Example: 100.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -146,6 +166,8 @@ def sync_detailed(
         period_start_at=period_start_at,
         period_end_at=period_end_at,
         reserve_type=reserve_type,
+        cursor=cursor,
+        limit=limit,
     )
 
     response = client.get_httpx_client().request(
@@ -162,6 +184,8 @@ def sync(
     period_start_at: datetime.datetime,
     period_end_at: datetime.datetime,
     reserve_type: ReserveType,
+    cursor: str | Unset = UNSET,
+    limit: int | Unset = UNSET,
 ) -> CrossBorderEnergyVolumesResponse | Problem | None:
     """Get cross-border balancing energy volumes
 
@@ -171,6 +195,16 @@ def sync(
     are expressed as average power in MW
     and split by activation type — for mFRR, DIRECT and SCHEDULED activations are returned as separate
     entries.
+    Supports cursor-based pagination for large result sets.
+
+    **Deprecated:** The non-paginated mode — omitting both `cursor` and `limit` to receive the full
+    result set in a single
+    response (bounded to a 32-day period) — is deprecated. In the next major version `limit` will take a
+    default value when
+    omitted, so requests that omit `cursor` and `limit` will be paginated automatically (returning the
+    first page) instead of
+    returning the full result set. Opt into pagination now by passing `limit` and following
+    `nextCursor`.
 
     This endpoint is experimental and may be changed or removed without a deprecation period.
 
@@ -179,6 +213,8 @@ def sync(
         period_start_at (datetime.datetime):  Example: 2025-01-01T00:00:00Z.
         period_end_at (datetime.datetime):  Example: 2025-01-02T00:00:00Z.
         reserve_type (ReserveType): Reserve type
+        cursor (str | Unset):  Example: v1:AAAAAYwBAgMEBQYHCAkKCw==.
+        limit (int | Unset):  Example: 100.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -194,6 +230,8 @@ def sync(
         period_start_at=period_start_at,
         period_end_at=period_end_at,
         reserve_type=reserve_type,
+        cursor=cursor,
+        limit=limit,
     ).parsed
 
 
@@ -204,6 +242,8 @@ async def asyncio_detailed(
     period_start_at: datetime.datetime,
     period_end_at: datetime.datetime,
     reserve_type: ReserveType,
+    cursor: str | Unset = UNSET,
+    limit: int | Unset = UNSET,
 ) -> Response[CrossBorderEnergyVolumesResponse | Problem]:
     """Get cross-border balancing energy volumes
 
@@ -213,6 +253,16 @@ async def asyncio_detailed(
     are expressed as average power in MW
     and split by activation type — for mFRR, DIRECT and SCHEDULED activations are returned as separate
     entries.
+    Supports cursor-based pagination for large result sets.
+
+    **Deprecated:** The non-paginated mode — omitting both `cursor` and `limit` to receive the full
+    result set in a single
+    response (bounded to a 32-day period) — is deprecated. In the next major version `limit` will take a
+    default value when
+    omitted, so requests that omit `cursor` and `limit` will be paginated automatically (returning the
+    first page) instead of
+    returning the full result set. Opt into pagination now by passing `limit` and following
+    `nextCursor`.
 
     This endpoint is experimental and may be changed or removed without a deprecation period.
 
@@ -221,6 +271,8 @@ async def asyncio_detailed(
         period_start_at (datetime.datetime):  Example: 2025-01-01T00:00:00Z.
         period_end_at (datetime.datetime):  Example: 2025-01-02T00:00:00Z.
         reserve_type (ReserveType): Reserve type
+        cursor (str | Unset):  Example: v1:AAAAAYwBAgMEBQYHCAkKCw==.
+        limit (int | Unset):  Example: 100.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -235,6 +287,8 @@ async def asyncio_detailed(
         period_start_at=period_start_at,
         period_end_at=period_end_at,
         reserve_type=reserve_type,
+        cursor=cursor,
+        limit=limit,
     )
 
     response = await client.get_async_httpx_client().request(**kwargs)
@@ -249,6 +303,8 @@ async def asyncio(
     period_start_at: datetime.datetime,
     period_end_at: datetime.datetime,
     reserve_type: ReserveType,
+    cursor: str | Unset = UNSET,
+    limit: int | Unset = UNSET,
 ) -> CrossBorderEnergyVolumesResponse | Problem | None:
     """Get cross-border balancing energy volumes
 
@@ -258,6 +314,16 @@ async def asyncio(
     are expressed as average power in MW
     and split by activation type — for mFRR, DIRECT and SCHEDULED activations are returned as separate
     entries.
+    Supports cursor-based pagination for large result sets.
+
+    **Deprecated:** The non-paginated mode — omitting both `cursor` and `limit` to receive the full
+    result set in a single
+    response (bounded to a 32-day period) — is deprecated. In the next major version `limit` will take a
+    default value when
+    omitted, so requests that omit `cursor` and `limit` will be paginated automatically (returning the
+    first page) instead of
+    returning the full result set. Opt into pagination now by passing `limit` and following
+    `nextCursor`.
 
     This endpoint is experimental and may be changed or removed without a deprecation period.
 
@@ -266,6 +332,8 @@ async def asyncio(
         period_start_at (datetime.datetime):  Example: 2025-01-01T00:00:00Z.
         period_end_at (datetime.datetime):  Example: 2025-01-02T00:00:00Z.
         reserve_type (ReserveType): Reserve type
+        cursor (str | Unset):  Example: v1:AAAAAYwBAgMEBQYHCAkKCw==.
+        limit (int | Unset):  Example: 100.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -282,5 +350,7 @@ async def asyncio(
             period_start_at=period_start_at,
             period_end_at=period_end_at,
             reserve_type=reserve_type,
+            cursor=cursor,
+            limit=limit,
         )
     ).parsed

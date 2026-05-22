@@ -339,6 +339,59 @@ def test_energy_cbpm_first_page_flag():
     assert result.exit_code == 0, result.output
 
 
+def test_energy_cross_border_volumes_requires_all_or_first_page():
+    """energy-cross-border-volumes must fail without --all or --first-page."""
+    runner = CliRunner()
+    result = runner.invoke(cli, ["--token", "test-token", "energy-cross-border-volumes", *COMMON_BID_ARGS])
+    assert result.exit_code != 0
+    assert "--all" in result.output or "--first-page" in result.output
+
+
+def test_energy_cross_border_volumes_all_flag():
+    runner = CliRunner()
+    with patch(
+        "balancing_services_cli.commands.energy.get_cross_border_energy_volumes.sync_detailed",
+        return_value=_make_bids_response(),
+    ) as mock_fn:
+        result = runner.invoke(
+            cli, ["--token", "test-token", "energy-cross-border-volumes", "--all", *COMMON_BID_ARGS],
+        )
+    assert result.exit_code == 0, result.output
+    # Pagination is opt-in on this endpoint, so the command must pass an explicit limit.
+    assert mock_fn.call_args[1]["limit"] == 1000
+
+
+def test_energy_cross_border_volumes_first_page_flag():
+    runner = CliRunner()
+    with patch(
+        "balancing_services_cli.commands.energy.get_cross_border_energy_volumes.sync_detailed",
+        return_value=_make_bids_response(),
+    ) as mock_fn:
+        result = runner.invoke(
+            cli, ["--token", "test-token", "energy-cross-border-volumes", "--first-page", *COMMON_BID_ARGS],
+        )
+    assert result.exit_code == 0, result.output
+    assert mock_fn.call_args[1]["limit"] == 1000
+
+
+def test_energy_cross_border_volumes_follows_cursor():
+    """--all walks every page, forwarding the returned cursor."""
+    runner = CliRunner()
+    page1 = StubResponse(status_code=200, parsed=StubBidsParsed(data=[], has_more=True, next_cursor="c1"))
+    page2 = StubResponse(status_code=200, parsed=StubBidsParsed(data=[], has_more=False))
+    with patch(
+        "balancing_services_cli.commands.energy.get_cross_border_energy_volumes.sync_detailed",
+        side_effect=[page1, page2],
+    ) as mock_fn:
+        result = runner.invoke(
+            cli, ["--token", "test-token", "energy-cross-border-volumes", "--all", *COMMON_BID_ARGS],
+        )
+    assert result.exit_code == 0, result.output
+    assert mock_fn.call_count == 2
+    assert mock_fn.call_args_list[0][1].get("cursor") is None
+    assert mock_fn.call_args_list[1][1]["cursor"] == "c1"
+
+
 # ── Day-ahead energy prices tests ────────────────────────────────────────
 
 
