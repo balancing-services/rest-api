@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Cursor-based pagination for the cross-border balancing energy volumes endpoint (`/balancing/energy/cross-border-volumes`) via optional `cursor` and `limit` query parameters
+
+### Deprecated
+- The non-paginated mode of the cross-border balancing energy volumes endpoint (`/balancing/energy/cross-border-volumes`) — omitting both `cursor` and `limit` to receive the full result set in one response — is deprecated. In the next major version `limit` will take a default value when omitted, so requests will always be paginated rather than returning the full result set in a single response
+
 ## [1.11.0] - 2026-05-13
 
 ### Added

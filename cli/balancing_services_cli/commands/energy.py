@@ -38,6 +38,10 @@ log = logging.getLogger(__name__)
 AREA_CHOICES = [a.value for a in Area]
 RESERVE_TYPE_CHOICES = [r.value for r in ReserveType]
 
+# Max page size for the cross-border-volumes endpoint (its spec maximum). Passed
+# explicitly because this endpoint opts into pagination on cursor/limit presence.
+CROSS_BORDER_VOLUMES_PAGE_SIZE = 1000
+
 
 @click.command("energy-activated")
 @click.option(
@@ -258,29 +262,33 @@ def energy_cbpm(
     type=click.Choice(RESERVE_TYPE_CHOICES, case_sensitive=False),
     help="Reserve type.",
 )
+@click.option("--all/--first-page", "fetch_all", default=None, help="Fetch all pages or only the first page.")
 @click.pass_context
 def energy_cross_border_volumes(
-    ctx: click.Context, area: str, start: datetime, end: datetime, reserve_type: str,
+    ctx: click.Context, area: str, start: datetime, end: datetime, reserve_type: str, fetch_all: bool | None,
 ) -> None:
     """Fetch cross-border balancing energy volumes."""
+    if fetch_all is None:
+        raise click.UsageError("You must specify either --all or --first-page.")
     client = make_client(ctx)
     log.debug(
         "GET /balancing/energy/cross-border-volumes area=%s start=%s end=%s reserve_type=%s",
         area, start, end, reserve_type,
     )
-    response = call_with_retry(
+    fetch = fetch_all_pages if fetch_all else fetch_first_page
+    # Pagination on this endpoint is opt-in: unlike the sibling endpoints it has no
+    # server-side default limit, so we pass an explicit limit to engage pagination
+    # (and lift the 32-day period cap that applies to unpaginated requests).
+    data = fetch(
         get_cross_border_energy_volumes.sync_detailed,
         client=client,
         area=Area(area),
         period_start_at=start,
         period_end_at=end,
         reserve_type=ReserveType(reserve_type),
+        limit=CROSS_BORDER_VOLUMES_PAGE_SIZE,
     )
-    if response.status_code != 200:
-        raise SystemExit(format_api_error(response))
-    n_groups = len(response.parsed.data) if response.parsed else 0
-    log.debug("Response: HTTP %d, %d group(s)", response.status_code, n_groups)
-    rows = flatten_response(response.parsed.data, ENERGY_CROSS_BORDER_VOLUMES)
+    rows = flatten_response(data, ENERGY_CROSS_BORDER_VOLUMES)
     log.debug("Flattened to %d row(s)", len(rows))
     write_rows(rows, ctx.obj["output"], ctx.obj["fmt"])
 
