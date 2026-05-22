@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.12.0] - 2026-05-21
+
 ### Added
 - Cursor-based pagination for the cross-border balancing energy volumes endpoint (`/balancing/energy/cross-border-volumes`) via optional `cursor` and `limit` query parameters
 
@@ -124,7 +126,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - UTC timestamp-based period filtering
 - OpenAPI 3.0.3 specification
 
-[Unreleased]: https://github.com/balancing-services/rest-api/compare/v1.11.0...HEAD
+[Unreleased]: https://github.com/balancing-services/rest-api/compare/v1.12.0...HEAD
+[1.12.0]: https://github.com/balancing-services/rest-api/compare/v1.11.0...v1.12.0
 [1.11.0]: https://github.com/balancing-services/rest-api/compare/v1.10.0...v1.11.0
 [1.10.0]: https://github.com/balancing-services/rest-api/compare/v1.9.0...v1.10.0
 [1.9.0]: https://github.com/balancing-services/rest-api/compare/v1.8.0...v1.9.0
