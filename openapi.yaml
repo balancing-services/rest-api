@@ -2345,6 +2345,7 @@ components:
         - GR
         - HR
         - HU
+        - IT
         - IT_NORTH
         - IT_CENTER_NORTH
         - IT_CENTER_SOUTH
@@ -2394,6 +2395,7 @@ components:
         - 10YGR-HTSO-----Y
         - 10YHR-HEP------M
         - 10YHU-MAVIR----U
+        - 10YIT-GRTN-----B
         - 10Y1001A1001A73I
         - 10Y1001A1001A70O
         - 10Y1001A1001A71M
