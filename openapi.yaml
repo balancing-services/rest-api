@@ -2441,6 +2441,10 @@ components:
     EicCode:
       type: string
       description: Energy Identification Code (EIC)
+      # Append new codes at the END: the generated Python client names these enum
+      # members positionally (VALUE_0, VALUE_1, ...), so inserting a code mid-list
+      # rebinds VALUE_N for every later code. Resolved in REST API 2.0 by switching
+      # the client to Literal enums (see clients/python/config.yaml).
       enum:
         - 10YAT-APG------L
         - 10YBE----------2
