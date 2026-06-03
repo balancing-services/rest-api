@@ -18,11 +18,13 @@ class ImbalancePrice:
     """
     Attributes:
         period (Period):
-        price (float): Price per MWh in the specified currency Example: 45.5.
+        price (float): Deprecated — use `pricePerMwh` instead. Price per MWh in the specified currency Example: 45.5.
+        price_per_mwh (float): Price per MWh in the specified currency Example: 45.5.
     """
 
     period: Period
     price: float
+    price_per_mwh: float
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -30,12 +32,15 @@ class ImbalancePrice:
 
         price = self.price
 
+        price_per_mwh = self.price_per_mwh
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
             {
                 "period": period,
                 "price": price,
+                "pricePerMwh": price_per_mwh,
             }
         )
 
@@ -50,9 +55,12 @@ class ImbalancePrice:
 
         price = d.pop("price")
 
+        price_per_mwh = d.pop("pricePerMwh")
+
         imbalance_price = cls(
             period=period,
             price=price,
+            price_per_mwh=price_per_mwh,
         )
 
         imbalance_price.additional_properties = d

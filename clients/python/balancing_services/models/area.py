@@ -21,6 +21,7 @@ class Area(str, Enum):
     GR = "GR"
     HR = "HR"
     HU = "HU"
+    IT = "IT"
     IT_CALABRIA = "IT_CALABRIA"
     IT_CENTER_NORTH = "IT_CENTER_NORTH"
     IT_CENTER_SOUTH = "IT_CENTER_SOUTH"

@@ -18,11 +18,13 @@ class BalancingEnergyVolume:
     """
     Attributes:
         period (Period):
-        volume (float): Average power in MW over the period Example: 250.5.
+        volume (float): Deprecated — use `volumeInMw` instead. Average power in MW over the period Example: 250.5.
+        volume_in_mw (float): Average power in MW over the period Example: 250.5.
     """
 
     period: Period
     volume: float
+    volume_in_mw: float
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -30,12 +32,15 @@ class BalancingEnergyVolume:
 
         volume = self.volume
 
+        volume_in_mw = self.volume_in_mw
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
             {
                 "period": period,
                 "volume": volume,
+                "volumeInMw": volume_in_mw,
             }
         )
 
@@ -50,9 +55,12 @@ class BalancingEnergyVolume:
 
         volume = d.pop("volume")
 
+        volume_in_mw = d.pop("volumeInMw")
+
         balancing_energy_volume = cls(
             period=period,
             volume=volume,
+            volume_in_mw=volume_in_mw,
         )
 
         balancing_energy_volume.additional_properties = d

@@ -18,11 +18,13 @@ class BalancingCapacityVolume:
     """
     Attributes:
         period (Period):
-        volume (float): Volume in MW Example: 50.0.
+        volume (float): Deprecated — use `volumeInMw` instead. Volume in MW Example: 50.0.
+        volume_in_mw (float): Volume in MW Example: 50.0.
     """
 
     period: Period
     volume: float
+    volume_in_mw: float
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -30,12 +32,15 @@ class BalancingCapacityVolume:
 
         volume = self.volume
 
+        volume_in_mw = self.volume_in_mw
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
             {
                 "period": period,
                 "volume": volume,
+                "volumeInMw": volume_in_mw,
             }
         )
 
@@ -50,9 +55,12 @@ class BalancingCapacityVolume:
 
         volume = d.pop("volume")
 
+        volume_in_mw = d.pop("volumeInMw")
+
         balancing_capacity_volume = cls(
             period=period,
             volume=volume,
+            volume_in_mw=volume_in_mw,
         )
 
         balancing_capacity_volume.additional_properties = d

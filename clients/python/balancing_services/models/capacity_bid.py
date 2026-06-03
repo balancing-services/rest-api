@@ -20,8 +20,11 @@ class CapacityBid:
     """
     Attributes:
         period (Period):
-        capacity (float): Bid capacity in MW Example: 50.
-        price (float): Bid price per MW per hour in the specified currency Example: 12.5.
+        capacity (float): Deprecated — use `capacityInMw` instead. Bid capacity in MW Example: 50.
+        capacity_in_mw (float): Bid capacity in MW Example: 50.
+        price (float): Deprecated — use `pricePerMwPerHour` instead. Bid price per MW per hour in the specified currency
+            Example: 12.5.
+        price_per_mw_per_hour (float): Bid price per MW per hour in the specified currency Example: 12.5.
         status (BidStatus): Status of a capacity bid:
             - offered: Bid was offered but not accepted
             - accepted: Bid was accepted (at least partially accepted)
@@ -29,7 +32,9 @@ class CapacityBid:
 
     period: Period
     capacity: float
+    capacity_in_mw: float
     price: float
+    price_per_mw_per_hour: float
     status: BidStatus
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
@@ -38,7 +43,11 @@ class CapacityBid:
 
         capacity = self.capacity
 
+        capacity_in_mw = self.capacity_in_mw
+
         price = self.price
+
+        price_per_mw_per_hour = self.price_per_mw_per_hour
 
         status = self.status.value
 
@@ -48,7 +57,9 @@ class CapacityBid:
             {
                 "period": period,
                 "capacity": capacity,
+                "capacityInMw": capacity_in_mw,
                 "price": price,
+                "pricePerMwPerHour": price_per_mw_per_hour,
                 "status": status,
             }
         )
@@ -64,14 +75,20 @@ class CapacityBid:
 
         capacity = d.pop("capacity")
 
+        capacity_in_mw = d.pop("capacityInMw")
+
         price = d.pop("price")
+
+        price_per_mw_per_hour = d.pop("pricePerMwPerHour")
 
         status = BidStatus(d.pop("status"))
 
         capacity_bid = cls(
             period=period,
             capacity=capacity,
+            capacity_in_mw=capacity_in_mw,
             price=price,
+            price_per_mw_per_hour=price_per_mw_per_hour,
             status=status,
         )
 

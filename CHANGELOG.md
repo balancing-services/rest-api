@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Explicit-unit field names across response schemas, so the unit is unambiguous from the field name alone: `volumeInMw` (alongside `volume` in `BalancingEnergyVolume`, `BalancingCapacityVolume`, and energy bids), `averagePowerInMw` (alongside `averagePowerMW` in total imbalance volumes), `capacityInMw` (alongside `capacity` in capacity bids), `pricePerMwh` (alongside `price` in imbalance, balancing energy, day-ahead, cross-border marginal prices, and energy bids), and `pricePerMwPerHour` (alongside `price` in capacity prices and capacity bids). Each new field carries the same value as the field it replaces
+
+### Deprecated
+- The ambiguous unit-less fields `volume`, `averagePowerMW`, `capacity`, and `price` are deprecated in favour of their explicit-unit counterparts (`volumeInMw`, `averagePowerInMw`, `capacityInMw`, `pricePerMwh`, `pricePerMwPerHour`). They remain populated in v1 and will be removed in the next major version
+
 ## [1.13.0] - 2026-05-29
 
 ### Added

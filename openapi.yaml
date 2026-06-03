@@ -1772,10 +1772,16 @@ components:
       required:
         - period
         - price
+        - pricePerMwh
       properties:
         period:
           $ref: '#/components/schemas/Period'
         price:
+          type: number
+          deprecated: true
+          description: 'Deprecated — use `pricePerMwh` instead. Price per MWh in the specified currency'
+          example: 45.50
+        pricePerMwh:
           type: number
           description: Price per MWh in the specified currency
           example: 45.50
@@ -1825,11 +1831,17 @@ components:
       required:
         - period
         - averagePowerMW
+        - averagePowerInMw
         - direction
       properties:
         period:
           $ref: '#/components/schemas/Period'
         averagePowerMW:
+          type: number
+          deprecated: true
+          description: 'Deprecated — use `averagePowerInMw` instead. Average power in MW during the period'
+          example: 60.5
+        averagePowerInMw:
           type: number
           description: Average power in MW during the period
           example: 60.5
@@ -1894,10 +1906,16 @@ components:
       required:
         - period
         - volume
+        - volumeInMw
       properties:
         period:
           $ref: '#/components/schemas/Period'
         volume:
+          type: number
+          deprecated: true
+          description: 'Deprecated — use `volumeInMw` instead. Average power in MW over the period'
+          example: 250.5
+        volumeInMw:
           type: number
           description: Average power in MW over the period
           example: 250.5
@@ -1963,10 +1981,16 @@ components:
       required:
         - period
         - price
+        - pricePerMwh
       properties:
         period:
           $ref: '#/components/schemas/Period'
         price:
+          type: number
+          deprecated: true
+          description: 'Deprecated — use `pricePerMwh` instead. Price per MWh in the specified currency'
+          example: 45.50
+        pricePerMwh:
           type: number
           description: Price per MWh in the specified currency
           example: 45.50
@@ -2018,10 +2042,16 @@ components:
       required:
         - period
         - price
+        - pricePerMwh
       properties:
         period:
           $ref: '#/components/schemas/Period'
         price:
+          type: number
+          deprecated: true
+          description: 'Deprecated — use `pricePerMwh` instead. Day-ahead price per MWh in the specified currency'
+          example: 45.67
+        pricePerMwh:
           type: number
           description: Day-ahead price per MWh in the specified currency
           example: 45.67
@@ -2084,15 +2114,27 @@ components:
       required:
         - period
         - volume
+        - volumeInMw
         - price
+        - pricePerMwh
       properties:
         period:
           $ref: '#/components/schemas/Period'
         volume:
           type: number
+          deprecated: true
+          description: 'Deprecated — use `volumeInMw` instead. Bid volume in MW'
+          example: 100
+        volumeInMw:
+          type: number
           description: Bid volume in MW
           example: 100
         price:
+          type: number
+          deprecated: true
+          description: 'Deprecated — use `pricePerMwh` instead. Bid price per MWh in the specified currency'
+          example: 55.25
+        pricePerMwh:
           type: number
           description: Bid price per MWh in the specified currency
           example: 55.25
@@ -2150,16 +2192,28 @@ components:
       required:
         - period
         - capacity
+        - capacityInMw
         - price
+        - pricePerMwPerHour
         - status
       properties:
         period:
           $ref: '#/components/schemas/Period'
         capacity:
           type: number
+          deprecated: true
+          description: 'Deprecated — use `capacityInMw` instead. Bid capacity in MW'
+          example: 50
+        capacityInMw:
+          type: number
           description: Bid capacity in MW
           example: 50
         price:
+          type: number
+          deprecated: true
+          description: 'Deprecated — use `pricePerMwPerHour` instead. Bid price per MW per hour in the specified currency'
+          example: 12.50
+        pricePerMwPerHour:
           type: number
           description: Bid price per MW per hour in the specified currency
           example: 12.50
@@ -2229,10 +2283,16 @@ components:
       required:
         - period
         - price
+        - pricePerMwPerHour
       properties:
         period:
           $ref: '#/components/schemas/Period'
         price:
+          type: number
+          deprecated: true
+          description: 'Deprecated — use `pricePerMwPerHour` instead. Price per MW per hour in the specified currency'
+          example: 12.50
+        pricePerMwPerHour:
           type: number
           description: Price per MW per hour in the specified currency
           example: 12.50
@@ -2297,10 +2357,16 @@ components:
       required:
         - period
         - volume
+        - volumeInMw
       properties:
         period:
           $ref: '#/components/schemas/Period'
         volume:
+          type: number
+          deprecated: true
+          description: 'Deprecated — use `volumeInMw` instead. Volume in MW'
+          example: 50.0
+        volumeInMw:
           type: number
           description: Volume in MW
           example: 50.0
@@ -2617,10 +2683,16 @@ components:
       required:
         - period
         - price
+        - pricePerMwh
       properties:
         period:
           $ref: '#/components/schemas/Period'
         price:
+          type: number
+          deprecated: true
+          description: 'Deprecated — use `pricePerMwh` instead. Marginal price per MWh in the specified currency'
+          example: 45.50
+        pricePerMwh:
           type: number
           description: Marginal price per MWh in the specified currency
           example: 45.50

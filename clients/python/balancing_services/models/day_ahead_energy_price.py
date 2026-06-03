@@ -18,11 +18,14 @@ class DayAheadEnergyPrice:
     """
     Attributes:
         period (Period):
-        price (float): Day-ahead price per MWh in the specified currency Example: 45.67.
+        price (float): Deprecated — use `pricePerMwh` instead. Day-ahead price per MWh in the specified currency
+            Example: 45.67.
+        price_per_mwh (float): Day-ahead price per MWh in the specified currency Example: 45.67.
     """
 
     period: Period
     price: float
+    price_per_mwh: float
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -30,12 +33,15 @@ class DayAheadEnergyPrice:
 
         price = self.price
 
+        price_per_mwh = self.price_per_mwh
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
             {
                 "period": period,
                 "price": price,
+                "pricePerMwh": price_per_mwh,
             }
         )
 
@@ -50,9 +56,12 @@ class DayAheadEnergyPrice:
 
         price = d.pop("price")
 
+        price_per_mwh = d.pop("pricePerMwh")
+
         day_ahead_energy_price = cls(
             period=period,
             price=price,
+            price_per_mwh=price_per_mwh,
         )
 
         day_ahead_energy_price.additional_properties = d

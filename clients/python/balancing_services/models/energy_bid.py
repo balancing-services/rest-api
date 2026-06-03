@@ -18,13 +18,18 @@ class EnergyBid:
     """
     Attributes:
         period (Period):
-        volume (float): Bid volume in MW Example: 100.
-        price (float): Bid price per MWh in the specified currency Example: 55.25.
+        volume (float): Deprecated — use `volumeInMw` instead. Bid volume in MW Example: 100.
+        volume_in_mw (float): Bid volume in MW Example: 100.
+        price (float): Deprecated — use `pricePerMwh` instead. Bid price per MWh in the specified currency Example:
+            55.25.
+        price_per_mwh (float): Bid price per MWh in the specified currency Example: 55.25.
     """
 
     period: Period
     volume: float
+    volume_in_mw: float
     price: float
+    price_per_mwh: float
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -32,7 +37,11 @@ class EnergyBid:
 
         volume = self.volume
 
+        volume_in_mw = self.volume_in_mw
+
         price = self.price
+
+        price_per_mwh = self.price_per_mwh
 
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
@@ -40,7 +49,9 @@ class EnergyBid:
             {
                 "period": period,
                 "volume": volume,
+                "volumeInMw": volume_in_mw,
                 "price": price,
+                "pricePerMwh": price_per_mwh,
             }
         )
 
@@ -55,12 +66,18 @@ class EnergyBid:
 
         volume = d.pop("volume")
 
+        volume_in_mw = d.pop("volumeInMw")
+
         price = d.pop("price")
+
+        price_per_mwh = d.pop("pricePerMwh")
 
         energy_bid = cls(
             period=period,
             volume=volume,
+            volume_in_mw=volume_in_mw,
             price=price,
+            price_per_mwh=price_per_mwh,
         )
 
         energy_bid.additional_properties = d

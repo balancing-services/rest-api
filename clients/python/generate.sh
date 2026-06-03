@@ -50,5 +50,21 @@ uvx openapi-python-client generate \
 echo "Fixing types with Ruff..."
 uvx ruff check --fix balancing_services --exit-zero --quiet || true
 
+# --- Python 3.10 compatibility shim ------------------------------------------
+# openapi-python-client (>= 0.24) generates `datetime.datetime.fromisoformat()`
+# for date-time fields. On Python 3.10 that call cannot parse the RFC3339 "Z"
+# UTC suffix the API returns (e.g. 2025-01-01T00:00:00Z) — `fromisoformat()`
+# only learned to accept "Z" in Python 3.11. Normalize the trailing "Z" to
+# "+00:00" before parsing so the client keeps working on Python 3.10.
+#
+# This is no longer needed once we drop Python 3.10 support (planned for the
+# next major version): delete this block then and the generated calls work
+# as-is. The matching guard test lives in tests/test_datetime_compat.py.
+echo "Patching datetime parsing for Python 3.10 compatibility..."
+find balancing_services -name '*.py' -exec sed -i -E \
+  -e 's/datetime\.datetime\.fromisoformat\(d\.pop\(("[^"]+")\)\)/datetime.datetime.fromisoformat(d.pop(\1).replace("Z", "+00:00"))/g' \
+  -e 's/datetime\.datetime\.fromisoformat\(data\)/datetime.datetime.fromisoformat(data.replace("Z", "+00:00"))/g' \
+  {} +
+
 echo "Client generation complete!"
 echo "Generated code is in: balancing_services/"

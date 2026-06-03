@@ -51,7 +51,8 @@ def mock_imbalance_prices_response():
                             "startAt": "2025-01-01T00:00:00Z",
                             "endAt": "2025-01-01T01:00:00Z"
                         },
-                        "price": 45.5
+                        "price": 45.5,
+                        "pricePerMwh": 45.5
                     }
                 ]
             }
@@ -84,7 +85,9 @@ def mock_balancing_energy_bids_response():
                             "endAt": "2025-01-01T00:15:00Z"
                         },
                         "volume": 10.5,
+                        "volumeInMw": 10.5,
                         "price": 25.0,
+                        "pricePerMwh": 25.0,
                         "status": "accepted"
                     }
                 ]
@@ -112,6 +115,7 @@ def test_get_imbalance_prices_success(authenticated_client, mock_imbalance_price
     assert response.parsed.has_more is False
     assert len(response.parsed.data) == 1
     assert response.parsed.data[0].area == Area.EE
+    assert response.parsed.data[0].prices[0].price_per_mwh == 45.5
 
 
 @respx.mock
@@ -187,6 +191,8 @@ def test_get_balancing_energy_bids_pagination(authenticated_client, mock_balanci
     assert response.parsed.has_more is True
     assert response.parsed.next_cursor == "v1:AAAAAYwBAgMEBQYHCAkKCw=="
     assert len(response.parsed.data) == 1
+    assert response.parsed.data[0].bids[0].volume_in_mw == 10.5
+    assert response.parsed.data[0].bids[0].price_per_mwh == 25.0
 
 
 @respx.mock
@@ -226,6 +232,7 @@ async def test_async_get_imbalance_prices(authenticated_client, mock_imbalance_p
     assert response.status_code == 200
     assert response.parsed is not None
     assert len(response.parsed.data) == 1
+    assert response.parsed.data[0].prices[0].price_per_mwh == 45.5
 
 
 @pytest.fixture
@@ -251,7 +258,8 @@ def mock_offered_volumes_response():
                             "startAt": "2025-01-01T00:00:00Z",
                             "endAt": "2025-01-01T01:00:00Z"
                         },
-                        "volume": 50.0
+                        "volume": 50.0,
+                        "volumeInMw": 50.0
                     }
                 ]
             }
@@ -281,7 +289,8 @@ def mock_cross_zonal_allocation_response():
                             "startAt": "2025-01-01T00:00:00Z",
                             "endAt": "2025-01-01T01:00:00Z"
                         },
-                        "volume": 25.0
+                        "volume": 25.0,
+                        "volumeInMw": 25.0
                     }
                 ]
             }
@@ -309,6 +318,7 @@ def test_get_balancing_energy_offered_volumes_success(authenticated_client, mock
     assert response.parsed.has_more is False
     assert len(response.parsed.data) == 1
     assert response.parsed.data[0].area == Area.EE
+    assert response.parsed.data[0].volumes[0].volume_in_mw == 50.0
 
 
 @respx.mock
@@ -357,6 +367,7 @@ async def test_async_get_balancing_energy_offered_volumes(authenticated_client, 
     assert response.status_code == 200
     assert response.parsed is not None
     assert len(response.parsed.data) == 1
+    assert response.parsed.data[0].volumes[0].volume_in_mw == 50.0
 
 
 @respx.mock
@@ -380,6 +391,7 @@ def test_get_cross_zonal_capacity_allocation_success(authenticated_client, mock_
     assert len(response.parsed.data) == 1
     assert response.parsed.data[0].from_area == Area.EE
     assert response.parsed.data[0].to_area == Area.LV
+    assert response.parsed.data[0].volumes[0].volume_in_mw == 25.0
 
 
 @respx.mock
@@ -428,6 +440,7 @@ async def test_async_get_cross_zonal_capacity_allocation(authenticated_client, m
     assert response.status_code == 200
     assert response.parsed is not None
     assert len(response.parsed.data) == 1
+    assert response.parsed.data[0].volumes[0].volume_in_mw == 25.0
 
 
 @pytest.fixture
@@ -453,7 +466,8 @@ def mock_cross_border_marginal_prices_response():
                             "startAt": "2026-03-01T00:00:00Z",
                             "endAt": "2026-03-01T00:15:00Z"
                         },
-                        "price": 45.50
+                        "price": 45.50,
+                        "pricePerMwh": 45.50
                     }
                 ]
             }
@@ -484,6 +498,7 @@ def test_get_cross_border_marginal_prices_success(authenticated_client, mock_cro
     assert response.parsed.data[0].area == Area.AT
     assert response.parsed.data[0].direction == Direction.UP
     assert response.parsed.data[0].prices[0].price == 45.50
+    assert response.parsed.data[0].prices[0].price_per_mwh == 45.50
 
 
 @respx.mock
@@ -532,6 +547,7 @@ async def test_async_get_cross_border_marginal_prices(authenticated_client, mock
     assert response.status_code == 200
     assert response.parsed is not None
     assert len(response.parsed.data) == 1
+    assert response.parsed.data[0].prices[0].price_per_mwh == 45.50
 
 
 @pytest.fixture
@@ -557,7 +573,8 @@ def mock_cross_border_energy_volumes_response():
                             "startAt": "2026-03-01T00:00:00Z",
                             "endAt": "2026-03-01T00:15:00Z"
                         },
-                        "volume": 250.5
+                        "volume": 250.5,
+                        "volumeInMw": 250.5
                     }
                 ]
             }
@@ -589,6 +606,7 @@ def test_get_cross_border_energy_volumes_success(authenticated_client, mock_cros
     assert response.parsed.data[0].reserve_type == ReserveType.AFRR
     assert response.parsed.data[0].activation_type == ActivationType.NOT_APPLICABLE
     assert response.parsed.data[0].volumes[0].volume == 250.5
+    assert response.parsed.data[0].volumes[0].volume_in_mw == 250.5
 
 
 @respx.mock
@@ -637,6 +655,7 @@ async def test_async_get_cross_border_energy_volumes(authenticated_client, mock_
     assert response.status_code == 200
     assert response.parsed is not None
     assert len(response.parsed.data) == 1
+    assert response.parsed.data[0].volumes[0].volume_in_mw == 250.5
 
 
 @respx.mock
@@ -671,6 +690,7 @@ def test_get_cross_border_energy_volumes_pagination(authenticated_client, mock_c
     sent_url = route.calls.last.request.url
     assert sent_url.params["cursor"] == "v1:AAAAAYwBAgMEBQYHCAkKCw=="
     assert sent_url.params["limit"] == "100"
+    assert response.parsed.data[0].volumes[0].volume_in_mw == 250.5
 
 
 @pytest.fixture
@@ -693,14 +713,16 @@ def mock_day_ahead_energy_prices_response():
                             "startAt": "2025-01-01T00:00:00Z",
                             "endAt": "2025-01-01T01:00:00Z"
                         },
-                        "price": 45.67
+                        "price": 45.67,
+                        "pricePerMwh": 45.67
                     },
                     {
                         "period": {
                             "startAt": "2025-01-01T01:00:00Z",
                             "endAt": "2025-01-01T02:00:00Z"
                         },
-                        "price": 38.21
+                        "price": 38.21,
+                        "pricePerMwh": 38.21
                     }
                 ]
             }
@@ -730,7 +752,9 @@ def test_get_day_ahead_energy_prices_success(authenticated_client, mock_day_ahea
     assert response.parsed.data[0].currency == Currency.EUR
     assert len(response.parsed.data[0].prices) == 2
     assert response.parsed.data[0].prices[0].price == 45.67
+    assert response.parsed.data[0].prices[0].price_per_mwh == 45.67
     assert response.parsed.data[0].prices[1].price == 38.21
+    assert response.parsed.data[0].prices[1].price_per_mwh == 38.21
 
 
 @respx.mock
@@ -754,7 +778,8 @@ def test_get_day_ahead_energy_prices_pagination(authenticated_client):
                             "startAt": "2025-01-01T00:00:00Z",
                             "endAt": "2025-01-01T01:00:00Z"
                         },
-                        "price": 45.67
+                        "price": 45.67,
+                        "pricePerMwh": 45.67
                     }
                 ]
             }
@@ -777,6 +802,7 @@ def test_get_day_ahead_energy_prices_pagination(authenticated_client):
     assert response.parsed is not None
     assert response.parsed.has_more is True
     assert response.parsed.next_cursor == "v1:AAAAAYwBAgMEBQYHCAkKCw=="
+    assert response.parsed.data[0].prices[0].price_per_mwh == 45.67
 
 
 @respx.mock
@@ -850,3 +876,4 @@ async def test_async_get_day_ahead_energy_prices(authenticated_client, mock_day_
     assert response.parsed is not None
     assert len(response.parsed.data) == 1
     assert response.parsed.data[0].area == Area.FI
+    assert response.parsed.data[0].prices[0].price_per_mwh == 45.67
