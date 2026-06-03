@@ -6,7 +6,6 @@ from typing import Any, TypeVar
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
-from dateutil.parser import isoparse
 
 T = TypeVar("T", bound="Period")
 
@@ -42,9 +41,9 @@ class Period:
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         d = dict(src_dict)
-        start_at = isoparse(d.pop("startAt"))
+        start_at = datetime.datetime.fromisoformat(d.pop("startAt").replace("Z", "+00:00"))
 
-        end_at = isoparse(d.pop("endAt"))
+        end_at = datetime.datetime.fromisoformat(d.pop("endAt").replace("Z", "+00:00"))
 
         period = cls(
             start_at=start_at,

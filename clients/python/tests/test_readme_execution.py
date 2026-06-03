@@ -61,7 +61,8 @@ def mock_success_response():
                             "startAt": "2025-01-01T00:00:00Z",
                             "endAt": "2025-01-01T01:00:00Z"
                         },
-                        "price": 45.5
+                        "price": 45.5,
+                        "pricePerMwh": 45.5
                     }
                 ]
             }
@@ -94,7 +95,9 @@ def mock_bids_response():
                             "endAt": "2025-01-01T00:15:00Z"
                         },
                         "volume": 10.5,
+                        "volumeInMw": 10.5,
                         "price": 25.0,
+                        "pricePerMwh": 25.0,
                         "status": "accepted"
                     }
                 ]

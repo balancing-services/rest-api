@@ -18,11 +18,14 @@ class BalancingCapacityPrice:
     """
     Attributes:
         period (Period):
-        price (float): Price per MW per hour in the specified currency Example: 12.5.
+        price (float): Deprecated — use `pricePerMwPerHour` instead. Price per MW per hour in the specified currency
+            Example: 12.5.
+        price_per_mw_per_hour (float): Price per MW per hour in the specified currency Example: 12.5.
     """
 
     period: Period
     price: float
+    price_per_mw_per_hour: float
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -30,12 +33,15 @@ class BalancingCapacityPrice:
 
         price = self.price
 
+        price_per_mw_per_hour = self.price_per_mw_per_hour
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
             {
                 "period": period,
                 "price": price,
+                "pricePerMwPerHour": price_per_mw_per_hour,
             }
         )
 
@@ -50,9 +56,12 @@ class BalancingCapacityPrice:
 
         price = d.pop("price")
 
+        price_per_mw_per_hour = d.pop("pricePerMwPerHour")
+
         balancing_capacity_price = cls(
             period=period,
             price=price,
+            price_per_mw_per_hour=price_per_mw_per_hour,
         )
 
         balancing_capacity_price.additional_properties = d

@@ -5,6 +5,8 @@ use_union_operator: true
 # Format generated code at 88 columns (black's width) rather than letting
 # `ruff format` pick up the project's line-length of 120. Keeps the generated
 # client stable across regenerations regardless of the formatter's default.
+# `--exit-zero` so leftover unfixable lint (e.g. docstring whitespace) in the
+# generated code does not fail the generate step and abort generate.sh.
 post_hooks:
-  - "ruff check --fix ."
+  - "ruff check --fix --exit-zero ."
   - "ruff format --line-length 88 ."

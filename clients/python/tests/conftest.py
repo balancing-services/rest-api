@@ -33,6 +33,7 @@ def sample_imbalance_prices_response():
                             "endAt": "2025-01-01T01:00:00Z",
                         },
                         "price": 45.50,
+                        "pricePerMwh": 45.50,
                     },
                     {
                         "period": {
@@ -40,6 +41,7 @@ def sample_imbalance_prices_response():
                             "endAt": "2025-01-01T02:00:00Z",
                         },
                         "price": 48.75,
+                        "pricePerMwh": 48.75,
                     },
                 ],
             }

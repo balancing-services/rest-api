@@ -20,7 +20,9 @@ class TotalImbalanceVolume:
     """
     Attributes:
         period (Period):
-        average_power_mw (float): Average power in MW during the period Example: 60.5.
+        average_power_mw (float): Deprecated — use `averagePowerInMw` instead. Average power in MW during the period
+            Example: 60.5.
+        average_power_in_mw (float): Average power in MW during the period Example: 60.5.
         direction (TotalImbalanceDirection): Total imbalance volume direction (ENTSO-E regulatory terminology):
             - surplus: Generation exceeds consumption (D > 0, positive imbalance)
             - deficit: Consumption exceeds generation (D < 0, negative imbalance)
@@ -29,6 +31,7 @@ class TotalImbalanceVolume:
 
     period: Period
     average_power_mw: float
+    average_power_in_mw: float
     direction: TotalImbalanceDirection
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
@@ -36,6 +39,8 @@ class TotalImbalanceVolume:
         period = self.period.to_dict()
 
         average_power_mw = self.average_power_mw
+
+        average_power_in_mw = self.average_power_in_mw
 
         direction = self.direction.value
 
@@ -45,6 +50,7 @@ class TotalImbalanceVolume:
             {
                 "period": period,
                 "averagePowerMW": average_power_mw,
+                "averagePowerInMw": average_power_in_mw,
                 "direction": direction,
             }
         )
@@ -60,11 +66,14 @@ class TotalImbalanceVolume:
 
         average_power_mw = d.pop("averagePowerMW")
 
+        average_power_in_mw = d.pop("averagePowerInMw")
+
         direction = TotalImbalanceDirection(d.pop("direction"))
 
         total_imbalance_volume = cls(
             period=period,
             average_power_mw=average_power_mw,
+            average_power_in_mw=average_power_in_mw,
             direction=direction,
         )
 
