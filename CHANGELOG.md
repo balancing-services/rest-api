@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.14.0] - 2026-06-03
+
 ### Added
 - Explicit-unit field names across response schemas, so the unit is unambiguous from the field name alone: `volumeInMw` (alongside `volume` in `BalancingEnergyVolume`, `BalancingCapacityVolume`, and energy bids), `averagePowerInMw` (alongside `averagePowerMW` in total imbalance volumes), `capacityInMw` (alongside `capacity` in capacity bids), `pricePerMwh` (alongside `price` in imbalance, balancing energy, day-ahead, cross-border marginal prices, and energy bids), and `pricePerMwPerHour` (alongside `price` in capacity prices and capacity bids). Each new field carries the same value as the field it replaces
 
@@ -137,7 +139,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - UTC timestamp-based period filtering
 - OpenAPI 3.0.3 specification
 
-[Unreleased]: https://github.com/balancing-services/rest-api/compare/v1.13.0...HEAD
+[Unreleased]: https://github.com/balancing-services/rest-api/compare/v1.14.0...HEAD
+[1.14.0]: https://github.com/balancing-services/rest-api/compare/v1.13.0...v1.14.0
 [1.13.0]: https://github.com/balancing-services/rest-api/compare/v1.12.0...v1.13.0
 [1.12.0]: https://github.com/balancing-services/rest-api/compare/v1.11.0...v1.12.0
 [1.11.0]: https://github.com/balancing-services/rest-api/compare/v1.10.0...v1.11.0
