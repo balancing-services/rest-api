@@ -357,13 +357,8 @@ paths:
   /balancing/energy/offered-volumes:
     get:
       summary: Get offered balancing energy volumes
-      description: |
-        **EXPERIMENTAL**: Returns offered balancing energy volumes for the specified area within the given time period.
-        Volumes are expressed as (average) power in MW.
-
-        This endpoint is experimental and may be changed or removed without a deprecation period.
+      description: Returns offered balancing energy volumes for the specified area within the given time period. Volumes are expressed as (average) power in MW.
       operationId: getBalancingEnergyOfferedVolumes
-      x-experimental: true
       parameters:
         - name: area
           in: query
