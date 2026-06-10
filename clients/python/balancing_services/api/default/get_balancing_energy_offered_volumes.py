@@ -116,11 +116,8 @@ def sync_detailed(
 ) -> Response[BalancingEnergyVolumesResponse | Problem]:
     """Get offered balancing energy volumes
 
-     **EXPERIMENTAL**: Returns offered balancing energy volumes for the specified area within the given
-    time period.
+     Returns offered balancing energy volumes for the specified area within the given time period.
     Volumes are expressed as (average) power in MW.
-
-    This endpoint is experimental and may be changed or removed without a deprecation period.
 
     Args:
         area (Area): Area code
@@ -160,11 +157,8 @@ def sync(
 ) -> BalancingEnergyVolumesResponse | Problem | None:
     """Get offered balancing energy volumes
 
-     **EXPERIMENTAL**: Returns offered balancing energy volumes for the specified area within the given
-    time period.
+     Returns offered balancing energy volumes for the specified area within the given time period.
     Volumes are expressed as (average) power in MW.
-
-    This endpoint is experimental and may be changed or removed without a deprecation period.
 
     Args:
         area (Area): Area code
@@ -199,11 +193,8 @@ async def asyncio_detailed(
 ) -> Response[BalancingEnergyVolumesResponse | Problem]:
     """Get offered balancing energy volumes
 
-     **EXPERIMENTAL**: Returns offered balancing energy volumes for the specified area within the given
-    time period.
+     Returns offered balancing energy volumes for the specified area within the given time period.
     Volumes are expressed as (average) power in MW.
-
-    This endpoint is experimental and may be changed or removed without a deprecation period.
 
     Args:
         area (Area): Area code
@@ -241,11 +232,8 @@ async def asyncio(
 ) -> BalancingEnergyVolumesResponse | Problem | None:
     """Get offered balancing energy volumes
 
-     **EXPERIMENTAL**: Returns offered balancing energy volumes for the specified area within the given
-    time period.
+     Returns offered balancing energy volumes for the specified area within the given time period.
     Volumes are expressed as (average) power in MW.
-
-    This endpoint is experimental and may be changed or removed without a deprecation period.
 
     Args:
         area (Area): Area code
