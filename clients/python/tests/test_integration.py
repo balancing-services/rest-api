@@ -11,7 +11,9 @@ from httpx import Response
 from balancing_services import AuthenticatedClient
 from balancing_services.api.default import (
     get_balancing_energy_bids,
+    get_balancing_energy_demand,
     get_balancing_energy_offered_volumes,
+    get_balancing_energy_satisfied_demand,
     get_cross_border_energy_volumes,
     get_cross_border_marginal_prices,
     get_cross_zonal_capacity_allocation,
@@ -441,6 +443,249 @@ async def test_async_get_cross_zonal_capacity_allocation(authenticated_client, m
     assert response.parsed is not None
     assert len(response.parsed.data) == 1
     assert response.parsed.data[0].volumes[0].volume_in_mw == 25.0
+
+
+@pytest.fixture
+def mock_balancing_energy_demand_response():
+    """Mock response data for balancing energy demand (also used for satisfied demand)."""
+    return {
+        "queriedPeriod": {
+            "startAt": "2025-01-01T00:00:00Z",
+            "endAt": "2025-01-02T00:00:00Z"
+        },
+        "hasMore": False,
+        "data": [
+            {
+                "area": "EE",
+                "eicCode": "10Y1001A1001A39I",
+                "reserveType": "aFRR",
+                "direction": "up",
+                "activationType": "not_applicable",
+                "standardProduct": True,
+                "volumes": [
+                    {
+                        "period": {
+                            "startAt": "2025-01-01T00:00:00Z",
+                            "endAt": "2025-01-01T01:00:00Z"
+                        },
+                        "volume": 80.0,
+                        "volumeInMw": 80.0
+                    }
+                ]
+            }
+        ]
+    }
+
+
+@respx.mock
+def test_get_balancing_energy_demand_success(authenticated_client, mock_balancing_energy_demand_response):
+    """Test successful balancing energy demand request."""
+    respx.get(
+        "https://api.balancing.services/v1/balancing/energy/demand"
+    ).mock(return_value=Response(200, json=mock_balancing_energy_demand_response))
+
+    response = get_balancing_energy_demand.sync_detailed(
+        client=authenticated_client,
+        area=Area.EE,
+        period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
+        period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
+        reserve_type=ReserveType.AFRR
+    )
+
+    assert response.status_code == 200
+    assert response.parsed is not None
+    assert response.parsed.has_more is False
+    assert len(response.parsed.data) == 1
+    assert response.parsed.data[0].area == Area.EE
+    assert response.parsed.data[0].reserve_type == ReserveType.AFRR
+    assert response.parsed.data[0].direction == Direction.UP
+    assert response.parsed.data[0].volumes[0].volume_in_mw == 80.0
+
+
+@respx.mock
+def test_get_balancing_energy_demand_pagination(authenticated_client, mock_balancing_energy_demand_response):
+    """Test balancing energy demand pagination - cursor/limit sent, nextCursor parsed."""
+    paginated_response = {
+        **mock_balancing_energy_demand_response,
+        "hasMore": True,
+        "nextCursor": "v1:AAAAAYwBAgMEBQYHCAkKCw==",
+    }
+
+    route = respx.get(
+        "https://api.balancing.services/v1/balancing/energy/demand"
+    ).mock(return_value=Response(200, json=paginated_response))
+
+    response = get_balancing_energy_demand.sync_detailed(
+        client=authenticated_client,
+        area=Area.EE,
+        period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
+        period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
+        reserve_type=ReserveType.AFRR,
+        cursor="v1:AAAAAYwBAgMEBQYHCAkKCw==",
+        limit=100,
+    )
+
+    assert response.status_code == 200
+    assert response.parsed is not None
+    assert response.parsed.has_more is True
+    assert response.parsed.next_cursor == "v1:AAAAAYwBAgMEBQYHCAkKCw=="
+    sent_url = route.calls.last.request.url
+    assert sent_url.params["cursor"] == "v1:AAAAAYwBAgMEBQYHCAkKCw=="
+    assert sent_url.params["limit"] == "100"
+
+
+@respx.mock
+def test_get_balancing_energy_demand_unauthorized(authenticated_client):
+    """Test unauthorized response (401) for balancing energy demand."""
+    error_response = {
+        "type": "unauthorized",
+        "title": "Unauthorized",
+        "status": 401,
+        "detail": "Invalid or missing authentication token"
+    }
+
+    respx.get(
+        "https://api.balancing.services/v1/balancing/energy/demand"
+    ).mock(return_value=Response(401, json=error_response))
+
+    response = get_balancing_energy_demand.sync_detailed(
+        client=authenticated_client,
+        area=Area.EE,
+        period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
+        period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
+        reserve_type=ReserveType.AFRR
+    )
+
+    assert response.status_code == 401
+    assert response.parsed is not None
+    assert response.parsed.status == 401
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_async_get_balancing_energy_demand(authenticated_client, mock_balancing_energy_demand_response):
+    """Test async request for balancing energy demand."""
+    respx.get(
+        "https://api.balancing.services/v1/balancing/energy/demand"
+    ).mock(return_value=Response(200, json=mock_balancing_energy_demand_response))
+
+    response = await get_balancing_energy_demand.asyncio_detailed(
+        client=authenticated_client,
+        area=Area.EE,
+        period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
+        period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
+        reserve_type=ReserveType.AFRR
+    )
+
+    assert response.status_code == 200
+    assert response.parsed is not None
+    assert len(response.parsed.data) == 1
+    assert response.parsed.data[0].volumes[0].volume_in_mw == 80.0
+
+
+@respx.mock
+def test_get_balancing_energy_satisfied_demand_success(authenticated_client, mock_balancing_energy_demand_response):
+    """Test successful satisfied balancing energy demand request."""
+    respx.get(
+        "https://api.balancing.services/v1/balancing/energy/satisfied-demand"
+    ).mock(return_value=Response(200, json=mock_balancing_energy_demand_response))
+
+    response = get_balancing_energy_satisfied_demand.sync_detailed(
+        client=authenticated_client,
+        area=Area.EE,
+        period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
+        period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
+        reserve_type=ReserveType.AFRR
+    )
+
+    assert response.status_code == 200
+    assert response.parsed is not None
+    assert response.parsed.has_more is False
+    assert len(response.parsed.data) == 1
+    assert response.parsed.data[0].area == Area.EE
+    assert response.parsed.data[0].reserve_type == ReserveType.AFRR
+    assert response.parsed.data[0].volumes[0].volume_in_mw == 80.0
+
+
+@respx.mock
+def test_get_balancing_energy_satisfied_demand_pagination(authenticated_client, mock_balancing_energy_demand_response):
+    """Test satisfied balancing energy demand pagination - cursor/limit sent, nextCursor parsed."""
+    paginated_response = {
+        **mock_balancing_energy_demand_response,
+        "hasMore": True,
+        "nextCursor": "v1:AAAAAYwBAgMEBQYHCAkKCw==",
+    }
+
+    route = respx.get(
+        "https://api.balancing.services/v1/balancing/energy/satisfied-demand"
+    ).mock(return_value=Response(200, json=paginated_response))
+
+    response = get_balancing_energy_satisfied_demand.sync_detailed(
+        client=authenticated_client,
+        area=Area.EE,
+        period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
+        period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
+        reserve_type=ReserveType.AFRR,
+        cursor="v1:AAAAAYwBAgMEBQYHCAkKCw==",
+        limit=100,
+    )
+
+    assert response.status_code == 200
+    assert response.parsed is not None
+    assert response.parsed.has_more is True
+    assert response.parsed.next_cursor == "v1:AAAAAYwBAgMEBQYHCAkKCw=="
+    sent_url = route.calls.last.request.url
+    assert sent_url.params["cursor"] == "v1:AAAAAYwBAgMEBQYHCAkKCw=="
+    assert sent_url.params["limit"] == "100"
+
+
+@respx.mock
+def test_get_balancing_energy_satisfied_demand_unauthorized(authenticated_client):
+    """Test unauthorized response (401) for satisfied balancing energy demand."""
+    error_response = {
+        "type": "unauthorized",
+        "title": "Unauthorized",
+        "status": 401,
+        "detail": "Invalid or missing authentication token"
+    }
+
+    respx.get(
+        "https://api.balancing.services/v1/balancing/energy/satisfied-demand"
+    ).mock(return_value=Response(401, json=error_response))
+
+    response = get_balancing_energy_satisfied_demand.sync_detailed(
+        client=authenticated_client,
+        area=Area.EE,
+        period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
+        period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
+        reserve_type=ReserveType.AFRR
+    )
+
+    assert response.status_code == 401
+    assert response.parsed is not None
+    assert response.parsed.status == 401
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_async_get_balancing_energy_satisfied_demand(authenticated_client, mock_balancing_energy_demand_response):
+    """Test async request for satisfied balancing energy demand."""
+    respx.get(
+        "https://api.balancing.services/v1/balancing/energy/satisfied-demand"
+    ).mock(return_value=Response(200, json=mock_balancing_energy_demand_response))
+
+    response = await get_balancing_energy_satisfied_demand.asyncio_detailed(
+        client=authenticated_client,
+        area=Area.EE,
+        period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
+        period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
+        reserve_type=ReserveType.AFRR
+    )
+
+    assert response.status_code == 200
+    assert response.parsed is not None
+    assert len(response.parsed.data) == 1
+    assert response.parsed.data[0].volumes[0].volume_in_mw == 80.0
 
 
 @pytest.fixture

@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Experimental endpoints for balancing energy demand (`/balancing/energy/demand`) and satisfied balancing energy demand (`/balancing/energy/satisfied-demand`)
+
 ### Changed
 - The offered balancing energy volumes endpoint (`/balancing/energy/offered-volumes`) is no longer experimental and is now considered stable
 
