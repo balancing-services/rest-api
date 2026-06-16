@@ -119,16 +119,14 @@ def sync_detailed(
     cursor: str | Unset = UNSET,
     limit: int | Unset = UNSET,
 ) -> Response[CrossBorderAvailableCapacityResponse | Problem]:
-    r"""Get cross-border available capacity
+    """Get cross-border available capacity
 
-     **EXPERIMENTAL**: Returns the available capacity (ATC) for balancing energy exchange across the
-    border
+     **EXPERIMENTAL**: Returns the available capacity for balancing energy exchange across the border
     between two areas, for the specified reserve type and time period. Both border ends must be given
     (`area` and `other-area`); results cover both directions (area → other-area and other-area → area).
     The value is the dynamic transfer capacity remaining for further balancing activation in a
     direction,
-    net of scheduled flows (source: ENTSO-E \"Balancing Border Capacity Limitation\"). Capacities are
-    expressed in MW.
+    net of scheduled flows. Capacities are expressed in MW.
 
     Results are cursor-paginated: pass `limit` (1–1000, defaults to 100) and follow `nextCursor` from
     each
@@ -181,16 +179,14 @@ def sync(
     cursor: str | Unset = UNSET,
     limit: int | Unset = UNSET,
 ) -> CrossBorderAvailableCapacityResponse | Problem | None:
-    r"""Get cross-border available capacity
+    """Get cross-border available capacity
 
-     **EXPERIMENTAL**: Returns the available capacity (ATC) for balancing energy exchange across the
-    border
+     **EXPERIMENTAL**: Returns the available capacity for balancing energy exchange across the border
     between two areas, for the specified reserve type and time period. Both border ends must be given
     (`area` and `other-area`); results cover both directions (area → other-area and other-area → area).
     The value is the dynamic transfer capacity remaining for further balancing activation in a
     direction,
-    net of scheduled flows (source: ENTSO-E \"Balancing Border Capacity Limitation\"). Capacities are
-    expressed in MW.
+    net of scheduled flows. Capacities are expressed in MW.
 
     Results are cursor-paginated: pass `limit` (1–1000, defaults to 100) and follow `nextCursor` from
     each
@@ -238,16 +234,14 @@ async def asyncio_detailed(
     cursor: str | Unset = UNSET,
     limit: int | Unset = UNSET,
 ) -> Response[CrossBorderAvailableCapacityResponse | Problem]:
-    r"""Get cross-border available capacity
+    """Get cross-border available capacity
 
-     **EXPERIMENTAL**: Returns the available capacity (ATC) for balancing energy exchange across the
-    border
+     **EXPERIMENTAL**: Returns the available capacity for balancing energy exchange across the border
     between two areas, for the specified reserve type and time period. Both border ends must be given
     (`area` and `other-area`); results cover both directions (area → other-area and other-area → area).
     The value is the dynamic transfer capacity remaining for further balancing activation in a
     direction,
-    net of scheduled flows (source: ENTSO-E \"Balancing Border Capacity Limitation\"). Capacities are
-    expressed in MW.
+    net of scheduled flows. Capacities are expressed in MW.
 
     Results are cursor-paginated: pass `limit` (1–1000, defaults to 100) and follow `nextCursor` from
     each
@@ -298,16 +292,14 @@ async def asyncio(
     cursor: str | Unset = UNSET,
     limit: int | Unset = UNSET,
 ) -> CrossBorderAvailableCapacityResponse | Problem | None:
-    r"""Get cross-border available capacity
+    """Get cross-border available capacity
 
-     **EXPERIMENTAL**: Returns the available capacity (ATC) for balancing energy exchange across the
-    border
+     **EXPERIMENTAL**: Returns the available capacity for balancing energy exchange across the border
     between two areas, for the specified reserve type and time period. Both border ends must be given
     (`area` and `other-area`); results cover both directions (area → other-area and other-area → area).
     The value is the dynamic transfer capacity remaining for further balancing activation in a
     direction,
-    net of scheduled flows (source: ENTSO-E \"Balancing Border Capacity Limitation\"). Capacities are
-    expressed in MW.
+    net of scheduled flows. Capacities are expressed in MW.
 
     Results are cursor-paginated: pass `limit` (1–1000, defaults to 100) and follow `nextCursor` from
     each

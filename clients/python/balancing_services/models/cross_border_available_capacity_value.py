@@ -18,7 +18,7 @@ class CrossBorderAvailableCapacityValue:
     """
     Attributes:
         period (Period):
-        available_capacity_in_mw (float): Available capacity (ATC) for balancing exchange in MW Example: 150.0.
+        available_capacity_in_mw (float): Available capacity for balancing exchange in MW Example: 150.0.
     """
 
     period: Period
