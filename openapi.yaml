@@ -1264,11 +1264,11 @@ paths:
     get:
       summary: Get cross-border available capacity
       description: |
-        **EXPERIMENTAL**: Returns the available capacity (ATC) for balancing energy exchange across the border
+        **EXPERIMENTAL**: Returns the available capacity for balancing energy exchange across the border
         between two areas, for the specified reserve type and time period. Both border ends must be given
         (`area` and `other-area`); results cover both directions (area → other-area and other-area → area).
         The value is the dynamic transfer capacity remaining for further balancing activation in a direction,
-        net of scheduled flows (source: ENTSO-E "Balancing Border Capacity Limitation"). Capacities are expressed in MW.
+        net of scheduled flows. Capacities are expressed in MW.
 
         Results are cursor-paginated: pass `limit` (1–1000, defaults to 100) and follow `nextCursor` from each
         response until `hasMore` is false.
@@ -3055,7 +3055,7 @@ components:
           $ref: '#/components/schemas/Period'
         availableCapacityInMw:
           type: number
-          description: Available capacity (ATC) for balancing exchange in MW
+          description: Available capacity for balancing exchange in MW
           example: 150.0
 
     CrossZonalCapacityAllocationResponse:
