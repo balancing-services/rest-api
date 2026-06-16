@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.16.0] - 2026-06-16
+
 ### Added
 - Experimental endpoint for cross-border available capacity (`/balancing/cross-border/available-capacity`)
 
@@ -150,7 +152,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - UTC timestamp-based period filtering
 - OpenAPI 3.0.3 specification
 
-[Unreleased]: https://github.com/balancing-services/rest-api/compare/v1.15.0...HEAD
+[Unreleased]: https://github.com/balancing-services/rest-api/compare/v1.16.0...HEAD
+[1.16.0]: https://github.com/balancing-services/rest-api/compare/v1.15.0...v1.16.0
 [1.15.0]: https://github.com/balancing-services/rest-api/compare/v1.14.0...v1.15.0
 [1.14.0]: https://github.com/balancing-services/rest-api/compare/v1.13.0...v1.14.0
 [1.13.0]: https://github.com/balancing-services/rest-api/compare/v1.12.0...v1.13.0
