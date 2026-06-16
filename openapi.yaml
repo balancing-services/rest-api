@@ -1260,6 +1260,140 @@ paths:
                 not-implemented:
                   $ref: '#/components/examples/problem-not-implemented'
 
+  /balancing/cross-border/available-capacity:
+    get:
+      summary: Get cross-border available capacity
+      description: |
+        **EXPERIMENTAL**: Returns the available capacity (ATC) for balancing energy exchange across the border
+        between two areas, for the specified reserve type and time period. Both border ends must be given
+        (`area` and `other-area`); results cover both directions (area → other-area and other-area → area).
+        The value is the dynamic transfer capacity remaining for further balancing activation in a direction,
+        net of scheduled flows (source: ENTSO-E "Balancing Border Capacity Limitation"). Capacities are expressed in MW.
+
+        Results are cursor-paginated: pass `limit` (1–1000, defaults to 100) and follow `nextCursor` from each
+        response until `hasMore` is false.
+
+        This endpoint is experimental and may be changed or removed without a deprecation period.
+      operationId: getCrossBorderAvailableCapacity
+      x-experimental: true
+      parameters:
+        - name: area
+          in: query
+          description: One end of the border (matched as either the from or the to area)
+          required: true
+          schema:
+            $ref: '#/components/schemas/Area'
+          example: 'FI'
+        - name: other-area
+          in: query
+          description: The other end of the border (matched as either the from or the to area)
+          required: true
+          schema:
+            $ref: '#/components/schemas/Area'
+          example: 'SE3'
+        - name: period-start-at
+          in: query
+          description: Start of the time period (UTC)
+          required: true
+          schema:
+            type: string
+            format: date-time
+            example: '2025-01-01T00:00:00Z'
+        - name: period-end-at
+          in: query
+          description: End of the time period (UTC)
+          required: true
+          schema:
+            type: string
+            format: date-time
+            example: '2025-01-02T00:00:00Z'
+        - name: reserve-type
+          in: query
+          description: Filter by reserve type
+          required: true
+          schema:
+            $ref: '#/components/schemas/ReserveType'
+          example: 'aFRR'
+        - name: cursor
+          in: query
+          description: Pagination cursor from a previous response's `nextCursor`. Omit to fetch the first page.
+          required: false
+          schema:
+            type: string
+            example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
+        - name: limit
+          in: query
+          description: Page size for cursor pagination (1–1000, defaults to 100 when omitted).
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+            example: 100
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CrossBorderAvailableCapacityResponse'
+        '400':
+          description: Bad request
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                invalid-parameter:
+                  $ref: '#/components/examples/problem-invalid-parameter'
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                unauthorized:
+                  $ref: '#/components/examples/problem-unauthorized'
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                forbidden:
+                  $ref: '#/components/examples/problem-forbidden'
+        '404':
+          description: Not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                not-found:
+                  $ref: '#/components/examples/problem-not-found'
+        '429':
+          description: Too many requests
+          headers:
+            Retry-After:
+              description: Number of seconds to wait before retrying
+              schema:
+                type: integer
+                example: 12
+            X-RateLimit-Limit:
+              description: Maximum number of requests allowed per minute
+              schema:
+                type: integer
+                example: 60
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                rate-limited:
+                  $ref: '#/components/examples/problem-rate-limited'
+
   /balancing/capacity/cross-zonal-allocation:
     get:
       summary: Get allocated cross-zonal capacity
@@ -2862,6 +2996,67 @@ components:
         detail:
           type: string
           description: Human-readable explanation specific to this occurrence
+
+    CrossBorderAvailableCapacityResponse:
+      type: object
+      required:
+        - queriedPeriod
+        - data
+        - hasMore
+      properties:
+        queriedPeriod:
+          $ref: '#/components/schemas/Period'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/CrossBorderAvailableCapacity'
+        nextCursor:
+          type: string
+          description: Cursor to fetch the next page of results. Null if no more results.
+          example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
+          nullable: true
+        hasMore:
+          type: boolean
+          description: Indicates whether there are more results available
+          example: false
+
+    CrossBorderAvailableCapacity:
+      type: object
+      required:
+        - fromArea
+        - fromEicCode
+        - toArea
+        - toEicCode
+        - reserveType
+        - availableCapacities
+      properties:
+        fromArea:
+          $ref: '#/components/schemas/Area'
+        fromEicCode:
+          $ref: '#/components/schemas/EicCode'
+        toArea:
+          $ref: '#/components/schemas/Area'
+        toEicCode:
+          $ref: '#/components/schemas/EicCode'
+        reserveType:
+          $ref: '#/components/schemas/ReserveType'
+        availableCapacities:
+          type: array
+          items:
+            $ref: '#/components/schemas/CrossBorderAvailableCapacityValue'
+
+    CrossBorderAvailableCapacityValue:
+      type: object
+      required:
+        - period
+        - availableCapacityInMw
+      properties:
+        period:
+          $ref: '#/components/schemas/Period'
+        availableCapacityInMw:
+          type: number
+          description: Available capacity (ATC) for balancing exchange in MW
+          example: 150.0
 
     CrossZonalCapacityAllocationResponse:
       type: object
