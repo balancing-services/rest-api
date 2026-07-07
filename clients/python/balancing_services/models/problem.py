@@ -6,8 +6,10 @@ from typing import Any, TypeVar
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
-from ..models.problem_type import ProblemType
 from ..types import UNSET, Unset
+
+from ..models.problem_type import ProblemType
+
 
 T = TypeVar("T", bound="Problem")
 

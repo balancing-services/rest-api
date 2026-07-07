@@ -19,6 +19,7 @@ from balancing_services.api.default import (
     get_cross_border_available_capacity,
     get_cross_border_energy_volumes,
     get_cross_border_marginal_prices,
+    get_current_imbalance_total_volumes,
     get_day_ahead_energy_prices,
     get_imbalance_prices,
     get_imbalance_total_volumes,
@@ -69,6 +70,8 @@ class TestAPIEndpointsExist:
         assert hasattr(get_imbalance_prices, "asyncio_detailed")
         assert hasattr(get_imbalance_total_volumes, "sync_detailed")
         assert hasattr(get_imbalance_total_volumes, "asyncio_detailed")
+        assert hasattr(get_current_imbalance_total_volumes, "sync_detailed")
+        assert hasattr(get_current_imbalance_total_volumes, "asyncio_detailed")
 
     def test_balancing_energy_endpoints_exist(self):
         """Test that balancing energy endpoints are available."""
