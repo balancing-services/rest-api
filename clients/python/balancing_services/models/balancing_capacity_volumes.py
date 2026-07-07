@@ -1,17 +1,19 @@
 from __future__ import annotations
 
-import datetime
 from collections.abc import Mapping
-from typing import TYPE_CHECKING, Any, TypeVar, cast
+from typing import Any, TypeVar, TYPE_CHECKING
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
+
+from ..types import UNSET, Unset
 
 from ..models.area import Area
 from ..models.direction import Direction
 from ..models.eic_code import EicCode
 from ..models.reserve_type import ReserveType
-from ..types import UNSET, Unset
+from typing import cast
+import datetime
 
 if TYPE_CHECKING:
     from ..models.balancing_capacity_volume import BalancingCapacityVolume

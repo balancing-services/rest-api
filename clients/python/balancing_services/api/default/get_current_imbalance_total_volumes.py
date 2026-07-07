@@ -8,11 +8,8 @@ from ...types import Response, UNSET
 from ... import errors
 
 from ...models.area import Area
-from ...models.cross_border_available_capacity_response import (
-    CrossBorderAvailableCapacityResponse,
-)
+from ...models.imbalance_total_volumes_response import ImbalanceTotalVolumesResponse
 from ...models.problem import Problem
-from ...models.reserve_type import ReserveType
 from ...types import Unset
 import datetime
 
@@ -20,12 +17,10 @@ import datetime
 def _get_kwargs(
     *,
     area: Area,
-    other_area: Area,
     period_start_at: datetime.datetime,
     period_end_at: datetime.datetime,
-    reserve_type: ReserveType,
     cursor: str | Unset = UNSET,
-    limit: int | Unset = UNSET,
+    limit: int | Unset = 120,
 ) -> dict[str, Any]:
 
     params: dict[str, Any] = {}
@@ -33,17 +28,11 @@ def _get_kwargs(
     json_area = area.value
     params["area"] = json_area
 
-    json_other_area = other_area.value
-    params["other-area"] = json_other_area
-
     json_period_start_at = period_start_at.isoformat()
     params["period-start-at"] = json_period_start_at
 
     json_period_end_at = period_end_at.isoformat()
     params["period-end-at"] = json_period_end_at
-
-    json_reserve_type = reserve_type.value
-    params["reserve-type"] = json_reserve_type
 
     params["cursor"] = cursor
 
@@ -53,7 +42,7 @@ def _get_kwargs(
 
     _kwargs: dict[str, Any] = {
         "method": "get",
-        "url": "/balancing/cross-border/available-capacity",
+        "url": "/imbalance/total-volumes/current",
         "params": params,
     }
 
@@ -62,9 +51,9 @@ def _get_kwargs(
 
 def _parse_response(
     *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> CrossBorderAvailableCapacityResponse | Problem | None:
+) -> ImbalanceTotalVolumesResponse | Problem | None:
     if response.status_code == 200:
-        response_200 = CrossBorderAvailableCapacityResponse.from_dict(response.json())
+        response_200 = ImbalanceTotalVolumesResponse.from_dict(response.json())
 
         return response_200
 
@@ -93,6 +82,16 @@ def _parse_response(
 
         return response_429
 
+    if response.status_code == 500:
+        response_500 = Problem.from_dict(response.json())
+
+        return response_500
+
+    if response.status_code == 501:
+        response_501 = Problem.from_dict(response.json())
+
+        return response_501
+
     if client.raise_on_unexpected_status:
         raise errors.UnexpectedStatus(response.status_code, response.content)
     else:
@@ -101,7 +100,7 @@ def _parse_response(
 
 def _build_response(
     *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> Response[CrossBorderAvailableCapacityResponse | Problem]:
+) -> Response[ImbalanceTotalVolumesResponse | Problem]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -114,51 +113,40 @@ def sync_detailed(
     *,
     client: AuthenticatedClient | Client,
     area: Area,
-    other_area: Area,
     period_start_at: datetime.datetime,
     period_end_at: datetime.datetime,
-    reserve_type: ReserveType,
     cursor: str | Unset = UNSET,
-    limit: int | Unset = UNSET,
-) -> Response[CrossBorderAvailableCapacityResponse | Problem]:
-    """Get cross-border available capacity
+    limit: int | Unset = 120,
+) -> Response[ImbalanceTotalVolumesResponse | Problem]:
+    """Get current (provisional) total imbalance volumes for an area
 
-     **EXPERIMENTAL**: Returns the available capacity for balancing energy exchange across the border
-    between two areas, for the specified reserve type and time period. Both border ends must be given
-    (`area` and `other-area`); results cover both directions (area → other-area and other-area → area).
-    The value is the dynamic transfer capacity remaining for further balancing activation in a
-    direction,
-    net of scheduled flows. Capacities are expressed in MW.
+     **Experimental** - This endpoint is under active development and may change without notice.
 
-    Results are cursor-paginated: pass `limit` (1–1000, defaults to 100) and follow `nextCursor` from
-    each
-    response until `hasMore` is false.
-
-    This endpoint is experimental and may be changed or removed without a deprecation period.
+    Returns the current balancing state (ENTSO-E GL EB article 12.3.A): the open area control error at
+    1-minute resolution, published roughly 25 minutes behind real time. This is the real-time preview of
+    the total imbalance volume — values are provisional and are superseded by the settled volumes on
+    /imbalance/total-volumes once those publish. Data is retained for roughly 90 days. Volumes are
+    expressed as average power in MW. Supports cursor-based pagination for large result sets.
 
     Args:
         area (Area): Area code
-        other_area (Area): Area code
         period_start_at (datetime.datetime):  Example: 2025-01-01T00:00:00Z.
         period_end_at (datetime.datetime):  Example: 2025-01-02T00:00:00Z.
-        reserve_type (ReserveType): Reserve type
         cursor (str | Unset):  Example: v1:AAAAAYwBAgMEBQYHCAkKCw==.
-        limit (int | Unset):  Example: 100.
+        limit (int | Unset):  Default: 120. Example: 120.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[CrossBorderAvailableCapacityResponse | Problem]
+        Response[ImbalanceTotalVolumesResponse | Problem]
     """
 
     kwargs = _get_kwargs(
         area=area,
-        other_area=other_area,
         period_start_at=period_start_at,
         period_end_at=period_end_at,
-        reserve_type=reserve_type,
         cursor=cursor,
         limit=limit,
     )
@@ -174,52 +162,41 @@ def sync(
     *,
     client: AuthenticatedClient | Client,
     area: Area,
-    other_area: Area,
     period_start_at: datetime.datetime,
     period_end_at: datetime.datetime,
-    reserve_type: ReserveType,
     cursor: str | Unset = UNSET,
-    limit: int | Unset = UNSET,
-) -> CrossBorderAvailableCapacityResponse | Problem | None:
-    """Get cross-border available capacity
+    limit: int | Unset = 120,
+) -> ImbalanceTotalVolumesResponse | Problem | None:
+    """Get current (provisional) total imbalance volumes for an area
 
-     **EXPERIMENTAL**: Returns the available capacity for balancing energy exchange across the border
-    between two areas, for the specified reserve type and time period. Both border ends must be given
-    (`area` and `other-area`); results cover both directions (area → other-area and other-area → area).
-    The value is the dynamic transfer capacity remaining for further balancing activation in a
-    direction,
-    net of scheduled flows. Capacities are expressed in MW.
+     **Experimental** - This endpoint is under active development and may change without notice.
 
-    Results are cursor-paginated: pass `limit` (1–1000, defaults to 100) and follow `nextCursor` from
-    each
-    response until `hasMore` is false.
-
-    This endpoint is experimental and may be changed or removed without a deprecation period.
+    Returns the current balancing state (ENTSO-E GL EB article 12.3.A): the open area control error at
+    1-minute resolution, published roughly 25 minutes behind real time. This is the real-time preview of
+    the total imbalance volume — values are provisional and are superseded by the settled volumes on
+    /imbalance/total-volumes once those publish. Data is retained for roughly 90 days. Volumes are
+    expressed as average power in MW. Supports cursor-based pagination for large result sets.
 
     Args:
         area (Area): Area code
-        other_area (Area): Area code
         period_start_at (datetime.datetime):  Example: 2025-01-01T00:00:00Z.
         period_end_at (datetime.datetime):  Example: 2025-01-02T00:00:00Z.
-        reserve_type (ReserveType): Reserve type
         cursor (str | Unset):  Example: v1:AAAAAYwBAgMEBQYHCAkKCw==.
-        limit (int | Unset):  Example: 100.
+        limit (int | Unset):  Default: 120. Example: 120.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        CrossBorderAvailableCapacityResponse | Problem
+        ImbalanceTotalVolumesResponse | Problem
     """
 
     return sync_detailed(
         client=client,
         area=area,
-        other_area=other_area,
         period_start_at=period_start_at,
         period_end_at=period_end_at,
-        reserve_type=reserve_type,
         cursor=cursor,
         limit=limit,
     ).parsed
@@ -229,51 +206,40 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient | Client,
     area: Area,
-    other_area: Area,
     period_start_at: datetime.datetime,
     period_end_at: datetime.datetime,
-    reserve_type: ReserveType,
     cursor: str | Unset = UNSET,
-    limit: int | Unset = UNSET,
-) -> Response[CrossBorderAvailableCapacityResponse | Problem]:
-    """Get cross-border available capacity
+    limit: int | Unset = 120,
+) -> Response[ImbalanceTotalVolumesResponse | Problem]:
+    """Get current (provisional) total imbalance volumes for an area
 
-     **EXPERIMENTAL**: Returns the available capacity for balancing energy exchange across the border
-    between two areas, for the specified reserve type and time period. Both border ends must be given
-    (`area` and `other-area`); results cover both directions (area → other-area and other-area → area).
-    The value is the dynamic transfer capacity remaining for further balancing activation in a
-    direction,
-    net of scheduled flows. Capacities are expressed in MW.
+     **Experimental** - This endpoint is under active development and may change without notice.
 
-    Results are cursor-paginated: pass `limit` (1–1000, defaults to 100) and follow `nextCursor` from
-    each
-    response until `hasMore` is false.
-
-    This endpoint is experimental and may be changed or removed without a deprecation period.
+    Returns the current balancing state (ENTSO-E GL EB article 12.3.A): the open area control error at
+    1-minute resolution, published roughly 25 minutes behind real time. This is the real-time preview of
+    the total imbalance volume — values are provisional and are superseded by the settled volumes on
+    /imbalance/total-volumes once those publish. Data is retained for roughly 90 days. Volumes are
+    expressed as average power in MW. Supports cursor-based pagination for large result sets.
 
     Args:
         area (Area): Area code
-        other_area (Area): Area code
         period_start_at (datetime.datetime):  Example: 2025-01-01T00:00:00Z.
         period_end_at (datetime.datetime):  Example: 2025-01-02T00:00:00Z.
-        reserve_type (ReserveType): Reserve type
         cursor (str | Unset):  Example: v1:AAAAAYwBAgMEBQYHCAkKCw==.
-        limit (int | Unset):  Example: 100.
+        limit (int | Unset):  Default: 120. Example: 120.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[CrossBorderAvailableCapacityResponse | Problem]
+        Response[ImbalanceTotalVolumesResponse | Problem]
     """
 
     kwargs = _get_kwargs(
         area=area,
-        other_area=other_area,
         period_start_at=period_start_at,
         period_end_at=period_end_at,
-        reserve_type=reserve_type,
         cursor=cursor,
         limit=limit,
     )
@@ -287,53 +253,42 @@ async def asyncio(
     *,
     client: AuthenticatedClient | Client,
     area: Area,
-    other_area: Area,
     period_start_at: datetime.datetime,
     period_end_at: datetime.datetime,
-    reserve_type: ReserveType,
     cursor: str | Unset = UNSET,
-    limit: int | Unset = UNSET,
-) -> CrossBorderAvailableCapacityResponse | Problem | None:
-    """Get cross-border available capacity
+    limit: int | Unset = 120,
+) -> ImbalanceTotalVolumesResponse | Problem | None:
+    """Get current (provisional) total imbalance volumes for an area
 
-     **EXPERIMENTAL**: Returns the available capacity for balancing energy exchange across the border
-    between two areas, for the specified reserve type and time period. Both border ends must be given
-    (`area` and `other-area`); results cover both directions (area → other-area and other-area → area).
-    The value is the dynamic transfer capacity remaining for further balancing activation in a
-    direction,
-    net of scheduled flows. Capacities are expressed in MW.
+     **Experimental** - This endpoint is under active development and may change without notice.
 
-    Results are cursor-paginated: pass `limit` (1–1000, defaults to 100) and follow `nextCursor` from
-    each
-    response until `hasMore` is false.
-
-    This endpoint is experimental and may be changed or removed without a deprecation period.
+    Returns the current balancing state (ENTSO-E GL EB article 12.3.A): the open area control error at
+    1-minute resolution, published roughly 25 minutes behind real time. This is the real-time preview of
+    the total imbalance volume — values are provisional and are superseded by the settled volumes on
+    /imbalance/total-volumes once those publish. Data is retained for roughly 90 days. Volumes are
+    expressed as average power in MW. Supports cursor-based pagination for large result sets.
 
     Args:
         area (Area): Area code
-        other_area (Area): Area code
         period_start_at (datetime.datetime):  Example: 2025-01-01T00:00:00Z.
         period_end_at (datetime.datetime):  Example: 2025-01-02T00:00:00Z.
-        reserve_type (ReserveType): Reserve type
         cursor (str | Unset):  Example: v1:AAAAAYwBAgMEBQYHCAkKCw==.
-        limit (int | Unset):  Example: 100.
+        limit (int | Unset):  Default: 120. Example: 120.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        CrossBorderAvailableCapacityResponse | Problem
+        ImbalanceTotalVolumesResponse | Problem
     """
 
     return (
         await asyncio_detailed(
             client=client,
             area=area,
-            other_area=other_area,
             period_start_at=period_start_at,
             period_end_at=period_end_at,
-            reserve_type=reserve_type,
             cursor=cursor,
             limit=limit,
         )

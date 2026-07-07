@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Experimental endpoint for current (provisional) total imbalance volumes (`/imbalance/total-volumes/current`): the open area control error at 1-minute resolution, published near real time and superseded by the settled volumes on `/imbalance/total-volumes`
+
 ## [1.16.0] - 2026-06-16
 
 ### Added

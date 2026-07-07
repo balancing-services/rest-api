@@ -1,16 +1,18 @@
-import datetime
 from http import HTTPStatus
 from typing import Any
 
 import httpx
 
-from ... import errors
 from ...client import AuthenticatedClient, Client
+from ...types import Response, UNSET
+from ... import errors
+
 from ...models.area import Area
 from ...models.balancing_capacity_bids_response import BalancingCapacityBidsResponse
 from ...models.problem import Problem
 from ...models.reserve_type import ReserveType
-from ...types import UNSET, Response, Unset
+from ...types import Unset
+import datetime
 
 
 def _get_kwargs(

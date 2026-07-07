@@ -18,10 +18,18 @@ from balancing_services.api.default import (
     get_cross_border_energy_volumes,
     get_cross_border_marginal_prices,
     get_cross_zonal_capacity_allocation,
+    get_current_imbalance_total_volumes,
     get_day_ahead_energy_prices,
     get_imbalance_prices,
 )
-from balancing_services.models import ActivationType, Area, Currency, Direction, ReserveType
+from balancing_services.models import (
+    ActivationType,
+    Area,
+    Currency,
+    Direction,
+    ReserveType,
+    TotalImbalanceDirection,
+)
 
 
 @pytest.fixture
@@ -1106,6 +1114,154 @@ def test_get_cross_border_available_capacity_pagination(
     # Both border ends must be transmitted as query params.
     assert sent_url.params["area"] == "FI"
     assert sent_url.params["other-area"] == "SE3"
+
+
+@pytest.fixture
+def mock_current_imbalance_total_volumes_response():
+    """Mock response data for current (provisional) total imbalance volumes."""
+    return {
+        "queriedPeriod": {
+            "startAt": "2025-01-01T00:00:00Z",
+            "endAt": "2025-01-01T02:00:00Z"
+        },
+        "hasMore": False,
+        "data": [
+            {
+                "area": "EE",
+                "eicCode": "10Y1001A1001A39I",
+                "volumes": [
+                    {
+                        "period": {
+                            "startAt": "2025-01-01T00:00:00Z",
+                            "endAt": "2025-01-01T00:01:00Z"
+                        },
+                        "averagePowerMW": 4.2,
+                        "averagePowerInMw": 4.2,
+                        "direction": "surplus"
+                    },
+                    {
+                        "period": {
+                            "startAt": "2025-01-01T00:01:00Z",
+                            "endAt": "2025-01-01T00:02:00Z"
+                        },
+                        "averagePowerMW": 7.5,
+                        "averagePowerInMw": 7.5,
+                        "direction": "deficit"
+                    }
+                ]
+            }
+        ]
+    }
+
+
+@respx.mock
+def test_get_current_imbalance_total_volumes_success(
+    authenticated_client, mock_current_imbalance_total_volumes_response
+):
+    """Test successful current imbalance total volumes request."""
+    respx.get(
+        "https://api.balancing.services/v1/imbalance/total-volumes/current"
+    ).mock(return_value=Response(200, json=mock_current_imbalance_total_volumes_response))
+
+    response = get_current_imbalance_total_volumes.sync_detailed(
+        client=authenticated_client,
+        area=Area.EE,
+        period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
+        period_end_at=datetime(2025, 1, 1, 2, 0, 0, tzinfo=timezone.utc),
+    )
+
+    assert response.status_code == 200
+    assert response.parsed is not None
+    assert response.parsed.has_more is False
+    assert len(response.parsed.data) == 1
+    assert response.parsed.data[0].area == Area.EE
+    # Per-minute values carry an unsigned magnitude plus a direction.
+    assert response.parsed.data[0].volumes[0].average_power_in_mw == 4.2
+    assert response.parsed.data[0].volumes[0].direction == TotalImbalanceDirection.SURPLUS
+    assert response.parsed.data[0].volumes[1].average_power_in_mw == 7.5
+    assert response.parsed.data[0].volumes[1].direction == TotalImbalanceDirection.DEFICIT
+
+
+@respx.mock
+def test_get_current_imbalance_total_volumes_unauthorized(authenticated_client):
+    """Test unauthorized response (401) for current imbalance total volumes."""
+    error_response = {
+        "type": "unauthorized",
+        "title": "Unauthorized",
+        "status": 401,
+        "detail": "Invalid or missing authentication token"
+    }
+
+    respx.get(
+        "https://api.balancing.services/v1/imbalance/total-volumes/current"
+    ).mock(return_value=Response(401, json=error_response))
+
+    response = get_current_imbalance_total_volumes.sync_detailed(
+        client=authenticated_client,
+        area=Area.EE,
+        period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
+        period_end_at=datetime(2025, 1, 1, 2, 0, 0, tzinfo=timezone.utc),
+    )
+
+    assert response.status_code == 401
+    assert response.parsed is not None
+    assert response.parsed.status == 401
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_async_get_current_imbalance_total_volumes(
+    authenticated_client, mock_current_imbalance_total_volumes_response
+):
+    """Test async request for current imbalance total volumes."""
+    respx.get(
+        "https://api.balancing.services/v1/imbalance/total-volumes/current"
+    ).mock(return_value=Response(200, json=mock_current_imbalance_total_volumes_response))
+
+    response = await get_current_imbalance_total_volumes.asyncio_detailed(
+        client=authenticated_client,
+        area=Area.EE,
+        period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
+        period_end_at=datetime(2025, 1, 1, 2, 0, 0, tzinfo=timezone.utc),
+    )
+
+    assert response.status_code == 200
+    assert response.parsed is not None
+    assert len(response.parsed.data) == 1
+    assert response.parsed.data[0].volumes[0].average_power_in_mw == 4.2
+
+
+@respx.mock
+def test_get_current_imbalance_total_volumes_pagination(
+    authenticated_client, mock_current_imbalance_total_volumes_response
+):
+    """Test current imbalance total volumes pagination - cursor/limit sent, nextCursor parsed."""
+    paginated_response = {
+        **mock_current_imbalance_total_volumes_response,
+        "hasMore": True,
+        "nextCursor": "v1:AAAAAYwBAgMEBQYHCAkKCw==",
+    }
+
+    route = respx.get(
+        "https://api.balancing.services/v1/imbalance/total-volumes/current"
+    ).mock(return_value=Response(200, json=paginated_response))
+
+    response = get_current_imbalance_total_volumes.sync_detailed(
+        client=authenticated_client,
+        area=Area.EE,
+        period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
+        period_end_at=datetime(2025, 1, 1, 2, 0, 0, tzinfo=timezone.utc),
+        cursor="v1:AAAAAYwBAgMEBQYHCAkKCw==",
+        limit=120,
+    )
+
+    assert response.status_code == 200
+    assert response.parsed is not None
+    assert response.parsed.has_more is True
+    assert response.parsed.next_cursor == "v1:AAAAAYwBAgMEBQYHCAkKCw=="
+    sent_url = route.calls.last.request.url
+    assert sent_url.params["cursor"] == "v1:AAAAAYwBAgMEBQYHCAkKCw=="
+    assert sent_url.params["limit"] == "120"
 
 
 @pytest.fixture
