@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.17.0] - 2026-07-07
+
 ### Added
 - Experimental endpoint for current (provisional) total imbalance volumes (`/imbalance/total-volumes/current`): the open area control error at 1-minute resolution, published near real time and superseded by the settled volumes on `/imbalance/total-volumes`
 
@@ -155,7 +157,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - UTC timestamp-based period filtering
 - OpenAPI 3.0.3 specification
 
-[Unreleased]: https://github.com/balancing-services/rest-api/compare/v1.16.0...HEAD
+[Unreleased]: https://github.com/balancing-services/rest-api/compare/v1.17.0...HEAD
+[1.17.0]: https://github.com/balancing-services/rest-api/compare/v1.16.0...v1.17.0
 [1.16.0]: https://github.com/balancing-services/rest-api/compare/v1.15.0...v1.16.0
 [1.15.0]: https://github.com/balancing-services/rest-api/compare/v1.14.0...v1.15.0
 [1.14.0]: https://github.com/balancing-services/rest-api/compare/v1.13.0...v1.14.0
