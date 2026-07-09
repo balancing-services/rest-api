@@ -126,9 +126,8 @@ def sync_detailed(
      **EXPERIMENTAL**: Returns the available capacity for balancing energy exchange across the border
     between two areas, for the specified reserve type and time period. Both border ends must be given
     (`area` and `other-area`); results cover both directions (area → other-area and other-area → area).
-    The value is the dynamic transfer capacity remaining for further balancing activation in a
-    direction,
-    net of scheduled flows. Capacities are expressed in MW.
+    The value is the per-direction capacity available for balancing energy exchange.
+    Capacities are expressed in MW.
 
     Results are cursor-paginated: pass `limit` (1–1000, defaults to 100) and follow `nextCursor` from
     each
@@ -186,9 +185,8 @@ def sync(
      **EXPERIMENTAL**: Returns the available capacity for balancing energy exchange across the border
     between two areas, for the specified reserve type and time period. Both border ends must be given
     (`area` and `other-area`); results cover both directions (area → other-area and other-area → area).
-    The value is the dynamic transfer capacity remaining for further balancing activation in a
-    direction,
-    net of scheduled flows. Capacities are expressed in MW.
+    The value is the per-direction capacity available for balancing energy exchange.
+    Capacities are expressed in MW.
 
     Results are cursor-paginated: pass `limit` (1–1000, defaults to 100) and follow `nextCursor` from
     each
@@ -241,9 +239,8 @@ async def asyncio_detailed(
      **EXPERIMENTAL**: Returns the available capacity for balancing energy exchange across the border
     between two areas, for the specified reserve type and time period. Both border ends must be given
     (`area` and `other-area`); results cover both directions (area → other-area and other-area → area).
-    The value is the dynamic transfer capacity remaining for further balancing activation in a
-    direction,
-    net of scheduled flows. Capacities are expressed in MW.
+    The value is the per-direction capacity available for balancing energy exchange.
+    Capacities are expressed in MW.
 
     Results are cursor-paginated: pass `limit` (1–1000, defaults to 100) and follow `nextCursor` from
     each
@@ -299,9 +296,8 @@ async def asyncio(
      **EXPERIMENTAL**: Returns the available capacity for balancing energy exchange across the border
     between two areas, for the specified reserve type and time period. Both border ends must be given
     (`area` and `other-area`); results cover both directions (area → other-area and other-area → area).
-    The value is the dynamic transfer capacity remaining for further balancing activation in a
-    direction,
-    net of scheduled flows. Capacities are expressed in MW.
+    The value is the per-direction capacity available for balancing energy exchange.
+    Capacities are expressed in MW.
 
     Results are cursor-paginated: pass `limit` (1–1000, defaults to 100) and follow `nextCursor` from
     each
