@@ -8,6 +8,7 @@ and can be instantiated correctly.
 from balancing_services import AuthenticatedClient, Client
 from balancing_services.api.default import (
     get_balancing_capacity_bids,
+    get_balancing_capacity_demand,
     get_balancing_capacity_prices,
     get_balancing_capacity_procured_volumes,
     get_balancing_energy_activated_volumes,
@@ -98,6 +99,8 @@ class TestAPIEndpointsExist:
         """Test that balancing capacity endpoints are available."""
         assert hasattr(get_balancing_capacity_bids, "sync_detailed")
         assert hasattr(get_balancing_capacity_bids, "asyncio_detailed")
+        assert hasattr(get_balancing_capacity_demand, "sync_detailed")
+        assert hasattr(get_balancing_capacity_demand, "asyncio_detailed")
         assert hasattr(get_balancing_capacity_prices, "sync_detailed")
         assert hasattr(get_balancing_capacity_prices, "asyncio_detailed")
         assert hasattr(get_balancing_capacity_procured_volumes, "sync_detailed")
