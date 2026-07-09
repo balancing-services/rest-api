@@ -4,6 +4,9 @@ from .activation_type import ActivationType
 from .area import Area
 from .balancing_capacity_bids import BalancingCapacityBids
 from .balancing_capacity_bids_response import BalancingCapacityBidsResponse
+from .balancing_capacity_demand import BalancingCapacityDemand
+from .balancing_capacity_demands import BalancingCapacityDemands
+from .balancing_capacity_demands_response import BalancingCapacityDemandsResponse
 from .balancing_capacity_price import BalancingCapacityPrice
 from .balancing_capacity_prices import BalancingCapacityPrices
 from .balancing_capacity_prices_response import BalancingCapacityPricesResponse
@@ -38,6 +41,7 @@ from .currency import Currency
 from .day_ahead_energy_price import DayAheadEnergyPrice
 from .day_ahead_energy_prices import DayAheadEnergyPrices
 from .day_ahead_energy_prices_response import DayAheadEnergyPricesResponse
+from .demand_basis import DemandBasis
 from .direction import Direction
 from .eic_code import EicCode
 from .energy_bid import EnergyBid
@@ -59,6 +63,9 @@ __all__ = (
     "Area",
     "BalancingCapacityBids",
     "BalancingCapacityBidsResponse",
+    "BalancingCapacityDemand",
+    "BalancingCapacityDemands",
+    "BalancingCapacityDemandsResponse",
     "BalancingCapacityPrice",
     "BalancingCapacityPrices",
     "BalancingCapacityPricesResponse",
@@ -89,6 +96,7 @@ __all__ = (
     "DayAheadEnergyPrice",
     "DayAheadEnergyPrices",
     "DayAheadEnergyPricesResponse",
+    "DemandBasis",
     "Direction",
     "EicCode",
     "EnergyBid",

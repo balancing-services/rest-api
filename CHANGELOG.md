@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Experimental endpoint for balancing capacity demand (`/balancing/capacity/demand`): the balancing capacity the TSO set out to procure, grouped per procurement so it can be compared against procured volumes. Each demand splits into the total requirement (`totalDemandInMw`) and the in-area floor (`localDemandInMw`), and each procurement group carries a `demandBasis` (`additive`/`substitutive`) telling whether it adds to the delivery period's total requirement or restates demand of an earlier procurement
+
 ### Fixed
 - Corrected the cross-border available capacity endpoint (`/balancing/cross-border/available-capacity`) description: the value is no longer described as net of scheduled flows
 - Updated the cross-border available capacity endpoint's parameter examples to a border and reserve type the API actually serves (`mFRR` on `ES`–`PT` instead of `aFRR` on `FI`–`SE3`)

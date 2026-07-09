@@ -1770,6 +1770,157 @@ paths:
                 not-implemented:
                   $ref: '#/components/examples/problem-not-implemented'
 
+  /balancing/capacity/demand:
+    get:
+      summary: Get balancing capacity demand
+      description: |
+        **EXPERIMENTAL**: Returns balancing capacity demand for the specified area and reserve type within
+        the given time period, i.e. the balancing capacity the TSO set out to procure. Demand is expressed
+        in MW and grouped per procurement (`procuredAt`), so it can be compared against the procured volumes
+        of the same procurement.
+
+        Each group carries a `demandBasis`: `additive` demand adds to the delivery period's total
+        requirement, while `substitutive` demand restates demand already represented by another procurement
+        of the same period (e.g. a re-run after a failed auction). When summing a period's total requirement
+        across procurements, sum additive demand only.
+
+        Total demand is the full requirement; local demand is the part that must be procured within the
+        area itself, so total minus local may be covered from other areas.
+        Supports cursor-based pagination for large result sets.
+
+        This endpoint is experimental and may be changed or removed without a deprecation period.
+      operationId: getBalancingCapacityDemand
+      x-experimental: true
+      parameters:
+        - name: area
+          in: query
+          description: The area for which to retrieve data
+          required: true
+          schema:
+            $ref: '#/components/schemas/Area'
+          example: 'EE'
+        - name: period-start-at
+          in: query
+          description: Start of the time period (UTC)
+          required: true
+          schema:
+            type: string
+            format: date-time
+            example: '2025-01-01T00:00:00Z'
+        - name: period-end-at
+          in: query
+          description: End of the time period (UTC)
+          required: true
+          schema:
+            type: string
+            format: date-time
+            example: '2025-01-02T00:00:00Z'
+        - name: reserve-type
+          in: query
+          description: Filter by reserve type
+          required: true
+          schema:
+            $ref: '#/components/schemas/ReserveType'
+          example: 'aFRR'
+        - name: cursor
+          in: query
+          description: Pagination cursor from previous response. Omit to start from the beginning.
+          required: false
+          schema:
+            type: string
+            example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
+        - name: limit
+          in: query
+          description: Maximum number of results to return (default 100, max 1000)
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+            default: 100
+            example: 100
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BalancingCapacityDemandsResponse'
+        '400':
+          description: Bad request
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                invalid-parameter:
+                  $ref: '#/components/examples/problem-invalid-parameter'
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                unauthorized:
+                  $ref: '#/components/examples/problem-unauthorized'
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                forbidden:
+                  $ref: '#/components/examples/problem-forbidden'
+        '404':
+          description: Not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                not-found:
+                  $ref: '#/components/examples/problem-not-found'
+        '429':
+          description: Too many requests
+          headers:
+            Retry-After:
+              description: Number of seconds to wait before retrying
+              schema:
+                type: integer
+                example: 12
+            X-RateLimit-Limit:
+              description: Maximum number of requests allowed per minute
+              schema:
+                type: integer
+                example: 60
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                rate-limited:
+                  $ref: '#/components/examples/problem-rate-limited'
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                internal-error:
+                  $ref: '#/components/examples/problem-internal-error'
+        '501':
+          description: Not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                not-implemented:
+                  $ref: '#/components/examples/problem-not-implemented'
+
   /balancing/energy/cross-border-marginal-prices:
     get:
       summary: Get cross-border marginal prices
@@ -2917,6 +3068,80 @@ components:
           description: Volume in MW
           example: 50.0
 
+    BalancingCapacityDemandsResponse:
+      type: object
+      required:
+        - queriedPeriod
+        - data
+        - hasMore
+      properties:
+        queriedPeriod:
+          $ref: '#/components/schemas/Period'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/BalancingCapacityDemands'
+        nextCursor:
+          type: string
+          description: Cursor to fetch the next page of results. Null if no more results.
+          example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
+          nullable: true
+        hasMore:
+          type: boolean
+          description: Indicates whether there are more results available
+          example: false
+
+    BalancingCapacityDemands:
+      type: object
+      required:
+        - area
+        - eicCode
+        - reserveType
+        - direction
+        - procuredAt
+        - demandBasis
+        - demands
+      properties:
+        area:
+          $ref: '#/components/schemas/Area'
+        eicCode:
+          $ref: '#/components/schemas/EicCode'
+        reserveType:
+          $ref: '#/components/schemas/ReserveType'
+        direction:
+          $ref: '#/components/schemas/Direction'
+        procuredAt:
+          type: string
+          format: date-time
+          description: |
+            Timestamp when the capacity was procured (allocation time or gate closure time).
+            Used to distinguish different procurements (e.g., yearly vs hourly, or multiple procurement rounds).
+          example: "2024-08-15T14:30:00Z"
+        demandBasis:
+          $ref: '#/components/schemas/DemandBasis'
+        demands:
+          type: array
+          items:
+            $ref: '#/components/schemas/BalancingCapacityDemand'
+
+    BalancingCapacityDemand:
+      type: object
+      required:
+        - period
+        - totalDemandInMw
+        - localDemandInMw
+      properties:
+        period:
+          $ref: '#/components/schemas/Period'
+        totalDemandInMw:
+          type: number
+          description: The full capacity requirement in MW
+          example: 300.0
+        localDemandInMw:
+          type: number
+          description: The part of the requirement in MW that must be procured within the area itself; total minus local may be covered from other areas
+          example: 120.0
+
     Period:
       type: object
       required:
@@ -3054,6 +3279,16 @@ components:
         - up
         - symmetric
         - down
+
+    DemandBasis:
+      type: string
+      description: |
+        Whether the demand adds to the delivery period's total requirement (`additive`) or restates demand
+        already represented by another procurement of the same period (`substitutive`), e.g. a re-run after
+        a failed auction. When summing a period's total requirement across procurements, sum additive demand only.
+      enum:
+        - additive
+        - substitutive
 
     ImbalanceDirection:
       type: string
