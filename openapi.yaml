@@ -3164,6 +3164,7 @@ components:
       description: Area code
       enum:
         - AT
+        - BALTICS
         - BE
         - BG
         - CH
@@ -3262,6 +3263,7 @@ components:
         - 10Y1001A1001A47J
         - 10YSI-ELES-----O
         - 10YSK-SEPS-----K
+        - 10Y1001A1001A94A
 
     ReserveType:
       type: string

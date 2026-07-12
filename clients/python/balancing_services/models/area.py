@@ -3,6 +3,7 @@ from enum import Enum
 
 class Area(str, Enum):
     AT = "AT"
+    BALTICS = "BALTICS"
     BE = "BE"
     BG = "BG"
     CH = "CH"
