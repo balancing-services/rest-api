@@ -42,6 +42,7 @@ class EicCode(str, Enum):
     VALUE_42 = "10Y1001A1001A47J"
     VALUE_43 = "10YSI-ELES-----O"
     VALUE_44 = "10YSK-SEPS-----K"
+    VALUE_45 = "10Y1001A1001A94A"
     VALUE_5 = "10Y1001A1001A83F"
     VALUE_6 = "10YDE-VE-------2"
     VALUE_7 = "10YDE-RWENET---I"

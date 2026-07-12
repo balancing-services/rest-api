@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Support for the `BALTICS` area, the Baltic LFC block that Estonia (`EE`), Latvia (`LV`) and Lithuania (`LT`) balance as one market; the corresponding EIC code `10Y1001A1001A94A` is added to the `EicCode` enum
+
 ## [1.18.0] - 2026-07-09
 
 ### Added
