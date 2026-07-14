@@ -5,7 +5,10 @@ All notable changes to the Balancing Services REST API will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [Unreleased - 2.0.0]
+
+### Changed
+- The API is served under a new base path: `https://api.balancing.services/v2`. Version 1 remains available at `https://api.balancing.services/v1`
 
 ## [1.20.0] - 2026-07-22
 
@@ -176,7 +179,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - UTC timestamp-based period filtering
 - OpenAPI 3.0.3 specification
 
-[Unreleased]: https://github.com/balancing-services/rest-api/compare/v1.20.0...HEAD
+[Unreleased - 2.0.0]: https://github.com/balancing-services/rest-api/compare/v1.20.0...HEAD
 [1.20.0]: https://github.com/balancing-services/rest-api/compare/v1.19.0...v1.20.0
 [1.19.0]: https://github.com/balancing-services/rest-api/compare/v1.18.0...v1.19.0
 [1.18.0]: https://github.com/balancing-services/rest-api/compare/v1.17.0...v1.18.0
