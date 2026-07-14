@@ -17,7 +17,7 @@ paths:
   /imbalance/prices:
     get:
       summary: Get imbalance prices for an area
-      description: Returns imbalance prices for the specified area within the given time period. Prices are in the specified currency per MWh.
+      description: Returns imbalance prices for the specified area within the given time period. Prices are in the specified currency per MWh. Supports cursor-based pagination for large result sets.
       operationId: getImbalancePrices
       parameters:
         - name: area
@@ -43,6 +43,23 @@ paths:
             type: string
             format: date-time
             example: '2025-01-02T00:00:00Z'
+        - name: cursor
+          in: query
+          description: Pagination cursor from previous response. Omit to start from the beginning.
+          required: false
+          schema:
+            type: string
+            example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
+        - name: limit
+          in: query
+          description: Maximum number of results to return (default 100, max 1000)
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+            default: 100
+            example: 100
       responses:
         '200':
           description: Successful response
@@ -128,7 +145,7 @@ paths:
   /imbalance/total-volumes:
     get:
       summary: Get total imbalance volumes for an area
-      description: Returns total aggregated imbalance volumes for the specified area within the given time period. Volumes are expressed as average power in MW.
+      description: Returns total aggregated imbalance volumes for the specified area within the given time period. Volumes are expressed as average power in MW. Supports cursor-based pagination for large result sets.
       operationId: getImbalanceTotalVolumes
       parameters:
         - name: area
@@ -154,6 +171,23 @@ paths:
             type: string
             format: date-time
             example: '2025-01-02T00:00:00Z'
+        - name: cursor
+          in: query
+          description: Pagination cursor from previous response. Omit to start from the beginning.
+          required: false
+          schema:
+            type: string
+            example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
+        - name: limit
+          in: query
+          description: Maximum number of results to return (default 100, max 1000)
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+            default: 100
+            example: 100
       responses:
         '200':
           description: Successful response
@@ -374,7 +408,7 @@ paths:
   /balancing/energy/activated-volumes:
     get:
       summary: Get activated balancing energy volumes
-      description: Returns activated balancing energy volumes for the specified area within the given time period. Volumes are expressed as (average) power in MW.
+      description: Returns activated balancing energy volumes for the specified area within the given time period. Volumes are expressed as (average) power in MW. Supports cursor-based pagination for large result sets.
       operationId: getBalancingEnergyActivatedVolumes
       parameters:
         - name: area
@@ -407,6 +441,23 @@ paths:
           schema:
             $ref: '#/components/schemas/ReserveType'
           example: 'aFRR'
+        - name: cursor
+          in: query
+          description: Pagination cursor from previous response. Omit to start from the beginning.
+          required: false
+          schema:
+            type: string
+            example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
+        - name: limit
+          in: query
+          description: Maximum number of results to return (default 100, max 1000)
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+            default: 100
+            example: 100
       responses:
         '200':
           description: Successful response
@@ -492,7 +543,7 @@ paths:
   /balancing/energy/offered-volumes:
     get:
       summary: Get offered balancing energy volumes
-      description: Returns offered balancing energy volumes for the specified area within the given time period. Volumes are expressed as (average) power in MW.
+      description: Returns offered balancing energy volumes for the specified area within the given time period. Volumes are expressed as (average) power in MW. Supports cursor-based pagination for large result sets.
       operationId: getBalancingEnergyOfferedVolumes
       parameters:
         - name: area
@@ -525,6 +576,23 @@ paths:
           schema:
             $ref: '#/components/schemas/ReserveType'
           example: 'aFRR'
+        - name: cursor
+          in: query
+          description: Pagination cursor from previous response. Omit to start from the beginning.
+          required: false
+          schema:
+            type: string
+            example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
+        - name: limit
+          in: query
+          description: Maximum number of results to return (default 100, max 1000)
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+            default: 100
+            example: 100
       responses:
         '200':
           description: Successful response
@@ -610,7 +678,7 @@ paths:
   /balancing/energy/prices:
     get:
       summary: Get balancing energy prices
-      description: Returns balancing energy prices for the specified area and reserve type within the given time period. Prices are in the specified currency per MWh.
+      description: Returns balancing energy prices for the specified area and reserve type within the given time period. Prices are in the specified currency per MWh. Supports cursor-based pagination for large result sets.
       operationId: getBalancingEnergyPrices
       parameters:
         - name: area
@@ -643,6 +711,23 @@ paths:
           schema:
             $ref: '#/components/schemas/ReserveType'
           example: 'aFRR'
+        - name: cursor
+          in: query
+          description: Pagination cursor from previous response. Omit to start from the beginning.
+          required: false
+          schema:
+            type: string
+            example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
+        - name: limit
+          in: query
+          description: Maximum number of results to return (default 100, max 1000)
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+            default: 100
+            example: 100
       responses:
         '200':
           description: Successful response
@@ -1280,7 +1365,7 @@ paths:
   /balancing/capacity/prices:
     get:
       summary: Get balancing capacity prices
-      description: Returns balancing capacity prices for the specified area and reserve type within the given time period. Prices are in the specified currency per MW per hour.
+      description: Returns balancing capacity prices for the specified area and reserve type within the given time period. Prices are in the specified currency per MW per hour. Supports cursor-based pagination for large result sets.
       operationId: getBalancingCapacityPrices
       parameters:
         - name: area
@@ -1313,6 +1398,23 @@ paths:
           schema:
             $ref: '#/components/schemas/ReserveType'
           example: 'aFRR'
+        - name: cursor
+          in: query
+          description: Pagination cursor from previous response. Omit to start from the beginning.
+          required: false
+          schema:
+            type: string
+            example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
+        - name: limit
+          in: query
+          description: Maximum number of results to return (default 100, max 1000)
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+            default: 100
+            example: 100
       responses:
         '200':
           description: Successful response
@@ -1451,19 +1553,20 @@ paths:
           example: 'mFRR'
         - name: cursor
           in: query
-          description: Pagination cursor from a previous response's `nextCursor`. Omit to fetch the first page.
+          description: Pagination cursor from previous response. Omit to start from the beginning.
           required: false
           schema:
             type: string
             example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
         - name: limit
           in: query
-          description: Page size for cursor pagination (1–1000, defaults to 100 when omitted).
+          description: Maximum number of results to return (default 100, max 1000)
           required: false
           schema:
             type: integer
             minimum: 1
             maximum: 1000
+            default: 100
             example: 100
       responses:
         '200':
@@ -1535,6 +1638,7 @@ paths:
       description: |
         **EXPERIMENTAL**: Returns allocated cross-zonal capacity volumes for the specified area and reserve type within the given time period.
         Returns both imports (where area is the destination) and exports (where area is the source). Volumes are expressed in MW.
+        Supports cursor-based pagination for large result sets.
 
         This endpoint is experimental and may be changed or removed without a deprecation period.
       operationId: getCrossZonalCapacityAllocation
@@ -1570,6 +1674,23 @@ paths:
           schema:
             $ref: '#/components/schemas/ReserveType'
           example: 'aFRR'
+        - name: cursor
+          in: query
+          description: Pagination cursor from previous response. Omit to start from the beginning.
+          required: false
+          schema:
+            type: string
+            example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
+        - name: limit
+          in: query
+          description: Maximum number of results to return (default 100, max 1000)
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+            default: 100
+            example: 100
       responses:
         '200':
           description: Successful response
@@ -1655,7 +1776,7 @@ paths:
   /balancing/capacity/procured-volumes:
     get:
       summary: Get procured balancing capacity volumes
-      description: Returns procured balancing capacity volumes for the specified area and reserve type within the given time period. Volumes are expressed in MW.
+      description: Returns procured balancing capacity volumes for the specified area and reserve type within the given time period. Volumes are expressed in MW. Supports cursor-based pagination for large result sets.
       operationId: getBalancingCapacityProcuredVolumes
       parameters:
         - name: area
@@ -1688,6 +1809,23 @@ paths:
           schema:
             $ref: '#/components/schemas/ReserveType'
           example: 'aFRR'
+        - name: cursor
+          in: query
+          description: Pagination cursor from previous response. Omit to start from the beginning.
+          required: false
+          schema:
+            type: string
+            example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
+        - name: limit
+          in: query
+          description: Maximum number of results to return (default 100, max 1000)
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+            default: 100
+            example: 100
       responses:
         '200':
           description: Successful response
@@ -2069,11 +2207,6 @@ paths:
         and split by activation type — for mFRR, DIRECT and SCHEDULED activations are returned as separate entries.
         Supports cursor-based pagination for large result sets.
 
-        **Deprecated:** The non-paginated mode — omitting both `cursor` and `limit` to receive the full result set in a single
-        response (bounded to a 32-day period) — is deprecated. In the next major version `limit` will take a default value when
-        omitted, so requests that omit `cursor` and `limit` will be paginated automatically (returning the first page) instead of
-        returning the full result set. Opt into pagination now by passing `limit` and following `nextCursor`.
-
         This endpoint is experimental and may be changed or removed without a deprecation period.
       operationId: getCrossBorderEnergyVolumes
       x-experimental: true
@@ -2110,27 +2243,20 @@ paths:
           example: 'aFRR'
         - name: cursor
           in: query
-          description: |
-            Pagination cursor from a previous response. Pagination is opt-in: supplying `cursor`
-            (and/or `limit`) switches the endpoint into cursor pagination. Omit both `cursor` and
-            `limit` to receive the full result set in a single response (bounded to a 32-day period).
+          description: Pagination cursor from previous response. Omit to start from the beginning.
           required: false
           schema:
             type: string
             example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
         - name: limit
           in: query
-          description: |
-            Page size for cursor pagination (max 1000, defaults to 100 when paginating). Supplying it
-            enables pagination; omitting both `limit` and `cursor` returns the full result set in a
-            single response (bounded to a 32-day period). This single-response mode is deprecated: in the
-            next major version `limit` will default to a value when omitted, so responses will always be
-            paginated.
+          description: Maximum number of results to return (default 100, max 1000)
           required: false
           schema:
             type: integer
             minimum: 1
             maximum: 1000
+            default: 100
             example: 100
       responses:
         '200':
