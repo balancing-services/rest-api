@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased - 2.0.0]
 
+### Added
+- Incremental polling on every data endpoint: an optional `updated-since` query parameter filters to records changed strictly after the given timestamp, and every paginated response carries a `nextUpdatedSince` watermark to pass back on the next poll over the same window. Every page of one drain reports the same watermark; it deliberately lags real time so consecutive polls overlap slightly — a record may be delivered more than once, so upsert on consume
+
 ### Changed
 - The API is served under a new base path: `https://api.balancing.services/v2`. Version 1 remains available at `https://api.balancing.services/v1`
 - **Breaking:** Every data endpoint is now paginated. All endpoints accept `cursor` and `limit`, and every response carries `nextCursor` and `hasMore`. `limit` defaults to 100 (max 1000) when omitted, so a request without pagination parameters returns the first page rather than the whole result set — follow `nextCursor` until `hasMore` is `false` to retrieve everything. Two endpoints keep their own bounds: `/imbalance/total-volumes/current` (default 120, max 1440) and `/balancing/energy/cross-border-marginal-prices` (default 1000, max 10000)

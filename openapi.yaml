@@ -60,6 +60,7 @@ paths:
             maximum: 1000
             default: 100
             example: 100
+        - $ref: '#/components/parameters/updated-since'
       responses:
         '200':
           description: Successful response
@@ -188,6 +189,7 @@ paths:
             maximum: 1000
             default: 100
             example: 100
+        - $ref: '#/components/parameters/updated-since'
       responses:
         '200':
           description: Successful response
@@ -323,6 +325,7 @@ paths:
             maximum: 1440
             default: 120
             example: 120
+        - $ref: '#/components/parameters/updated-since'
       responses:
         '200':
           description: Successful response
@@ -458,6 +461,7 @@ paths:
             maximum: 1000
             default: 100
             example: 100
+        - $ref: '#/components/parameters/updated-since'
       responses:
         '200':
           description: Successful response
@@ -593,6 +597,7 @@ paths:
             maximum: 1000
             default: 100
             example: 100
+        - $ref: '#/components/parameters/updated-since'
       responses:
         '200':
           description: Successful response
@@ -728,6 +733,7 @@ paths:
             maximum: 1000
             default: 100
             example: 100
+        - $ref: '#/components/parameters/updated-since'
       responses:
         '200':
           description: Successful response
@@ -863,6 +869,7 @@ paths:
             maximum: 1000
             default: 100
             example: 100
+        - $ref: '#/components/parameters/updated-since'
       responses:
         '200':
           description: Successful response
@@ -1004,6 +1011,7 @@ paths:
             maximum: 1000
             default: 100
             example: 100
+        - $ref: '#/components/parameters/updated-since'
       responses:
         '200':
           description: Successful response
@@ -1145,6 +1153,7 @@ paths:
             maximum: 1000
             default: 100
             example: 100
+        - $ref: '#/components/parameters/updated-since'
       responses:
         '200':
           description: Successful response
@@ -1280,6 +1289,7 @@ paths:
             maximum: 1000
             default: 100
             example: 100
+        - $ref: '#/components/parameters/updated-since'
       responses:
         '200':
           description: Successful response
@@ -1415,6 +1425,7 @@ paths:
             maximum: 1000
             default: 100
             example: 100
+        - $ref: '#/components/parameters/updated-since'
       responses:
         '200':
           description: Successful response
@@ -1568,6 +1579,7 @@ paths:
             maximum: 1000
             default: 100
             example: 100
+        - $ref: '#/components/parameters/updated-since'
       responses:
         '200':
           description: Successful response
@@ -1691,6 +1703,7 @@ paths:
             maximum: 1000
             default: 100
             example: 100
+        - $ref: '#/components/parameters/updated-since'
       responses:
         '200':
           description: Successful response
@@ -1826,6 +1839,7 @@ paths:
             maximum: 1000
             default: 100
             example: 100
+        - $ref: '#/components/parameters/updated-since'
       responses:
         '200':
           description: Successful response
@@ -1977,6 +1991,7 @@ paths:
             maximum: 1000
             default: 100
             example: 100
+        - $ref: '#/components/parameters/updated-since'
       responses:
         '200':
           description: Successful response
@@ -2116,6 +2131,7 @@ paths:
             maximum: 10000
             default: 1000
             example: 1000
+        - $ref: '#/components/parameters/updated-since'
       responses:
         '200':
           description: Successful response
@@ -2258,6 +2274,7 @@ paths:
             maximum: 1000
             default: 100
             example: 100
+        - $ref: '#/components/parameters/updated-since'
       responses:
         '200':
           description: Successful response
@@ -2396,6 +2413,7 @@ paths:
             maximum: 1000
             default: 100
             example: 100
+        - $ref: '#/components/parameters/updated-since'
       responses:
         '200':
           description: Successful response
@@ -2479,6 +2497,21 @@ paths:
                   $ref: '#/components/examples/problem-not-implemented'
 
 components:
+  parameters:
+    updated-since:
+      name: updated-since
+      in: query
+      description: >-
+        Only return records the backend stored a change for strictly after this timestamp (UTC).
+        Combine with the mandatory period window to poll incrementally for changes instead of
+        re-downloading the full window. Pass back the `nextUpdatedSince` of your previous poll over
+        the same window — a timestamp you derive yourself can silently skip changes.
+        Like all query parameters, repeat the same value on every page of a paginated drain.
+      required: false
+      schema:
+        type: string
+        format: date-time
+        example: '2025-01-02T09:15:00Z'
   securitySchemes:
     BearerAuth:
       type: http
@@ -2545,12 +2578,22 @@ components:
         detail: An unexpected error occurred while processing the request
 
   schemas:
+    NextUpdatedSince:
+      type: string
+      format: date-time
+      description: >-
+        The watermark to pass as `updated-since` on the next poll. Every page of one drain reports
+        the same value. It deliberately lags real time to cover writes that were still committing,
+        so consecutive polls overlap slightly and a record may be delivered more than once — upsert
+        on consume.
+      example: '2025-01-02T09:15:00Z'
     ImbalancePricesResponse:
       type: object
       required:
         - queriedPeriod
         - data
         - hasMore
+        - nextUpdatedSince
       properties:
         queriedPeriod:
           $ref: '#/components/schemas/Period'
@@ -2567,6 +2610,8 @@ components:
           type: boolean
           description: Indicates whether there are more results available
           example: true
+        nextUpdatedSince:
+          $ref: '#/components/schemas/NextUpdatedSince'
 
     ImbalancePrices:
       type: object
@@ -2615,6 +2660,7 @@ components:
         - queriedPeriod
         - data
         - hasMore
+        - nextUpdatedSince
       properties:
         queriedPeriod:
           $ref: '#/components/schemas/Period'
@@ -2631,6 +2677,8 @@ components:
           type: boolean
           description: Indicates whether there are more results available
           example: false
+        nextUpdatedSince:
+          $ref: '#/components/schemas/NextUpdatedSince'
 
     ImbalanceTotalVolumes:
       type: object
@@ -2677,6 +2725,7 @@ components:
         - queriedPeriod
         - data
         - hasMore
+        - nextUpdatedSince
       properties:
         queriedPeriod:
           $ref: '#/components/schemas/Period'
@@ -2693,6 +2742,8 @@ components:
           type: boolean
           description: Indicates whether there are more results available
           example: true
+        nextUpdatedSince:
+          $ref: '#/components/schemas/NextUpdatedSince'
 
     BalancingEnergyVolumes:
       type: object
@@ -2749,6 +2800,7 @@ components:
         - queriedPeriod
         - data
         - hasMore
+        - nextUpdatedSince
       properties:
         queriedPeriod:
           $ref: '#/components/schemas/Period'
@@ -2765,6 +2817,8 @@ components:
           type: boolean
           description: Indicates whether there are more results available
           example: false
+        nextUpdatedSince:
+          $ref: '#/components/schemas/NextUpdatedSince'
 
     BalancingEnergyPrices:
       type: object
@@ -2824,6 +2878,7 @@ components:
         - queriedPeriod
         - data
         - hasMore
+        - nextUpdatedSince
       properties:
         queriedPeriod:
           $ref: '#/components/schemas/Period'
@@ -2840,6 +2895,8 @@ components:
           type: boolean
           description: Indicates whether there are more results available
           example: false
+        nextUpdatedSince:
+          $ref: '#/components/schemas/NextUpdatedSince'
 
     DayAheadEnergyPrices:
       type: object
@@ -2885,6 +2942,7 @@ components:
         - queriedPeriod
         - data
         - hasMore
+        - nextUpdatedSince
       properties:
         queriedPeriod:
           $ref: '#/components/schemas/Period'
@@ -2901,6 +2959,8 @@ components:
           type: boolean
           description: Indicates whether there are more results available
           example: true
+        nextUpdatedSince:
+          $ref: '#/components/schemas/NextUpdatedSince'
 
     BalancingEnergyBids:
       type: object
@@ -2968,6 +3028,7 @@ components:
         - queriedPeriod
         - data
         - hasMore
+        - nextUpdatedSince
       properties:
         queriedPeriod:
           $ref: '#/components/schemas/Period'
@@ -2984,6 +3045,8 @@ components:
           type: boolean
           description: Indicates whether there are more results available
           example: true
+        nextUpdatedSince:
+          $ref: '#/components/schemas/NextUpdatedSince'
 
     BalancingCapacityBids:
       type: object
@@ -3049,6 +3112,7 @@ components:
         - queriedPeriod
         - data
         - hasMore
+        - nextUpdatedSince
       properties:
         queriedPeriod:
           $ref: '#/components/schemas/Period'
@@ -3065,6 +3129,8 @@ components:
           type: boolean
           description: Indicates whether there are more results available
           example: false
+        nextUpdatedSince:
+          $ref: '#/components/schemas/NextUpdatedSince'
 
     BalancingCapacityPrices:
       type: object
@@ -3126,6 +3192,7 @@ components:
         - queriedPeriod
         - data
         - hasMore
+        - nextUpdatedSince
       properties:
         queriedPeriod:
           $ref: '#/components/schemas/Period'
@@ -3142,6 +3209,8 @@ components:
           type: boolean
           description: Indicates whether there are more results available
           example: false
+        nextUpdatedSince:
+          $ref: '#/components/schemas/NextUpdatedSince'
 
     BalancingCapacityVolumes:
       type: object
@@ -3200,6 +3269,7 @@ components:
         - queriedPeriod
         - data
         - hasMore
+        - nextUpdatedSince
       properties:
         queriedPeriod:
           $ref: '#/components/schemas/Period'
@@ -3216,6 +3286,8 @@ components:
           type: boolean
           description: Indicates whether there are more results available
           example: false
+        nextUpdatedSince:
+          $ref: '#/components/schemas/NextUpdatedSince'
 
     BalancingCapacityDemands:
       type: object
@@ -3504,6 +3576,7 @@ components:
         - queriedPeriod
         - data
         - hasMore
+        - nextUpdatedSince
       properties:
         queriedPeriod:
           $ref: '#/components/schemas/Period'
@@ -3520,6 +3593,8 @@ components:
           type: boolean
           description: Indicates whether there are more results available
           example: false
+        nextUpdatedSince:
+          $ref: '#/components/schemas/NextUpdatedSince'
 
     CrossBorderAvailableCapacity:
       type: object
@@ -3565,6 +3640,7 @@ components:
         - queriedPeriod
         - data
         - hasMore
+        - nextUpdatedSince
       properties:
         queriedPeriod:
           $ref: '#/components/schemas/Period'
@@ -3581,6 +3657,8 @@ components:
           type: boolean
           description: Indicates whether there are more results available
           example: false
+        nextUpdatedSince:
+          $ref: '#/components/schemas/NextUpdatedSince'
 
     CrossZonalVolumes:
       type: object
@@ -3613,6 +3691,7 @@ components:
         - queriedPeriod
         - data
         - hasMore
+        - nextUpdatedSince
       properties:
         queriedPeriod:
           $ref: '#/components/schemas/Period'
@@ -3629,6 +3708,8 @@ components:
           type: boolean
           description: Indicates whether there are more results available
           example: true
+        nextUpdatedSince:
+          $ref: '#/components/schemas/NextUpdatedSince'
 
     CrossBorderMarginalPrices:
       type: object
@@ -3680,6 +3761,7 @@ components:
         - queriedPeriod
         - data
         - hasMore
+        - nextUpdatedSince
       properties:
         queriedPeriod:
           $ref: '#/components/schemas/Period'
@@ -3696,6 +3778,8 @@ components:
           type: boolean
           description: Indicates whether there are more results available
           example: false
+        nextUpdatedSince:
+          $ref: '#/components/schemas/NextUpdatedSince'
 
     CrossBorderEnergyVolumes:
       type: object
