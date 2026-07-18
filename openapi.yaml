@@ -1512,7 +1512,7 @@ paths:
     get:
       summary: Get cross-border available capacity
       description: |
-        **EXPERIMENTAL**: Returns the available capacity for balancing energy exchange across the border
+        Returns the available capacity for balancing energy exchange across the border
         between two areas, for the specified reserve type and time period. Both border ends must be given
         (`area` and `other-area`); results cover both directions (area → other-area and other-area → area).
         The value is the per-direction capacity available for balancing energy exchange.
@@ -1520,10 +1520,7 @@ paths:
 
         Results are cursor-paginated: pass `limit` (1–1000, defaults to 100) and follow `nextCursor` from each
         response until `hasMore` is false.
-
-        This endpoint is experimental and may be changed or removed without a deprecation period.
       operationId: getCrossBorderAvailableCapacity
-      x-experimental: true
       parameters:
         - name: area
           in: query
@@ -1648,21 +1645,26 @@ paths:
     get:
       summary: Get allocated cross-zonal capacity
       description: |
-        **EXPERIMENTAL**: Returns allocated cross-zonal capacity volumes for the specified area and reserve type within the given time period.
-        Returns both imports (where area is the destination) and exports (where area is the source). Volumes are expressed in MW.
+        Returns allocated cross-zonal capacity volumes across the border between two areas,
+        for the specified reserve type and time period. Both border ends must be given (`area` and `other-area`);
+        results cover both directions (area → other-area and other-area → area). Volumes are expressed in MW.
         Supports cursor-based pagination for large result sets.
-
-        This endpoint is experimental and may be changed or removed without a deprecation period.
       operationId: getCrossZonalCapacityAllocation
-      x-experimental: true
       parameters:
         - name: area
           in: query
-          description: The area for which to retrieve data (matches either from or to area)
+          description: One end of the border (matched as either the from or the to area)
           required: true
           schema:
             $ref: '#/components/schemas/Area'
           example: 'FI'
+        - name: other-area
+          in: query
+          description: The other end of the border (matched as either the from or the to area)
+          required: true
+          schema:
+            $ref: '#/components/schemas/Area'
+          example: 'EE'
         - name: period-start-at
           in: query
           description: Start of the time period (UTC)
@@ -2218,22 +2220,27 @@ paths:
     get:
       summary: Get cross-border balancing energy volumes
       description: |
-        **EXPERIMENTAL**: Returns cross-border balancing energy volumes for the specified area and reserve type within the given time period.
-        Returns both imports (where area is the destination) and exports (where area is the source). Volumes are expressed as average power in MW
+        Returns cross-border balancing energy volumes across the border between two areas,
+        for the specified reserve type and time period. Both border ends must be given (`area` and `other-area`);
+        results cover both directions (area → other-area and other-area → area). Volumes are expressed as average power in MW
         and split by activation type — for mFRR, DIRECT and SCHEDULED activations are returned as separate entries.
         Supports cursor-based pagination for large result sets.
-
-        This endpoint is experimental and may be changed or removed without a deprecation period.
       operationId: getCrossBorderEnergyVolumes
-      x-experimental: true
       parameters:
         - name: area
           in: query
-          description: The area for which to retrieve data (matches either from or to area)
+          description: One end of the border (matched as either the from or the to area)
           required: true
           schema:
             $ref: '#/components/schemas/Area'
           example: 'FI'
+        - name: other-area
+          in: query
+          description: The other end of the border (matched as either the from or the to area)
+          required: true
+          schema:
+            $ref: '#/components/schemas/Area'
+          example: 'EE'
         - name: period-start-at
           in: query
           description: Start of the time period (UTC)
