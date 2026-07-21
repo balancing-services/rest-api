@@ -819,7 +819,22 @@ paths:
   /balancing/energy/bids:
     get:
       summary: Get balancing energy bids
-      description: Returns balancing energy bids for the specified area within the given time period. Prices are in the specified currency per MWh. Supports cursor-based pagination for large result sets.
+      description: |
+        Returns balancing energy bids for the specified area within the given time period. Prices are in
+        the specified currency per MWh.
+
+        Bids are grouped by their shared dimensions (area, reserve type, direction, currency,
+        standard-product flag), and inside each group by delivery period: each entry of `periods` states
+        the period once and carries that period's bids. Period entries ascend by period start within
+        their group.
+
+        Supports cursor-based pagination for large result sets; `limit` counts individual bids, not
+        groups or period entries. Groups and period entries are assembled per page: when `hasMore` is
+        true the last period entry may continue on the next page, so merge entries on their group's
+        dimensions plus the period when accumulating pages. Bids within a period entry are returned in no
+        guaranteed order — sort by price client-side if you need the merit order. When polling with
+        `updated-since`, a page holds only the bids that changed, so the period entries of a poll are not
+        necessarily contiguous.
       operationId: getBalancingEnergyBids
       parameters:
         - name: area
@@ -1239,7 +1254,21 @@ paths:
   /balancing/capacity/bids:
     get:
       summary: Get balancing capacity bids
-      description: Returns balancing capacity bids for the specified area within the given time period. Prices are in the specified currency per MW per hour. Supports cursor-based pagination for large result sets.
+      description: |
+        Returns balancing capacity bids for the specified area within the given time period. Prices are
+        in the specified currency per MW per hour.
+
+        Bids are grouped by their shared dimensions (area, reserve type, direction, currency), and inside
+        each group by delivery period: each entry of `periods` states the period once and carries that
+        period's bids. Period entries ascend by period start within their group.
+
+        Supports cursor-based pagination for large result sets; `limit` counts individual bids, not
+        groups or period entries. Groups and period entries are assembled per page: when `hasMore` is
+        true the last period entry may continue on the next page, so merge entries on their group's
+        dimensions plus the period when accumulating pages. Bids within a period entry are returned in no
+        guaranteed order — sort by price client-side if you need the merit order. When polling with
+        `updated-since`, a page holds only the bids that changed, so the period entries of a poll are not
+        necessarily contiguous.
       operationId: getBalancingCapacityBids
       parameters:
         - name: area
@@ -2646,16 +2675,10 @@ components:
       type: object
       required:
         - period
-        - price
         - pricePerMwh
       properties:
         period:
           $ref: '#/components/schemas/Period'
-        price:
-          type: number
-          deprecated: true
-          description: 'Deprecated — use `pricePerMwh` instead. Price per MWh in the specified currency'
-          example: 45.50
         pricePerMwh:
           type: number
           description: Price per MWh in the specified currency
@@ -2708,17 +2731,11 @@ components:
       type: object
       required:
         - period
-        - averagePowerMW
         - averagePowerInMw
         - direction
       properties:
         period:
           $ref: '#/components/schemas/Period'
-        averagePowerMW:
-          type: number
-          deprecated: true
-          description: 'Deprecated — use `averagePowerInMw` instead. Average power in MW during the period'
-          example: 60.5
         averagePowerInMw:
           type: number
           description: Average power in MW during the period
@@ -2786,16 +2803,10 @@ components:
       type: object
       required:
         - period
-        - volume
         - volumeInMw
       properties:
         period:
           $ref: '#/components/schemas/Period'
-        volume:
-          type: number
-          deprecated: true
-          description: 'Deprecated — use `volumeInMw` instead. Average power in MW over the period'
-          example: 250.5
         volumeInMw:
           type: number
           description: Average power in MW over the period
@@ -2864,16 +2875,10 @@ components:
       type: object
       required:
         - period
-        - price
         - pricePerMwh
       properties:
         period:
           $ref: '#/components/schemas/Period'
-        price:
-          type: number
-          deprecated: true
-          description: 'Deprecated — use `pricePerMwh` instead. Price per MWh in the specified currency'
-          example: 45.50
         pricePerMwh:
           type: number
           description: Price per MWh in the specified currency
@@ -2928,16 +2933,10 @@ components:
       type: object
       required:
         - period
-        - price
         - pricePerMwh
       properties:
         period:
           $ref: '#/components/schemas/Period'
-        price:
-          type: number
-          deprecated: true
-          description: 'Deprecated — use `pricePerMwh` instead. Day-ahead price per MWh in the specified currency'
-          example: 45.67
         pricePerMwh:
           type: number
           description: Day-ahead price per MWh in the specified currency
@@ -2978,7 +2977,7 @@ components:
         - direction
         - currency
         - standardProduct
-        - bids
+        - periods
       properties:
         area:
           $ref: '#/components/schemas/Area'
@@ -2994,36 +2993,41 @@ components:
           type: boolean
           description: Indicates if this is a European standard balancing product
           example: true
+        periods:
+          type: array
+          description: >-
+            One entry per delivery period for this group, ascending by period start. When a page ends
+            inside a delivery period (`hasMore` is true), the next page continues the same entry — merge
+            entries on the group's dimensions plus the period when accumulating pages.
+          items:
+            $ref: '#/components/schemas/BalancingEnergyBidPeriod'
+
+    BalancingEnergyBidPeriod:
+      type: object
+      required:
+        - period
+        - bids
+      properties:
+        period:
+          $ref: '#/components/schemas/Period'
         bids:
           type: array
+          description: >-
+            The bids for this delivery period. No ordering is guaranteed — sort by price client-side if
+            you need the merit order.
           items:
             $ref: '#/components/schemas/EnergyBid'
 
     EnergyBid:
       type: object
       required:
-        - period
-        - volume
         - volumeInMw
-        - price
         - pricePerMwh
       properties:
-        period:
-          $ref: '#/components/schemas/Period'
-        volume:
-          type: number
-          deprecated: true
-          description: 'Deprecated — use `volumeInMw` instead. Bid volume in MW'
-          example: 100
         volumeInMw:
           type: number
           description: Bid volume in MW
           example: 100
-        price:
-          type: number
-          deprecated: true
-          description: 'Deprecated — use `pricePerMwh` instead. Bid price per MWh in the specified currency'
-          example: 55.25
         pricePerMwh:
           type: number
           description: Bid price per MWh in the specified currency
@@ -3063,7 +3067,7 @@ components:
         - reserveType
         - direction
         - currency
-        - bids
+        - periods
       properties:
         area:
           $ref: '#/components/schemas/Area'
@@ -3075,37 +3079,42 @@ components:
           $ref: '#/components/schemas/Direction'
         currency:
           $ref: '#/components/schemas/Currency'
+        periods:
+          type: array
+          description: >-
+            One entry per delivery period for this group, ascending by period start. When a page ends
+            inside a delivery period (`hasMore` is true), the next page continues the same entry — merge
+            entries on the group's dimensions plus the period when accumulating pages.
+          items:
+            $ref: '#/components/schemas/BalancingCapacityBidPeriod'
+
+    BalancingCapacityBidPeriod:
+      type: object
+      required:
+        - period
+        - bids
+      properties:
+        period:
+          $ref: '#/components/schemas/Period'
         bids:
           type: array
+          description: >-
+            The bids for this delivery period. No ordering is guaranteed — sort by price client-side if
+            you need the merit order.
           items:
             $ref: '#/components/schemas/CapacityBid'
 
     CapacityBid:
       type: object
       required:
-        - period
-        - capacity
         - capacityInMw
-        - price
         - pricePerMwPerHour
         - status
       properties:
-        period:
-          $ref: '#/components/schemas/Period'
-        capacity:
-          type: number
-          deprecated: true
-          description: 'Deprecated — use `capacityInMw` instead. Bid capacity in MW'
-          example: 50
         capacityInMw:
           type: number
           description: Bid capacity in MW
           example: 50
-        price:
-          type: number
-          deprecated: true
-          description: 'Deprecated — use `pricePerMwPerHour` instead. Bid price per MW per hour in the specified currency'
-          example: 12.50
         pricePerMwPerHour:
           type: number
           description: Bid price per MW per hour in the specified currency
@@ -3178,16 +3187,10 @@ components:
       type: object
       required:
         - period
-        - price
         - pricePerMwPerHour
       properties:
         period:
           $ref: '#/components/schemas/Period'
-        price:
-          type: number
-          deprecated: true
-          description: 'Deprecated — use `pricePerMwPerHour` instead. Price per MW per hour in the specified currency'
-          example: 12.50
         pricePerMwPerHour:
           type: number
           description: Price per MW per hour in the specified currency
@@ -3255,16 +3258,10 @@ components:
       type: object
       required:
         - period
-        - volume
         - volumeInMw
       properties:
         period:
           $ref: '#/components/schemas/Period'
-        volume:
-          type: number
-          deprecated: true
-          description: 'Deprecated — use `volumeInMw` instead. Volume in MW'
-          example: 50.0
         volumeInMw:
           type: number
           description: Volume in MW
@@ -3747,16 +3744,10 @@ components:
       type: object
       required:
         - period
-        - price
         - pricePerMwh
       properties:
         period:
           $ref: '#/components/schemas/Period'
-        price:
-          type: number
-          deprecated: true
-          description: 'Deprecated — use `pricePerMwh` instead. Marginal price per MWh in the specified currency'
-          example: 45.50
         pricePerMwh:
           type: number
           description: Marginal price per MWh in the specified currency
