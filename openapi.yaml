@@ -1260,7 +1260,9 @@ paths:
 
         Bids are grouped by their shared dimensions (area, reserve type, direction, currency), and inside
         each group by delivery period: each entry of `periods` states the period once and carries that
-        period's bids. Period entries ascend by period start within their group.
+        period's bids. Period entries ascend by period start within their group. Each bid carries the
+        procurement it was submitted to (`procurement.procuredAt`) — a single period entry can mix bids
+        from multiple procurement rounds.
 
         Supports cursor-based pagination for large result sets; `limit` counts individual bids, not
         groups or period entries. Groups and period entries are assembled per page: when `hasMore` is
@@ -1959,8 +1961,8 @@ paths:
       description: |
         **EXPERIMENTAL**: Returns balancing capacity demand for the specified area and reserve type within
         the given time period, i.e. the balancing capacity the TSO set out to procure. Demand is expressed
-        in MW and grouped per procurement (`procuredAt`), so it can be compared against the procured volumes
-        of the same procurement.
+        in MW and grouped per procurement (`procurement.procuredAt`), so it can be compared against the
+        procured volumes of the same procurement.
 
         Each group carries a `demandBasis`: `additive` demand adds to the delivery period's total
         requirement, while `substitutive` demand restates demand already represented by another procurement
@@ -3110,6 +3112,7 @@ components:
         - capacityInMw
         - pricePerMwPerHour
         - status
+        - procurement
       properties:
         capacityInMw:
           type: number
@@ -3121,6 +3124,23 @@ components:
           example: 12.50
         status:
           $ref: '#/components/schemas/BidStatus'
+        procurement:
+          description: The procurement this bid was submitted to.
+          allOf:
+            - $ref: '#/components/schemas/Procurement'
+
+    Procurement:
+      type: object
+      required:
+        - procuredAt
+      properties:
+        procuredAt:
+          type: string
+          format: date-time
+          description: |
+            Timestamp when the capacity was procured (allocation time or gate closure time).
+            Used to distinguish different procurements (e.g. yearly vs hourly, or multiple procurement rounds).
+          example: "2024-08-15T14:30:00Z"
 
     BalancingCapacityPricesResponse:
       type: object
@@ -3156,6 +3176,7 @@ components:
         - reserveType
         - direction
         - currency
+        - procurement
         - prices
       properties:
         area:
@@ -3168,16 +3189,10 @@ components:
           $ref: '#/components/schemas/Direction'
         currency:
           $ref: '#/components/schemas/Currency'
-        procuredAt:
-          type: string
-          format: date-time
-          nullable: true
-          description: |
-            **EXPERIMENTAL**: Timestamp when the capacity was procured (allocation time or gate closure time).
-            Used to distinguish different auctions (e.g., yearly vs hourly, or multiple procurement rounds).
-            This field is experimental and may be changed or removed without a deprecation period.
-          example: "2024-08-15T14:30:00Z"
-          x-experimental: true
+        procurement:
+          description: The procurement these prices came from.
+          allOf:
+            - $ref: '#/components/schemas/Procurement'
         prices:
           type: array
           items:
@@ -3229,6 +3244,7 @@ components:
         - eicCode
         - reserveType
         - direction
+        - procurement
         - volumes
       properties:
         area:
@@ -3239,16 +3255,10 @@ components:
           $ref: '#/components/schemas/ReserveType'
         direction:
           $ref: '#/components/schemas/Direction'
-        procuredAt:
-          type: string
-          format: date-time
-          nullable: true
-          description: |
-            **EXPERIMENTAL**: Timestamp when the capacity was procured (allocation time or gate closure time).
-            Used to distinguish different auctions (e.g., yearly vs hourly, or multiple procurement rounds).
-            This field is experimental and may be changed or removed without a deprecation period.
-          example: "2024-08-15T14:30:00Z"
-          x-experimental: true
+        procurement:
+          description: The procurement these volumes came from.
+          allOf:
+            - $ref: '#/components/schemas/Procurement'
         volumes:
           type: array
           items:
@@ -3300,7 +3310,7 @@ components:
         - eicCode
         - reserveType
         - direction
-        - procuredAt
+        - procurement
         - demandBasis
         - demands
       properties:
@@ -3312,13 +3322,8 @@ components:
           $ref: '#/components/schemas/ReserveType'
         direction:
           $ref: '#/components/schemas/Direction'
-        procuredAt:
-          type: string
-          format: date-time
-          description: |
-            Timestamp when the capacity was procured (allocation time or gate closure time).
-            Used to distinguish different procurements (e.g., yearly vs hourly, or multiple procurement rounds).
-          example: "2024-08-15T14:30:00Z"
+        procurement:
+          $ref: '#/components/schemas/Procurement'
         demandBasis:
           $ref: '#/components/schemas/DemandBasis'
         demands:
