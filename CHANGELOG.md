@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.20.0] - 2026-07-22
+
 ### Added
 - Support for the `UA` area (Ukraine IPS); the corresponding EIC code `10Y1001C--000182` is added to the `EicCode` enum; `UAH` is added to the `Currency` enum since UA prices are denominated in hryvnia
 
@@ -174,7 +176,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - UTC timestamp-based period filtering
 - OpenAPI 3.0.3 specification
 
-[Unreleased]: https://github.com/balancing-services/rest-api/compare/v1.19.0...HEAD
+[Unreleased]: https://github.com/balancing-services/rest-api/compare/v1.20.0...HEAD
+[1.20.0]: https://github.com/balancing-services/rest-api/compare/v1.19.0...v1.20.0
 [1.19.0]: https://github.com/balancing-services/rest-api/compare/v1.18.0...v1.19.0
 [1.18.0]: https://github.com/balancing-services/rest-api/compare/v1.17.0...v1.18.0
 [1.17.0]: https://github.com/balancing-services/rest-api/compare/v1.16.0...v1.17.0
