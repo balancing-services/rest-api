@@ -48,6 +48,7 @@ class Area(str, Enum):
     SE4 = "SE4"
     SI = "SI"
     SK = "SK"
+    UA = "UA"
 
     def __str__(self) -> str:
         return str(self.value)
