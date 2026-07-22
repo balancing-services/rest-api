@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Support for the `UA` area (Ukraine IPS); the corresponding EIC code `10Y1001C--000182` is added to the `EicCode` enum; `UAH` is added to the `Currency` enum since UA prices are denominated in hryvnia
+
 ## [1.19.0] - 2026-07-12
 
 ### Added

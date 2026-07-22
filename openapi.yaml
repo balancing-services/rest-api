@@ -3209,6 +3209,7 @@ components:
         - SE4
         - SI
         - SK
+        - UA
 
     EicCode:
       type: string
@@ -3264,6 +3265,7 @@ components:
         - 10YSI-ELES-----O
         - 10YSK-SEPS-----K
         - 10Y1001A1001A94A
+        - 10Y1001C--000182
 
     ReserveType:
       type: string
@@ -3322,6 +3324,7 @@ components:
         - HUF
         - PLN
         - RON
+        - UAH
 
     ActivationType:
       type: string

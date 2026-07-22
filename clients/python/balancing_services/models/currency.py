@@ -8,6 +8,7 @@ class Currency(str, Enum):
     HUF = "HUF"
     PLN = "PLN"
     RON = "RON"
+    UAH = "UAH"
 
     def __str__(self) -> str:
         return str(self.value)
