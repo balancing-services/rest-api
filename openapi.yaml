@@ -20,36 +20,10 @@ paths:
       description: Returns imbalance prices for the specified area within the given time period. Prices are in the specified currency per MWh. Supports cursor-based pagination for large result sets.
       operationId: getImbalancePrices
       parameters:
-        - name: area
-          in: query
-          description: The area for which to retrieve data
-          required: true
-          schema:
-            $ref: '#/components/schemas/Area'
-          example: 'EE'
-        - name: period-start-at
-          in: query
-          description: Start of the time period (UTC)
-          required: true
-          schema:
-            type: string
-            format: date-time
-            example: '2025-01-01T00:00:00Z'
-        - name: period-end-at
-          in: query
-          description: End of the time period (UTC)
-          required: true
-          schema:
-            type: string
-            format: date-time
-            example: '2025-01-02T00:00:00Z'
-        - name: cursor
-          in: query
-          description: Pagination cursor from previous response. Omit to start from the beginning.
-          required: false
-          schema:
-            type: string
-            example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
+        - $ref: '#/components/parameters/area'
+        - $ref: '#/components/parameters/period-start-at'
+        - $ref: '#/components/parameters/period-end-at'
+        - $ref: '#/components/parameters/cursor'
         - name: limit
           in: query
           description: Maximum number of results to return (default 100, max 1000)
@@ -69,79 +43,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/ImbalancePricesResponse'
         '400':
-          description: Bad request
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                invalid-parameter:
-                  $ref: '#/components/examples/problem-invalid-parameter'
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                unauthorized:
-                  $ref: '#/components/examples/problem-unauthorized'
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Forbidden
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                forbidden:
-                  $ref: '#/components/examples/problem-forbidden'
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: Not found
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                not-found:
-                  $ref: '#/components/examples/problem-not-found'
+          $ref: '#/components/responses/NotFound'
         '429':
-          description: Too many requests
-          headers:
-            Retry-After:
-              description: Number of seconds to wait before retrying
-              schema:
-                type: integer
-                example: 12
-            X-RateLimit-Limit:
-              description: Maximum number of requests allowed per minute
-              schema:
-                type: integer
-                example: 60
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                rate-limited:
-                  $ref: '#/components/examples/problem-rate-limited'
+          $ref: '#/components/responses/TooManyRequests'
         '500':
-          description: Internal server error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                internal-error:
-                  $ref: '#/components/examples/problem-internal-error'
+          $ref: '#/components/responses/InternalServerError'
         '501':
-          description: Not implemented
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                not-implemented:
-                  $ref: '#/components/examples/problem-not-implemented'
+          $ref: '#/components/responses/NotImplemented'
 
   /imbalance/total-volumes:
     get:
@@ -149,36 +63,10 @@ paths:
       description: Returns total aggregated imbalance volumes for the specified area within the given time period. Volumes are expressed as average power in MW. Supports cursor-based pagination for large result sets.
       operationId: getImbalanceTotalVolumes
       parameters:
-        - name: area
-          in: query
-          description: The area for which to retrieve data
-          required: true
-          schema:
-            $ref: '#/components/schemas/Area'
-          example: 'EE'
-        - name: period-start-at
-          in: query
-          description: Start of the time period (UTC)
-          required: true
-          schema:
-            type: string
-            format: date-time
-            example: '2025-01-01T00:00:00Z'
-        - name: period-end-at
-          in: query
-          description: End of the time period (UTC)
-          required: true
-          schema:
-            type: string
-            format: date-time
-            example: '2025-01-02T00:00:00Z'
-        - name: cursor
-          in: query
-          description: Pagination cursor from previous response. Omit to start from the beginning.
-          required: false
-          schema:
-            type: string
-            example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
+        - $ref: '#/components/parameters/area'
+        - $ref: '#/components/parameters/period-start-at'
+        - $ref: '#/components/parameters/period-end-at'
+        - $ref: '#/components/parameters/cursor'
         - name: limit
           in: query
           description: Maximum number of results to return (default 100, max 1000)
@@ -198,79 +86,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/ImbalanceTotalVolumesResponse'
         '400':
-          description: Bad request
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                invalid-parameter:
-                  $ref: '#/components/examples/problem-invalid-parameter'
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                unauthorized:
-                  $ref: '#/components/examples/problem-unauthorized'
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Forbidden
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                forbidden:
-                  $ref: '#/components/examples/problem-forbidden'
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: Not found
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                not-found:
-                  $ref: '#/components/examples/problem-not-found'
+          $ref: '#/components/responses/NotFound'
         '429':
-          description: Too many requests
-          headers:
-            Retry-After:
-              description: Number of seconds to wait before retrying
-              schema:
-                type: integer
-                example: 12
-            X-RateLimit-Limit:
-              description: Maximum number of requests allowed per minute
-              schema:
-                type: integer
-                example: 60
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                rate-limited:
-                  $ref: '#/components/examples/problem-rate-limited'
+          $ref: '#/components/responses/TooManyRequests'
         '500':
-          description: Internal server error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                internal-error:
-                  $ref: '#/components/examples/problem-internal-error'
+          $ref: '#/components/responses/InternalServerError'
         '501':
-          description: Not implemented
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                not-implemented:
-                  $ref: '#/components/examples/problem-not-implemented'
+          $ref: '#/components/responses/NotImplemented'
 
   /imbalance/total-volumes/current:
     get:
@@ -285,36 +113,10 @@ paths:
         expressed as average power in MW. Supports cursor-based pagination for large result sets.
       operationId: getCurrentImbalanceTotalVolumes
       parameters:
-        - name: area
-          in: query
-          description: The area for which to retrieve data
-          required: true
-          schema:
-            $ref: '#/components/schemas/Area'
-          example: 'EE'
-        - name: period-start-at
-          in: query
-          description: Start of the time period (UTC)
-          required: true
-          schema:
-            type: string
-            format: date-time
-            example: '2025-01-01T00:00:00Z'
-        - name: period-end-at
-          in: query
-          description: End of the time period (UTC)
-          required: true
-          schema:
-            type: string
-            format: date-time
-            example: '2025-01-02T00:00:00Z'
-        - name: cursor
-          in: query
-          description: Pagination cursor from previous response. Omit to start from the beginning.
-          required: false
-          schema:
-            type: string
-            example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
+        - $ref: '#/components/parameters/area'
+        - $ref: '#/components/parameters/period-start-at'
+        - $ref: '#/components/parameters/period-end-at'
+        - $ref: '#/components/parameters/cursor'
         - name: limit
           in: query
           description: Maximum number of results to return (default 120, max 1440)
@@ -334,79 +136,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/ImbalanceTotalVolumesResponse'
         '400':
-          description: Bad request
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                invalid-parameter:
-                  $ref: '#/components/examples/problem-invalid-parameter'
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                unauthorized:
-                  $ref: '#/components/examples/problem-unauthorized'
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Forbidden
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                forbidden:
-                  $ref: '#/components/examples/problem-forbidden'
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: Not found
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                not-found:
-                  $ref: '#/components/examples/problem-not-found'
+          $ref: '#/components/responses/NotFound'
         '429':
-          description: Too many requests
-          headers:
-            Retry-After:
-              description: Number of seconds to wait before retrying
-              schema:
-                type: integer
-                example: 12
-            X-RateLimit-Limit:
-              description: Maximum number of requests allowed per minute
-              schema:
-                type: integer
-                example: 60
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                rate-limited:
-                  $ref: '#/components/examples/problem-rate-limited'
+          $ref: '#/components/responses/TooManyRequests'
         '500':
-          description: Internal server error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                internal-error:
-                  $ref: '#/components/examples/problem-internal-error'
+          $ref: '#/components/responses/InternalServerError'
         '501':
-          description: Not implemented
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                not-implemented:
-                  $ref: '#/components/examples/problem-not-implemented'
+          $ref: '#/components/responses/NotImplemented'
 
   /balancing/energy/activated-volumes:
     get:
@@ -414,43 +156,11 @@ paths:
       description: Returns activated balancing energy volumes for the specified area within the given time period. Volumes are expressed as (average) power in MW. Supports cursor-based pagination for large result sets.
       operationId: getBalancingEnergyActivatedVolumes
       parameters:
-        - name: area
-          in: query
-          description: The area for which to retrieve data
-          required: true
-          schema:
-            $ref: '#/components/schemas/Area'
-          example: 'EE'
-        - name: period-start-at
-          in: query
-          description: Start of the time period (UTC)
-          required: true
-          schema:
-            type: string
-            format: date-time
-            example: '2025-01-01T00:00:00Z'
-        - name: period-end-at
-          in: query
-          description: End of the time period (UTC)
-          required: true
-          schema:
-            type: string
-            format: date-time
-            example: '2025-01-02T00:00:00Z'
-        - name: reserve-type
-          in: query
-          description: Filter by reserve type
-          required: true
-          schema:
-            $ref: '#/components/schemas/ReserveType'
-          example: 'aFRR'
-        - name: cursor
-          in: query
-          description: Pagination cursor from previous response. Omit to start from the beginning.
-          required: false
-          schema:
-            type: string
-            example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
+        - $ref: '#/components/parameters/area'
+        - $ref: '#/components/parameters/period-start-at'
+        - $ref: '#/components/parameters/period-end-at'
+        - $ref: '#/components/parameters/reserve-type'
+        - $ref: '#/components/parameters/cursor'
         - name: limit
           in: query
           description: Maximum number of results to return (default 100, max 1000)
@@ -470,79 +180,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/BalancingEnergyVolumesResponse'
         '400':
-          description: Bad request
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                invalid-parameter:
-                  $ref: '#/components/examples/problem-invalid-parameter'
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                unauthorized:
-                  $ref: '#/components/examples/problem-unauthorized'
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Forbidden
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                forbidden:
-                  $ref: '#/components/examples/problem-forbidden'
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: Not found
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                not-found:
-                  $ref: '#/components/examples/problem-not-found'
+          $ref: '#/components/responses/NotFound'
         '429':
-          description: Too many requests
-          headers:
-            Retry-After:
-              description: Number of seconds to wait before retrying
-              schema:
-                type: integer
-                example: 12
-            X-RateLimit-Limit:
-              description: Maximum number of requests allowed per minute
-              schema:
-                type: integer
-                example: 60
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                rate-limited:
-                  $ref: '#/components/examples/problem-rate-limited'
+          $ref: '#/components/responses/TooManyRequests'
         '500':
-          description: Internal server error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                internal-error:
-                  $ref: '#/components/examples/problem-internal-error'
+          $ref: '#/components/responses/InternalServerError'
         '501':
-          description: Not implemented
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                not-implemented:
-                  $ref: '#/components/examples/problem-not-implemented'
+          $ref: '#/components/responses/NotImplemented'
 
   /balancing/energy/offered-volumes:
     get:
@@ -550,43 +200,11 @@ paths:
       description: Returns offered balancing energy volumes for the specified area within the given time period. Volumes are expressed as (average) power in MW. Supports cursor-based pagination for large result sets.
       operationId: getBalancingEnergyOfferedVolumes
       parameters:
-        - name: area
-          in: query
-          description: The area for which to retrieve data
-          required: true
-          schema:
-            $ref: '#/components/schemas/Area'
-          example: 'EE'
-        - name: period-start-at
-          in: query
-          description: Start of the time period (UTC)
-          required: true
-          schema:
-            type: string
-            format: date-time
-            example: '2025-01-01T00:00:00Z'
-        - name: period-end-at
-          in: query
-          description: End of the time period (UTC)
-          required: true
-          schema:
-            type: string
-            format: date-time
-            example: '2025-01-02T00:00:00Z'
-        - name: reserve-type
-          in: query
-          description: Filter by reserve type
-          required: true
-          schema:
-            $ref: '#/components/schemas/ReserveType'
-          example: 'aFRR'
-        - name: cursor
-          in: query
-          description: Pagination cursor from previous response. Omit to start from the beginning.
-          required: false
-          schema:
-            type: string
-            example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
+        - $ref: '#/components/parameters/area'
+        - $ref: '#/components/parameters/period-start-at'
+        - $ref: '#/components/parameters/period-end-at'
+        - $ref: '#/components/parameters/reserve-type'
+        - $ref: '#/components/parameters/cursor'
         - name: limit
           in: query
           description: Maximum number of results to return (default 100, max 1000)
@@ -606,79 +224,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/BalancingEnergyVolumesResponse'
         '400':
-          description: Bad request
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                invalid-parameter:
-                  $ref: '#/components/examples/problem-invalid-parameter'
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                unauthorized:
-                  $ref: '#/components/examples/problem-unauthorized'
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Forbidden
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                forbidden:
-                  $ref: '#/components/examples/problem-forbidden'
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: Not found
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                not-found:
-                  $ref: '#/components/examples/problem-not-found'
+          $ref: '#/components/responses/NotFound'
         '429':
-          description: Too many requests
-          headers:
-            Retry-After:
-              description: Number of seconds to wait before retrying
-              schema:
-                type: integer
-                example: 12
-            X-RateLimit-Limit:
-              description: Maximum number of requests allowed per minute
-              schema:
-                type: integer
-                example: 60
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                rate-limited:
-                  $ref: '#/components/examples/problem-rate-limited'
+          $ref: '#/components/responses/TooManyRequests'
         '500':
-          description: Internal server error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                internal-error:
-                  $ref: '#/components/examples/problem-internal-error'
+          $ref: '#/components/responses/InternalServerError'
         '501':
-          description: Not implemented
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                not-implemented:
-                  $ref: '#/components/examples/problem-not-implemented'
+          $ref: '#/components/responses/NotImplemented'
 
   /balancing/energy/prices:
     get:
@@ -686,43 +244,11 @@ paths:
       description: Returns balancing energy prices for the specified area and reserve type within the given time period. Prices are in the specified currency per MWh. Supports cursor-based pagination for large result sets.
       operationId: getBalancingEnergyPrices
       parameters:
-        - name: area
-          in: query
-          description: The area for which to retrieve data
-          required: true
-          schema:
-            $ref: '#/components/schemas/Area'
-          example: 'EE'
-        - name: period-start-at
-          in: query
-          description: Start of the time period (UTC)
-          required: true
-          schema:
-            type: string
-            format: date-time
-            example: '2025-01-01T00:00:00Z'
-        - name: period-end-at
-          in: query
-          description: End of the time period (UTC)
-          required: true
-          schema:
-            type: string
-            format: date-time
-            example: '2025-01-02T00:00:00Z'
-        - name: reserve-type
-          in: query
-          description: Filter by reserve type
-          required: true
-          schema:
-            $ref: '#/components/schemas/ReserveType'
-          example: 'aFRR'
-        - name: cursor
-          in: query
-          description: Pagination cursor from previous response. Omit to start from the beginning.
-          required: false
-          schema:
-            type: string
-            example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
+        - $ref: '#/components/parameters/area'
+        - $ref: '#/components/parameters/period-start-at'
+        - $ref: '#/components/parameters/period-end-at'
+        - $ref: '#/components/parameters/reserve-type'
+        - $ref: '#/components/parameters/cursor'
         - name: limit
           in: query
           description: Maximum number of results to return (default 100, max 1000)
@@ -742,79 +268,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/BalancingEnergyPricesResponse'
         '400':
-          description: Bad request
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                invalid-parameter:
-                  $ref: '#/components/examples/problem-invalid-parameter'
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                unauthorized:
-                  $ref: '#/components/examples/problem-unauthorized'
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Forbidden
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                forbidden:
-                  $ref: '#/components/examples/problem-forbidden'
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: Not found
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                not-found:
-                  $ref: '#/components/examples/problem-not-found'
+          $ref: '#/components/responses/NotFound'
         '429':
-          description: Too many requests
-          headers:
-            Retry-After:
-              description: Number of seconds to wait before retrying
-              schema:
-                type: integer
-                example: 12
-            X-RateLimit-Limit:
-              description: Maximum number of requests allowed per minute
-              schema:
-                type: integer
-                example: 60
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                rate-limited:
-                  $ref: '#/components/examples/problem-rate-limited'
+          $ref: '#/components/responses/TooManyRequests'
         '500':
-          description: Internal server error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                internal-error:
-                  $ref: '#/components/examples/problem-internal-error'
+          $ref: '#/components/responses/InternalServerError'
         '501':
-          description: Not implemented
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                not-implemented:
-                  $ref: '#/components/examples/problem-not-implemented'
+          $ref: '#/components/responses/NotImplemented'
 
   /balancing/energy/bids:
     get:
@@ -837,43 +303,11 @@ paths:
         necessarily contiguous.
       operationId: getBalancingEnergyBids
       parameters:
-        - name: area
-          in: query
-          description: The area for which to retrieve data
-          required: true
-          schema:
-            $ref: '#/components/schemas/Area'
-          example: 'EE'
-        - name: period-start-at
-          in: query
-          description: Start of the time period (UTC)
-          required: true
-          schema:
-            type: string
-            format: date-time
-            example: '2025-01-01T00:00:00Z'
-        - name: period-end-at
-          in: query
-          description: End of the time period (UTC)
-          required: true
-          schema:
-            type: string
-            format: date-time
-            example: '2025-01-02T00:00:00Z'
-        - name: reserve-type
-          in: query
-          description: Filter by reserve type
-          required: true
-          schema:
-            $ref: '#/components/schemas/ReserveType'
-          example: 'aFRR'
-        - name: cursor
-          in: query
-          description: Pagination cursor from previous response. Omit to start from the beginning.
-          required: false
-          schema:
-            type: string
-            example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
+        - $ref: '#/components/parameters/area'
+        - $ref: '#/components/parameters/period-start-at'
+        - $ref: '#/components/parameters/period-end-at'
+        - $ref: '#/components/parameters/reserve-type'
+        - $ref: '#/components/parameters/cursor'
         - name: limit
           in: query
           description: Maximum number of results to return (default 100, max 1000)
@@ -893,79 +327,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/BalancingEnergyBidsResponse'
         '400':
-          description: Bad request
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                invalid-parameter:
-                  $ref: '#/components/examples/problem-invalid-parameter'
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                unauthorized:
-                  $ref: '#/components/examples/problem-unauthorized'
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Forbidden
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                forbidden:
-                  $ref: '#/components/examples/problem-forbidden'
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: Not found
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                not-found:
-                  $ref: '#/components/examples/problem-not-found'
+          $ref: '#/components/responses/NotFound'
         '429':
-          description: Too many requests
-          headers:
-            Retry-After:
-              description: Number of seconds to wait before retrying
-              schema:
-                type: integer
-                example: 12
-            X-RateLimit-Limit:
-              description: Maximum number of requests allowed per minute
-              schema:
-                type: integer
-                example: 60
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                rate-limited:
-                  $ref: '#/components/examples/problem-rate-limited'
+          $ref: '#/components/responses/TooManyRequests'
         '500':
-          description: Internal server error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                internal-error:
-                  $ref: '#/components/examples/problem-internal-error'
+          $ref: '#/components/responses/InternalServerError'
         '501':
-          description: Not implemented
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                not-implemented:
-                  $ref: '#/components/examples/problem-not-implemented'
+          $ref: '#/components/responses/NotImplemented'
 
   /balancing/energy/demand:
     get:
@@ -979,43 +353,11 @@ paths:
       operationId: getBalancingEnergyDemand
       x-experimental: true
       parameters:
-        - name: area
-          in: query
-          description: The area for which to retrieve data
-          required: true
-          schema:
-            $ref: '#/components/schemas/Area'
-          example: 'EE'
-        - name: period-start-at
-          in: query
-          description: Start of the time period (UTC)
-          required: true
-          schema:
-            type: string
-            format: date-time
-            example: '2025-01-01T00:00:00Z'
-        - name: period-end-at
-          in: query
-          description: End of the time period (UTC)
-          required: true
-          schema:
-            type: string
-            format: date-time
-            example: '2025-01-02T00:00:00Z'
-        - name: reserve-type
-          in: query
-          description: Filter by reserve type
-          required: true
-          schema:
-            $ref: '#/components/schemas/ReserveType'
-          example: 'aFRR'
-        - name: cursor
-          in: query
-          description: Pagination cursor from previous response. Omit to start from the beginning.
-          required: false
-          schema:
-            type: string
-            example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
+        - $ref: '#/components/parameters/area'
+        - $ref: '#/components/parameters/period-start-at'
+        - $ref: '#/components/parameters/period-end-at'
+        - $ref: '#/components/parameters/reserve-type'
+        - $ref: '#/components/parameters/cursor'
         - name: limit
           in: query
           description: Maximum number of results to return (default 100, max 1000)
@@ -1035,79 +377,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/BalancingEnergyVolumesResponse'
         '400':
-          description: Bad request
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                invalid-parameter:
-                  $ref: '#/components/examples/problem-invalid-parameter'
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                unauthorized:
-                  $ref: '#/components/examples/problem-unauthorized'
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Forbidden
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                forbidden:
-                  $ref: '#/components/examples/problem-forbidden'
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: Not found
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                not-found:
-                  $ref: '#/components/examples/problem-not-found'
+          $ref: '#/components/responses/NotFound'
         '429':
-          description: Too many requests
-          headers:
-            Retry-After:
-              description: Number of seconds to wait before retrying
-              schema:
-                type: integer
-                example: 12
-            X-RateLimit-Limit:
-              description: Maximum number of requests allowed per minute
-              schema:
-                type: integer
-                example: 60
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                rate-limited:
-                  $ref: '#/components/examples/problem-rate-limited'
+          $ref: '#/components/responses/TooManyRequests'
         '500':
-          description: Internal server error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                internal-error:
-                  $ref: '#/components/examples/problem-internal-error'
+          $ref: '#/components/responses/InternalServerError'
         '501':
-          description: Not implemented
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                not-implemented:
-                  $ref: '#/components/examples/problem-not-implemented'
+          $ref: '#/components/responses/NotImplemented'
 
   /balancing/energy/satisfied-demand:
     get:
@@ -1121,43 +403,11 @@ paths:
       operationId: getBalancingEnergySatisfiedDemand
       x-experimental: true
       parameters:
-        - name: area
-          in: query
-          description: The area for which to retrieve data
-          required: true
-          schema:
-            $ref: '#/components/schemas/Area'
-          example: 'EE'
-        - name: period-start-at
-          in: query
-          description: Start of the time period (UTC)
-          required: true
-          schema:
-            type: string
-            format: date-time
-            example: '2025-01-01T00:00:00Z'
-        - name: period-end-at
-          in: query
-          description: End of the time period (UTC)
-          required: true
-          schema:
-            type: string
-            format: date-time
-            example: '2025-01-02T00:00:00Z'
-        - name: reserve-type
-          in: query
-          description: Filter by reserve type
-          required: true
-          schema:
-            $ref: '#/components/schemas/ReserveType'
-          example: 'aFRR'
-        - name: cursor
-          in: query
-          description: Pagination cursor from previous response. Omit to start from the beginning.
-          required: false
-          schema:
-            type: string
-            example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
+        - $ref: '#/components/parameters/area'
+        - $ref: '#/components/parameters/period-start-at'
+        - $ref: '#/components/parameters/period-end-at'
+        - $ref: '#/components/parameters/reserve-type'
+        - $ref: '#/components/parameters/cursor'
         - name: limit
           in: query
           description: Maximum number of results to return (default 100, max 1000)
@@ -1177,79 +427,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/BalancingEnergyVolumesResponse'
         '400':
-          description: Bad request
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                invalid-parameter:
-                  $ref: '#/components/examples/problem-invalid-parameter'
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                unauthorized:
-                  $ref: '#/components/examples/problem-unauthorized'
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Forbidden
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                forbidden:
-                  $ref: '#/components/examples/problem-forbidden'
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: Not found
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                not-found:
-                  $ref: '#/components/examples/problem-not-found'
+          $ref: '#/components/responses/NotFound'
         '429':
-          description: Too many requests
-          headers:
-            Retry-After:
-              description: Number of seconds to wait before retrying
-              schema:
-                type: integer
-                example: 12
-            X-RateLimit-Limit:
-              description: Maximum number of requests allowed per minute
-              schema:
-                type: integer
-                example: 60
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                rate-limited:
-                  $ref: '#/components/examples/problem-rate-limited'
+          $ref: '#/components/responses/TooManyRequests'
         '500':
-          description: Internal server error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                internal-error:
-                  $ref: '#/components/examples/problem-internal-error'
+          $ref: '#/components/responses/InternalServerError'
         '501':
-          description: Not implemented
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                not-implemented:
-                  $ref: '#/components/examples/problem-not-implemented'
+          $ref: '#/components/responses/NotImplemented'
 
   /balancing/capacity/bids:
     get:
@@ -1273,43 +463,11 @@ paths:
         necessarily contiguous.
       operationId: getBalancingCapacityBids
       parameters:
-        - name: area
-          in: query
-          description: The area for which to retrieve data
-          required: true
-          schema:
-            $ref: '#/components/schemas/Area'
-          example: 'EE'
-        - name: period-start-at
-          in: query
-          description: Start of the time period (UTC)
-          required: true
-          schema:
-            type: string
-            format: date-time
-            example: '2025-01-01T00:00:00Z'
-        - name: period-end-at
-          in: query
-          description: End of the time period (UTC)
-          required: true
-          schema:
-            type: string
-            format: date-time
-            example: '2025-01-02T00:00:00Z'
-        - name: reserve-type
-          in: query
-          description: Filter by reserve type
-          required: true
-          schema:
-            $ref: '#/components/schemas/ReserveType'
-          example: 'aFRR'
-        - name: cursor
-          in: query
-          description: Pagination cursor from previous response. Omit to start from the beginning.
-          required: false
-          schema:
-            type: string
-            example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
+        - $ref: '#/components/parameters/area'
+        - $ref: '#/components/parameters/period-start-at'
+        - $ref: '#/components/parameters/period-end-at'
+        - $ref: '#/components/parameters/reserve-type'
+        - $ref: '#/components/parameters/cursor'
         - name: limit
           in: query
           description: Maximum number of results to return (default 100, max 1000)
@@ -1329,79 +487,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/BalancingCapacityBidsResponse'
         '400':
-          description: Bad request
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                invalid-parameter:
-                  $ref: '#/components/examples/problem-invalid-parameter'
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                unauthorized:
-                  $ref: '#/components/examples/problem-unauthorized'
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Forbidden
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                forbidden:
-                  $ref: '#/components/examples/problem-forbidden'
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: Not found
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                not-found:
-                  $ref: '#/components/examples/problem-not-found'
+          $ref: '#/components/responses/NotFound'
         '429':
-          description: Too many requests
-          headers:
-            Retry-After:
-              description: Number of seconds to wait before retrying
-              schema:
-                type: integer
-                example: 12
-            X-RateLimit-Limit:
-              description: Maximum number of requests allowed per minute
-              schema:
-                type: integer
-                example: 60
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                rate-limited:
-                  $ref: '#/components/examples/problem-rate-limited'
+          $ref: '#/components/responses/TooManyRequests'
         '500':
-          description: Internal server error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                internal-error:
-                  $ref: '#/components/examples/problem-internal-error'
+          $ref: '#/components/responses/InternalServerError'
         '501':
-          description: Not implemented
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                not-implemented:
-                  $ref: '#/components/examples/problem-not-implemented'
+          $ref: '#/components/responses/NotImplemented'
 
   /balancing/capacity/prices:
     get:
@@ -1409,43 +507,11 @@ paths:
       description: Returns balancing capacity prices for the specified area and reserve type within the given time period. Prices are in the specified currency per MW per hour. Supports cursor-based pagination for large result sets.
       operationId: getBalancingCapacityPrices
       parameters:
-        - name: area
-          in: query
-          description: The area for which to retrieve data
-          required: true
-          schema:
-            $ref: '#/components/schemas/Area'
-          example: 'EE'
-        - name: period-start-at
-          in: query
-          description: Start of the time period (UTC)
-          required: true
-          schema:
-            type: string
-            format: date-time
-            example: '2025-01-01T00:00:00Z'
-        - name: period-end-at
-          in: query
-          description: End of the time period (UTC)
-          required: true
-          schema:
-            type: string
-            format: date-time
-            example: '2025-01-02T00:00:00Z'
-        - name: reserve-type
-          in: query
-          description: Filter by reserve type
-          required: true
-          schema:
-            $ref: '#/components/schemas/ReserveType'
-          example: 'aFRR'
-        - name: cursor
-          in: query
-          description: Pagination cursor from previous response. Omit to start from the beginning.
-          required: false
-          schema:
-            type: string
-            example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
+        - $ref: '#/components/parameters/area'
+        - $ref: '#/components/parameters/period-start-at'
+        - $ref: '#/components/parameters/period-end-at'
+        - $ref: '#/components/parameters/reserve-type'
+        - $ref: '#/components/parameters/cursor'
         - name: limit
           in: query
           description: Maximum number of results to return (default 100, max 1000)
@@ -1465,79 +531,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/BalancingCapacityPricesResponse'
         '400':
-          description: Bad request
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                invalid-parameter:
-                  $ref: '#/components/examples/problem-invalid-parameter'
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                unauthorized:
-                  $ref: '#/components/examples/problem-unauthorized'
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Forbidden
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                forbidden:
-                  $ref: '#/components/examples/problem-forbidden'
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: Not found
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                not-found:
-                  $ref: '#/components/examples/problem-not-found'
+          $ref: '#/components/responses/NotFound'
         '429':
-          description: Too many requests
-          headers:
-            Retry-After:
-              description: Number of seconds to wait before retrying
-              schema:
-                type: integer
-                example: 12
-            X-RateLimit-Limit:
-              description: Maximum number of requests allowed per minute
-              schema:
-                type: integer
-                example: 60
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                rate-limited:
-                  $ref: '#/components/examples/problem-rate-limited'
+          $ref: '#/components/responses/TooManyRequests'
         '500':
-          description: Internal server error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                internal-error:
-                  $ref: '#/components/examples/problem-internal-error'
+          $ref: '#/components/responses/InternalServerError'
         '501':
-          description: Not implemented
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                not-implemented:
-                  $ref: '#/components/examples/problem-not-implemented'
+          $ref: '#/components/responses/NotImplemented'
 
   /balancing/cross-border/available-capacity:
     get:
@@ -1567,36 +573,10 @@ paths:
           schema:
             $ref: '#/components/schemas/Area'
           example: 'PT'
-        - name: period-start-at
-          in: query
-          description: Start of the time period (UTC)
-          required: true
-          schema:
-            type: string
-            format: date-time
-            example: '2025-01-01T00:00:00Z'
-        - name: period-end-at
-          in: query
-          description: End of the time period (UTC)
-          required: true
-          schema:
-            type: string
-            format: date-time
-            example: '2025-01-02T00:00:00Z'
-        - name: reserve-type
-          in: query
-          description: Filter by reserve type
-          required: true
-          schema:
-            $ref: '#/components/schemas/ReserveType'
-          example: 'mFRR'
-        - name: cursor
-          in: query
-          description: Pagination cursor from previous response. Omit to start from the beginning.
-          required: false
-          schema:
-            type: string
-            example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
+        - $ref: '#/components/parameters/period-start-at'
+        - $ref: '#/components/parameters/period-end-at'
+        - $ref: '#/components/parameters/reserve-type'
+        - $ref: '#/components/parameters/cursor'
         - name: limit
           in: query
           description: Maximum number of results to return (default 100, max 1000)
@@ -1616,61 +596,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/CrossBorderAvailableCapacityResponse'
         '400':
-          description: Bad request
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                invalid-parameter:
-                  $ref: '#/components/examples/problem-invalid-parameter'
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                unauthorized:
-                  $ref: '#/components/examples/problem-unauthorized'
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Forbidden
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                forbidden:
-                  $ref: '#/components/examples/problem-forbidden'
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: Not found
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                not-found:
-                  $ref: '#/components/examples/problem-not-found'
+          $ref: '#/components/responses/NotFound'
         '429':
-          description: Too many requests
-          headers:
-            Retry-After:
-              description: Number of seconds to wait before retrying
-              schema:
-                type: integer
-                example: 12
-            X-RateLimit-Limit:
-              description: Maximum number of requests allowed per minute
-              schema:
-                type: integer
-                example: 60
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                rate-limited:
-                  $ref: '#/components/examples/problem-rate-limited'
+          $ref: '#/components/responses/TooManyRequests'
 
   /balancing/capacity/cross-zonal-allocation:
     get:
@@ -1696,36 +630,10 @@ paths:
           schema:
             $ref: '#/components/schemas/Area'
           example: 'EE'
-        - name: period-start-at
-          in: query
-          description: Start of the time period (UTC)
-          required: true
-          schema:
-            type: string
-            format: date-time
-            example: '2025-01-01T00:00:00Z'
-        - name: period-end-at
-          in: query
-          description: End of the time period (UTC)
-          required: true
-          schema:
-            type: string
-            format: date-time
-            example: '2025-01-02T00:00:00Z'
-        - name: reserve-type
-          in: query
-          description: Filter by reserve type
-          required: true
-          schema:
-            $ref: '#/components/schemas/ReserveType'
-          example: 'aFRR'
-        - name: cursor
-          in: query
-          description: Pagination cursor from previous response. Omit to start from the beginning.
-          required: false
-          schema:
-            type: string
-            example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
+        - $ref: '#/components/parameters/period-start-at'
+        - $ref: '#/components/parameters/period-end-at'
+        - $ref: '#/components/parameters/reserve-type'
+        - $ref: '#/components/parameters/cursor'
         - name: limit
           in: query
           description: Maximum number of results to return (default 100, max 1000)
@@ -1745,79 +653,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/CrossZonalCapacityAllocationResponse'
         '400':
-          description: Bad request
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                invalid-parameter:
-                  $ref: '#/components/examples/problem-invalid-parameter'
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                unauthorized:
-                  $ref: '#/components/examples/problem-unauthorized'
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Forbidden
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                forbidden:
-                  $ref: '#/components/examples/problem-forbidden'
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: Not found
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                not-found:
-                  $ref: '#/components/examples/problem-not-found'
+          $ref: '#/components/responses/NotFound'
         '429':
-          description: Too many requests
-          headers:
-            Retry-After:
-              description: Number of seconds to wait before retrying
-              schema:
-                type: integer
-                example: 12
-            X-RateLimit-Limit:
-              description: Maximum number of requests allowed per minute
-              schema:
-                type: integer
-                example: 60
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                rate-limited:
-                  $ref: '#/components/examples/problem-rate-limited'
+          $ref: '#/components/responses/TooManyRequests'
         '500':
-          description: Internal server error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                internal-error:
-                  $ref: '#/components/examples/problem-internal-error'
+          $ref: '#/components/responses/InternalServerError'
         '501':
-          description: Not implemented
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                not-implemented:
-                  $ref: '#/components/examples/problem-not-implemented'
+          $ref: '#/components/responses/NotImplemented'
 
   /balancing/capacity/procured-volumes:
     get:
@@ -1825,43 +673,11 @@ paths:
       description: Returns procured balancing capacity volumes for the specified area and reserve type within the given time period. Volumes are expressed in MW. Supports cursor-based pagination for large result sets.
       operationId: getBalancingCapacityProcuredVolumes
       parameters:
-        - name: area
-          in: query
-          description: The area for which to retrieve data
-          required: true
-          schema:
-            $ref: '#/components/schemas/Area'
-          example: 'EE'
-        - name: period-start-at
-          in: query
-          description: Start of the time period (UTC)
-          required: true
-          schema:
-            type: string
-            format: date-time
-            example: '2025-01-01T00:00:00Z'
-        - name: period-end-at
-          in: query
-          description: End of the time period (UTC)
-          required: true
-          schema:
-            type: string
-            format: date-time
-            example: '2025-01-02T00:00:00Z'
-        - name: reserve-type
-          in: query
-          description: Filter by reserve type
-          required: true
-          schema:
-            $ref: '#/components/schemas/ReserveType'
-          example: 'aFRR'
-        - name: cursor
-          in: query
-          description: Pagination cursor from previous response. Omit to start from the beginning.
-          required: false
-          schema:
-            type: string
-            example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
+        - $ref: '#/components/parameters/area'
+        - $ref: '#/components/parameters/period-start-at'
+        - $ref: '#/components/parameters/period-end-at'
+        - $ref: '#/components/parameters/reserve-type'
+        - $ref: '#/components/parameters/cursor'
         - name: limit
           in: query
           description: Maximum number of results to return (default 100, max 1000)
@@ -1881,79 +697,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/BalancingCapacityVolumesResponse'
         '400':
-          description: Bad request
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                invalid-parameter:
-                  $ref: '#/components/examples/problem-invalid-parameter'
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                unauthorized:
-                  $ref: '#/components/examples/problem-unauthorized'
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Forbidden
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                forbidden:
-                  $ref: '#/components/examples/problem-forbidden'
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: Not found
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                not-found:
-                  $ref: '#/components/examples/problem-not-found'
+          $ref: '#/components/responses/NotFound'
         '429':
-          description: Too many requests
-          headers:
-            Retry-After:
-              description: Number of seconds to wait before retrying
-              schema:
-                type: integer
-                example: 12
-            X-RateLimit-Limit:
-              description: Maximum number of requests allowed per minute
-              schema:
-                type: integer
-                example: 60
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                rate-limited:
-                  $ref: '#/components/examples/problem-rate-limited'
+          $ref: '#/components/responses/TooManyRequests'
         '500':
-          description: Internal server error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                internal-error:
-                  $ref: '#/components/examples/problem-internal-error'
+          $ref: '#/components/responses/InternalServerError'
         '501':
-          description: Not implemented
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                not-implemented:
-                  $ref: '#/components/examples/problem-not-implemented'
+          $ref: '#/components/responses/NotImplemented'
 
   /balancing/capacity/demand:
     get:
@@ -1977,43 +733,11 @@ paths:
       operationId: getBalancingCapacityDemand
       x-experimental: true
       parameters:
-        - name: area
-          in: query
-          description: The area for which to retrieve data
-          required: true
-          schema:
-            $ref: '#/components/schemas/Area'
-          example: 'EE'
-        - name: period-start-at
-          in: query
-          description: Start of the time period (UTC)
-          required: true
-          schema:
-            type: string
-            format: date-time
-            example: '2025-01-01T00:00:00Z'
-        - name: period-end-at
-          in: query
-          description: End of the time period (UTC)
-          required: true
-          schema:
-            type: string
-            format: date-time
-            example: '2025-01-02T00:00:00Z'
-        - name: reserve-type
-          in: query
-          description: Filter by reserve type
-          required: true
-          schema:
-            $ref: '#/components/schemas/ReserveType'
-          example: 'aFRR'
-        - name: cursor
-          in: query
-          description: Pagination cursor from previous response. Omit to start from the beginning.
-          required: false
-          schema:
-            type: string
-            example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
+        - $ref: '#/components/parameters/area'
+        - $ref: '#/components/parameters/period-start-at'
+        - $ref: '#/components/parameters/period-end-at'
+        - $ref: '#/components/parameters/reserve-type'
+        - $ref: '#/components/parameters/cursor'
         - name: limit
           in: query
           description: Maximum number of results to return (default 100, max 1000)
@@ -2033,79 +757,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/BalancingCapacityDemandsResponse'
         '400':
-          description: Bad request
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                invalid-parameter:
-                  $ref: '#/components/examples/problem-invalid-parameter'
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                unauthorized:
-                  $ref: '#/components/examples/problem-unauthorized'
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Forbidden
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                forbidden:
-                  $ref: '#/components/examples/problem-forbidden'
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: Not found
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                not-found:
-                  $ref: '#/components/examples/problem-not-found'
+          $ref: '#/components/responses/NotFound'
         '429':
-          description: Too many requests
-          headers:
-            Retry-After:
-              description: Number of seconds to wait before retrying
-              schema:
-                type: integer
-                example: 12
-            X-RateLimit-Limit:
-              description: Maximum number of requests allowed per minute
-              schema:
-                type: integer
-                example: 60
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                rate-limited:
-                  $ref: '#/components/examples/problem-rate-limited'
+          $ref: '#/components/responses/TooManyRequests'
         '500':
-          description: Internal server error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                internal-error:
-                  $ref: '#/components/examples/problem-internal-error'
+          $ref: '#/components/responses/InternalServerError'
         '501':
-          description: Not implemented
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                not-implemented:
-                  $ref: '#/components/examples/problem-not-implemented'
+          $ref: '#/components/responses/NotImplemented'
 
   /balancing/energy/cross-border-marginal-prices:
     get:
@@ -2140,20 +804,8 @@ paths:
             type: string
             format: date-time
             example: '2026-03-01T01:00:00Z'
-        - name: reserve-type
-          in: query
-          description: Filter by reserve type
-          required: true
-          schema:
-            $ref: '#/components/schemas/ReserveType'
-          example: 'aFRR'
-        - name: cursor
-          in: query
-          description: Pagination cursor from previous response. Omit to start from the beginning.
-          required: false
-          schema:
-            type: string
-            example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
+        - $ref: '#/components/parameters/reserve-type'
+        - $ref: '#/components/parameters/cursor'
         - name: limit
           in: query
           description: Maximum number of results to return (default 1000, max 10000)
@@ -2173,79 +825,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/CrossBorderMarginalPricesResponse'
         '400':
-          description: Bad request
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                invalid-parameter:
-                  $ref: '#/components/examples/problem-invalid-parameter'
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                unauthorized:
-                  $ref: '#/components/examples/problem-unauthorized'
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Forbidden
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                forbidden:
-                  $ref: '#/components/examples/problem-forbidden'
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: Not found
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                not-found:
-                  $ref: '#/components/examples/problem-not-found'
+          $ref: '#/components/responses/NotFound'
         '429':
-          description: Too many requests
-          headers:
-            Retry-After:
-              description: Number of seconds to wait before retrying
-              schema:
-                type: integer
-                example: 12
-            X-RateLimit-Limit:
-              description: Maximum number of requests allowed per minute
-              schema:
-                type: integer
-                example: 60
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                rate-limited:
-                  $ref: '#/components/examples/problem-rate-limited'
+          $ref: '#/components/responses/TooManyRequests'
         '500':
-          description: Internal server error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                internal-error:
-                  $ref: '#/components/examples/problem-internal-error'
+          $ref: '#/components/responses/InternalServerError'
         '501':
-          description: Not implemented
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                not-implemented:
-                  $ref: '#/components/examples/problem-not-implemented'
+          $ref: '#/components/responses/NotImplemented'
 
   /balancing/energy/cross-border-volumes:
     get:
@@ -2272,36 +864,10 @@ paths:
           schema:
             $ref: '#/components/schemas/Area'
           example: 'EE'
-        - name: period-start-at
-          in: query
-          description: Start of the time period (UTC)
-          required: true
-          schema:
-            type: string
-            format: date-time
-            example: '2025-01-01T00:00:00Z'
-        - name: period-end-at
-          in: query
-          description: End of the time period (UTC)
-          required: true
-          schema:
-            type: string
-            format: date-time
-            example: '2025-01-02T00:00:00Z'
-        - name: reserve-type
-          in: query
-          description: Filter by reserve type
-          required: true
-          schema:
-            $ref: '#/components/schemas/ReserveType'
-          example: 'aFRR'
-        - name: cursor
-          in: query
-          description: Pagination cursor from previous response. Omit to start from the beginning.
-          required: false
-          schema:
-            type: string
-            example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
+        - $ref: '#/components/parameters/period-start-at'
+        - $ref: '#/components/parameters/period-end-at'
+        - $ref: '#/components/parameters/reserve-type'
+        - $ref: '#/components/parameters/cursor'
         - name: limit
           in: query
           description: Maximum number of results to return (default 100, max 1000)
@@ -2321,79 +887,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/CrossBorderEnergyVolumesResponse'
         '400':
-          description: Bad request
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                invalid-parameter:
-                  $ref: '#/components/examples/problem-invalid-parameter'
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                unauthorized:
-                  $ref: '#/components/examples/problem-unauthorized'
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Forbidden
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                forbidden:
-                  $ref: '#/components/examples/problem-forbidden'
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: Not found
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                not-found:
-                  $ref: '#/components/examples/problem-not-found'
+          $ref: '#/components/responses/NotFound'
         '429':
-          description: Too many requests
-          headers:
-            Retry-After:
-              description: Number of seconds to wait before retrying
-              schema:
-                type: integer
-                example: 12
-            X-RateLimit-Limit:
-              description: Maximum number of requests allowed per minute
-              schema:
-                type: integer
-                example: 60
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                rate-limited:
-                  $ref: '#/components/examples/problem-rate-limited'
+          $ref: '#/components/responses/TooManyRequests'
         '500':
-          description: Internal server error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                internal-error:
-                  $ref: '#/components/examples/problem-internal-error'
+          $ref: '#/components/responses/InternalServerError'
         '501':
-          description: Not implemented
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                not-implemented:
-                  $ref: '#/components/examples/problem-not-implemented'
+          $ref: '#/components/responses/NotImplemented'
 
   /energy/day-ahead/prices:
     get:
@@ -2418,29 +924,9 @@ paths:
           schema:
             $ref: '#/components/schemas/Area'
           example: 'FI'
-        - name: period-start-at
-          in: query
-          description: Start of the time period (UTC)
-          required: true
-          schema:
-            type: string
-            format: date-time
-            example: '2025-01-01T00:00:00Z'
-        - name: period-end-at
-          in: query
-          description: End of the time period (UTC)
-          required: true
-          schema:
-            type: string
-            format: date-time
-            example: '2025-01-02T00:00:00Z'
-        - name: cursor
-          in: query
-          description: Pagination cursor from previous response. Omit to start from the beginning.
-          required: false
-          schema:
-            type: string
-            example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
+        - $ref: '#/components/parameters/period-start-at'
+        - $ref: '#/components/parameters/period-end-at'
+        - $ref: '#/components/parameters/cursor'
         - name: limit
           in: query
           description: Maximum number of results to return (default 100, max 1000)
@@ -2460,82 +946,64 @@ paths:
               schema:
                 $ref: '#/components/schemas/DayAheadEnergyPricesResponse'
         '400':
-          description: Bad request
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                invalid-parameter:
-                  $ref: '#/components/examples/problem-invalid-parameter'
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                unauthorized:
-                  $ref: '#/components/examples/problem-unauthorized'
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Forbidden
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                forbidden:
-                  $ref: '#/components/examples/problem-forbidden'
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: Not found
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                not-found:
-                  $ref: '#/components/examples/problem-not-found'
+          $ref: '#/components/responses/NotFound'
         '429':
-          description: Too many requests
-          headers:
-            Retry-After:
-              description: Number of seconds to wait before retrying
-              schema:
-                type: integer
-                example: 12
-            X-RateLimit-Limit:
-              description: Maximum number of requests allowed per minute
-              schema:
-                type: integer
-                example: 60
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                rate-limited:
-                  $ref: '#/components/examples/problem-rate-limited'
+          $ref: '#/components/responses/TooManyRequests'
         '500':
-          description: Internal server error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                internal-error:
-                  $ref: '#/components/examples/problem-internal-error'
+          $ref: '#/components/responses/InternalServerError'
         '501':
-          description: Not implemented
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                not-implemented:
-                  $ref: '#/components/examples/problem-not-implemented'
+          $ref: '#/components/responses/NotImplemented'
 
 components:
   parameters:
+    area:
+      name: area
+      in: query
+      description: The area for which to retrieve data
+      required: true
+      schema:
+        $ref: '#/components/schemas/Area'
+      example: 'EE'
+    period-start-at:
+      name: period-start-at
+      in: query
+      description: Start of the time period (UTC)
+      required: true
+      schema:
+        type: string
+        format: date-time
+        example: '2025-01-01T00:00:00Z'
+    period-end-at:
+      name: period-end-at
+      in: query
+      description: End of the time period (UTC)
+      required: true
+      schema:
+        type: string
+        format: date-time
+        example: '2025-01-02T00:00:00Z'
+    reserve-type:
+      name: reserve-type
+      in: query
+      description: Filter by reserve type
+      required: true
+      schema:
+        $ref: '#/components/schemas/ReserveType'
+      example: 'aFRR'
+    cursor:
+      name: cursor
+      in: query
+      description: Pagination cursor from previous response. Omit to start from the beginning.
+      required: false
+      schema:
+        type: string
+        example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
     updated-since:
       name: updated-since
       in: query
@@ -2550,6 +1018,82 @@ components:
         type: string
         format: date-time
         example: '2025-01-02T09:15:00Z'
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+          examples:
+            invalid-parameter:
+              $ref: '#/components/examples/problem-invalid-parameter'
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+          examples:
+            unauthorized:
+              $ref: '#/components/examples/problem-unauthorized'
+    Forbidden:
+      description: Forbidden
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+          examples:
+            forbidden:
+              $ref: '#/components/examples/problem-forbidden'
+    NotFound:
+      description: Not found
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+          examples:
+            not-found:
+              $ref: '#/components/examples/problem-not-found'
+    TooManyRequests:
+      description: Too many requests
+      headers:
+        Retry-After:
+          description: Number of seconds to wait before retrying
+          schema:
+            type: integer
+            example: 12
+        X-RateLimit-Limit:
+          description: Maximum number of requests allowed per minute
+          schema:
+            type: integer
+            example: 60
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+          examples:
+            rate-limited:
+              $ref: '#/components/examples/problem-rate-limited'
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+          examples:
+            internal-error:
+              $ref: '#/components/examples/problem-internal-error'
+    NotImplemented:
+      description: Not implemented
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+          examples:
+            not-implemented:
+              $ref: '#/components/examples/problem-not-implemented'
   securitySchemes:
     BearerAuth:
       type: http
