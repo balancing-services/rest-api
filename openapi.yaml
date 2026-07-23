@@ -846,7 +846,8 @@ paths:
         Returns cross-border balancing energy volumes across the border between two areas,
         for the specified reserve type and time period. Both border ends must be given (`area` and `other-area`);
         results cover both directions (area → other-area and other-area → area). Volumes are expressed as average power in MW
-        and split by activation type — for mFRR, DIRECT and SCHEDULED activations are returned as separate entries.
+        and split by activation type — for mFRR, direct and scheduled activations are returned as separate entries,
+        and volumes without a direct/scheduled breakdown come back as a single unspecified entry.
         Supports cursor-based pagination for large result sets.
       operationId: getCrossBorderEnergyVolumes
       parameters:
@@ -2079,10 +2080,16 @@ components:
 
     ActivationType:
       type: string
-      description: Activation type (only applicable for mFRR)
+      description: |
+        Activation type of the balancing energy. Only mFRR distinguishes activation types:
+        - direct: mFRR activated directly
+        - scheduled: mFRR activated on a schedule
+        - unspecified: mFRR without a direct/scheduled breakdown — the source does not publish one, or the product does not define one
+        - not_applicable: the reserve type has no activation-type concept (FCR, aFRR, RR)
       enum:
         - direct
         - scheduled
+        - unspecified
         - not_applicable
 
     BidStatus:
