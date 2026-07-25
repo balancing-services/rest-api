@@ -2085,12 +2085,12 @@ components:
         - direct: mFRR activated directly
         - scheduled: mFRR activated on a schedule
         - unspecified: mFRR without a direct/scheduled breakdown — the source does not publish one, or the product does not define one
-        - not_applicable: the reserve type has no activation-type concept (FCR, aFRR, RR)
+        - notApplicable: the reserve type has no activation-type concept (FCR, aFRR, RR)
       enum:
         - direct
         - scheduled
         - unspecified
-        - not_applicable
+        - notApplicable
 
     BidStatus:
       type: string
