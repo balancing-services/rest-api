@@ -1,16 +1,15 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, TypeVar
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
-
-from ..models.bid_status import BidStatus
+from ..models.bid_status import BidStatus, check_bid_status
 
 if TYPE_CHECKING:
-    from ..models.period import Period
+    from ..models.procurement import Procurement
 
 
 T = TypeVar("T", bound="CapacityBid")
@@ -20,48 +19,37 @@ T = TypeVar("T", bound="CapacityBid")
 class CapacityBid:
     """
     Attributes:
-        period (Period):
-        capacity (float): Deprecated — use `capacityInMw` instead. Bid capacity in MW Example: 50.
         capacity_in_mw (float): Bid capacity in MW Example: 50.
-        price (float): Deprecated — use `pricePerMwPerHour` instead. Bid price per MW per hour in the specified currency
-            Example: 12.5.
         price_per_mw_per_hour (float): Bid price per MW per hour in the specified currency Example: 12.5.
         status (BidStatus): Status of a capacity bid:
             - offered: Bid was offered but not accepted
             - accepted: Bid was accepted (at least partially accepted)
+        procurement (Procurement):
     """
 
-    period: Period
-    capacity: float
     capacity_in_mw: float
-    price: float
     price_per_mw_per_hour: float
     status: BidStatus
+    procurement: Procurement
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
-        period = self.period.to_dict()
-
-        capacity = self.capacity
-
         capacity_in_mw = self.capacity_in_mw
-
-        price = self.price
 
         price_per_mw_per_hour = self.price_per_mw_per_hour
 
-        status = self.status.value
+        status: str = self.status
+
+        procurement = self.procurement.to_dict()
 
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
             {
-                "period": period,
-                "capacity": capacity,
                 "capacityInMw": capacity_in_mw,
-                "price": price,
                 "pricePerMwPerHour": price_per_mw_per_hour,
                 "status": status,
+                "procurement": procurement,
             }
         )
 
@@ -69,28 +57,22 @@ class CapacityBid:
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
-        from ..models.period import Period
+        from ..models.procurement import Procurement
 
         d = dict(src_dict)
-        period = Period.from_dict(d.pop("period"))
-
-        capacity = d.pop("capacity")
-
         capacity_in_mw = d.pop("capacityInMw")
-
-        price = d.pop("price")
 
         price_per_mw_per_hour = d.pop("pricePerMwPerHour")
 
-        status = BidStatus(d.pop("status"))
+        status = check_bid_status(d.pop("status"))
+
+        procurement = Procurement.from_dict(d.pop("procurement"))
 
         capacity_bid = cls(
-            period=period,
-            capacity=capacity,
             capacity_in_mw=capacity_in_mw,
-            price=price,
             price_per_mw_per_hour=price_per_mw_per_hour,
             status=status,
+            procurement=procurement,
         )
 
         capacity_bid.additional_properties = d

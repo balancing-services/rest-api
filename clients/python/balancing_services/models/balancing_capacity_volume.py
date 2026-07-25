@@ -1,11 +1,10 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, TypeVar
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
-
 
 if TYPE_CHECKING:
     from ..models.period import Period
@@ -19,19 +18,15 @@ class BalancingCapacityVolume:
     """
     Attributes:
         period (Period):
-        volume (float): Deprecated — use `volumeInMw` instead. Volume in MW Example: 50.0.
         volume_in_mw (float): Volume in MW Example: 50.0.
     """
 
     period: Period
-    volume: float
     volume_in_mw: float
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         period = self.period.to_dict()
-
-        volume = self.volume
 
         volume_in_mw = self.volume_in_mw
 
@@ -40,7 +35,6 @@ class BalancingCapacityVolume:
         field_dict.update(
             {
                 "period": period,
-                "volume": volume,
                 "volumeInMw": volume_in_mw,
             }
         )
@@ -54,13 +48,10 @@ class BalancingCapacityVolume:
         d = dict(src_dict)
         period = Period.from_dict(d.pop("period"))
 
-        volume = d.pop("volume")
-
         volume_in_mw = d.pop("volumeInMw")
 
         balancing_capacity_volume = cls(
             period=period,
-            volume=volume,
             volume_in_mw=volume_in_mw,
         )
 

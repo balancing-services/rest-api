@@ -1,54 +1,107 @@
-from enum import Enum
+from typing import Literal
+
+Area = Literal[
+    "AT",
+    "BALTICS",
+    "BE",
+    "BG",
+    "CH",
+    "CZ",
+    "DE",
+    "DE_50HERTZ",
+    "DE_AMPRION",
+    "DE_TENNET",
+    "DE_TRANSNETBW",
+    "DK1",
+    "DK2",
+    "EE",
+    "ES",
+    "FI",
+    "FR",
+    "GR",
+    "HR",
+    "HU",
+    "IT",
+    "IT_CALABRIA",
+    "IT_CENTER_NORTH",
+    "IT_CENTER_SOUTH",
+    "IT_NORTH",
+    "IT_SARDINIA",
+    "IT_SICILY",
+    "IT_SOUTH",
+    "LT",
+    "LV",
+    "NL",
+    "NO1",
+    "NO2",
+    "NO3",
+    "NO4",
+    "NO5",
+    "PL",
+    "PT",
+    "RO",
+    "RS",
+    "SE1",
+    "SE2",
+    "SE3",
+    "SE4",
+    "SI",
+    "SK",
+    "UA",
+]
+
+AREA_VALUES: set[Area] = {
+    "AT",
+    "BALTICS",
+    "BE",
+    "BG",
+    "CH",
+    "CZ",
+    "DE",
+    "DE_50HERTZ",
+    "DE_AMPRION",
+    "DE_TENNET",
+    "DE_TRANSNETBW",
+    "DK1",
+    "DK2",
+    "EE",
+    "ES",
+    "FI",
+    "FR",
+    "GR",
+    "HR",
+    "HU",
+    "IT",
+    "IT_CALABRIA",
+    "IT_CENTER_NORTH",
+    "IT_CENTER_SOUTH",
+    "IT_NORTH",
+    "IT_SARDINIA",
+    "IT_SICILY",
+    "IT_SOUTH",
+    "LT",
+    "LV",
+    "NL",
+    "NO1",
+    "NO2",
+    "NO3",
+    "NO4",
+    "NO5",
+    "PL",
+    "PT",
+    "RO",
+    "RS",
+    "SE1",
+    "SE2",
+    "SE3",
+    "SE4",
+    "SI",
+    "SK",
+    "UA",
+}
 
 
-class Area(str, Enum):
-    AT = "AT"
-    BALTICS = "BALTICS"
-    BE = "BE"
-    BG = "BG"
-    CH = "CH"
-    CZ = "CZ"
-    DE = "DE"
-    DE_50HERTZ = "DE_50HERTZ"
-    DE_AMPRION = "DE_AMPRION"
-    DE_TENNET = "DE_TENNET"
-    DE_TRANSNETBW = "DE_TRANSNETBW"
-    DK1 = "DK1"
-    DK2 = "DK2"
-    EE = "EE"
-    ES = "ES"
-    FI = "FI"
-    FR = "FR"
-    GR = "GR"
-    HR = "HR"
-    HU = "HU"
-    IT = "IT"
-    IT_CALABRIA = "IT_CALABRIA"
-    IT_CENTER_NORTH = "IT_CENTER_NORTH"
-    IT_CENTER_SOUTH = "IT_CENTER_SOUTH"
-    IT_NORTH = "IT_NORTH"
-    IT_SARDINIA = "IT_SARDINIA"
-    IT_SICILY = "IT_SICILY"
-    IT_SOUTH = "IT_SOUTH"
-    LT = "LT"
-    LV = "LV"
-    NL = "NL"
-    NO1 = "NO1"
-    NO2 = "NO2"
-    NO3 = "NO3"
-    NO4 = "NO4"
-    NO5 = "NO5"
-    PL = "PL"
-    PT = "PT"
-    RO = "RO"
-    RS = "RS"
-    SE1 = "SE1"
-    SE2 = "SE2"
-    SE3 = "SE3"
-    SE4 = "SE4"
-    SI = "SI"
-    SK = "SK"
-    UA = "UA"
-
-    def __str__(self) -> str:
-        return str(self.value)
+def check_area(value: str) -> Area:
+    if value in AREA_VALUES:
+        return value
+    raise TypeError(f"Unexpected value {value!r}. Expected one of {AREA_VALUES!r}")

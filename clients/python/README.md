@@ -32,10 +32,10 @@ uv pip install -e .
 ## Quick Start
 
 ```python
+from datetime import datetime
+
 from balancing_services import AuthenticatedClient
 from balancing_services.api.default import get_imbalance_prices
-from balancing_services.models import Area
-from datetime import datetime
 
 # Create an authenticated client
 client = AuthenticatedClient(
@@ -43,10 +43,11 @@ client = AuthenticatedClient(
     token="YOUR_API_TOKEN"
 )
 
-# Get imbalance prices for Estonia
+# Get imbalance prices for Estonia. Enum-typed parameters take plain string
+# values (e.g. area="EE") — see "Data Models" below.
 response = get_imbalance_prices.sync_detailed(
     client=client,
-    area=Area.EE,
+    area="EE",
     period_start_at=datetime.fromisoformat("2025-01-01T00:00:00Z"),
     period_end_at=datetime.fromisoformat("2025-01-02T00:00:00Z")
 )
@@ -57,7 +58,7 @@ if response.status_code == 200:
     for imbalance_prices in data.data:
         print(f"Area: {imbalance_prices.area}, Direction: {imbalance_prices.direction}")
         for price in imbalance_prices.prices:
-            print(f"  {price.period.start_at}: {price.price} {imbalance_prices.currency}")
+            print(f"  {price.period.start_at}: {price.price_per_mwh} {imbalance_prices.currency}")
 ```
 
 ## Authentication
@@ -82,20 +83,20 @@ client = AuthenticatedClient(
 ### Get Balancing Energy Bids with Pagination
 
 ```python
+from datetime import datetime
+
 from balancing_services import AuthenticatedClient
 from balancing_services.api.default import get_balancing_energy_bids
-from balancing_services.models import Area, ReserveType
-from datetime import datetime
 
 client = AuthenticatedClient(base_url="https://api.balancing.services/v1", token="YOUR_TOKEN")
 
 # First page
 response = get_balancing_energy_bids.sync_detailed(
     client=client,
-    area=Area.EE,
+    area="EE",
     period_start_at=datetime.fromisoformat("2025-01-01T00:00:00Z"),
     period_end_at=datetime.fromisoformat("2025-01-02T00:00:00Z"),
-    reserve_type=ReserveType.AFRR,
+    reserve_type="aFRR",
     limit=100
 )
 
@@ -103,19 +104,20 @@ if response.status_code == 200:
     data = response.parsed
     print(f"Has more: {data.has_more}")
 
-    # Process first page
+    # Process first page. Each group carries one entry per delivery period.
     for bid_group in data.data:
-        for bid in bid_group.bids:
-            print(f"Bid: {bid.volume} MW @ {bid.price} {bid_group.currency}")
+        for period in bid_group.periods:
+            for bid in period.bids:
+                print(f"Bid: {bid.volume_in_mw} MW @ {bid.price_per_mwh} {bid_group.currency}")
 
     # Get next page if available
     if data.has_more and data.next_cursor:
         next_response = get_balancing_energy_bids.sync_detailed(
             client=client,
-            area=Area.EE,
+            area="EE",
             period_start_at=datetime.fromisoformat("2025-01-01T00:00:00Z"),
             period_end_at=datetime.fromisoformat("2025-01-02T00:00:00Z"),
-            reserve_type=ReserveType.AFRR,
+            reserve_type="aFRR",
             cursor=data.next_cursor,
             limit=100
         )
@@ -125,10 +127,10 @@ if response.status_code == 200:
 
 ```python
 import asyncio
+from datetime import datetime
+
 from balancing_services import AuthenticatedClient
 from balancing_services.api.default import get_imbalance_prices
-from balancing_services.models import Area
-from datetime import datetime
 
 async def fetch_prices():
     client = AuthenticatedClient(
@@ -138,7 +140,7 @@ async def fetch_prices():
 
     response = await get_imbalance_prices.asyncio_detailed(
         client=client,
-        area=Area.EE,
+        area="EE",
         period_start_at=datetime.fromisoformat("2025-01-01T00:00:00Z"),
         period_end_at=datetime.fromisoformat("2025-01-02T00:00:00Z")
     )
@@ -154,16 +156,16 @@ prices = asyncio.run(fetch_prices())
 ### Error Handling
 
 ```python
+from datetime import datetime
+
 from balancing_services import AuthenticatedClient
 from balancing_services.api.default import get_imbalance_prices
-from balancing_services.models import Area
-from datetime import datetime
 
 client = AuthenticatedClient(base_url="https://api.balancing.services/v1", token="YOUR_TOKEN")
 
 response = get_imbalance_prices.sync_detailed(
     client=client,
-    area=Area.EE,
+    area="EE",
     period_start_at=datetime.fromisoformat("2025-01-01T00:00:00Z"),
     period_end_at=datetime.fromisoformat("2025-01-02T00:00:00Z")
 )
@@ -189,7 +191,13 @@ All response and request models are fully typed using attrs. Key models include:
 - `ImbalancePricesResponse`, `ImbalanceTotalVolumesResponse`
 - `BalancingEnergyVolumesResponse`, `BalancingEnergyPricesResponse`, `BalancingEnergyBidsResponse`
 - `BalancingCapacityBidsResponse`, `BalancingCapacityPricesResponse`, `BalancingCapacityVolumesResponse`
-- Enums: `Area`, `ReserveType`, `Direction`, `Currency`, `ActivationType`, `BidStatus`
+- Enum types: `Area`, `ReserveType`, `Direction`, `Currency`, `ActivationType`, `BidStatus`
+
+Enum-typed fields and parameters are plain strings. Each enum is a `Literal`
+string type (e.g. `Area = Literal["EE", "FI", ...]`) with a companion
+`*_VALUES` set of accepted values — there is no `Area.EE` member access or
+`.value` accessor. Pass the bare wire string (`area="EE"`, `reserve_type="aFRR"`)
+and read fields back as strings.
 
 ## Development
 
@@ -366,15 +374,21 @@ client = AuthenticatedClient(
 
 **Problem:** Type errors when passing area or reserve type
 
-**Solution:** Use the provided enum classes:
+**Solution:** Pass the bare wire string value. Enum-typed parameters are
+`Literal` string types, so the string itself is the type-safe value — there is
+no enum member to import:
 ```python
-from balancing_services.models import Area, ReserveType
-
 # Correct
-area=Area.EE
+area="EE"
+reserve_type="aFRR"
+```
 
-# Incorrect
-area="EE"  # String might work but not type-safe
+The accepted values for each enum are available as a `*_VALUES` set if you need
+to validate or enumerate them:
+```python
+from balancing_services.models.area import AREA_VALUES
+
+assert "EE" in AREA_VALUES
 ```
 
 ## Documentation

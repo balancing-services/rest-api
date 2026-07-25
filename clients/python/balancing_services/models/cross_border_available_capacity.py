@@ -1,15 +1,14 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, TypeVar
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
-
-from ..models.area import Area
-from ..models.eic_code import EicCode
-from ..models.reserve_type import ReserveType
+from ..models.area import Area, check_area
+from ..models.eic_code import EicCode, check_eic_code
+from ..models.reserve_type import ReserveType, check_reserve_type
 
 if TYPE_CHECKING:
     from ..models.cross_border_available_capacity_value import (
@@ -41,15 +40,15 @@ class CrossBorderAvailableCapacity:
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
-        from_area = self.from_area.value
+        from_area: str = self.from_area
 
-        from_eic_code = self.from_eic_code.value
+        from_eic_code: str = self.from_eic_code
 
-        to_area = self.to_area.value
+        to_area: str = self.to_area
 
-        to_eic_code = self.to_eic_code.value
+        to_eic_code: str = self.to_eic_code
 
-        reserve_type = self.reserve_type.value
+        reserve_type: str = self.reserve_type
 
         available_capacities = []
         for available_capacities_item_data in self.available_capacities:
@@ -78,15 +77,15 @@ class CrossBorderAvailableCapacity:
         )
 
         d = dict(src_dict)
-        from_area = Area(d.pop("fromArea"))
+        from_area = check_area(d.pop("fromArea"))
 
-        from_eic_code = EicCode(d.pop("fromEicCode"))
+        from_eic_code = check_eic_code(d.pop("fromEicCode"))
 
-        to_area = Area(d.pop("toArea"))
+        to_area = check_area(d.pop("toArea"))
 
-        to_eic_code = EicCode(d.pop("toEicCode"))
+        to_eic_code = check_eic_code(d.pop("toEicCode"))
 
-        reserve_type = ReserveType(d.pop("reserveType"))
+        reserve_type = check_reserve_type(d.pop("reserveType"))
 
         available_capacities = []
         _available_capacities = d.pop("availableCapacities")

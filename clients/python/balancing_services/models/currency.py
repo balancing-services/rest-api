@@ -1,14 +1,19 @@
-from enum import Enum
+from typing import Literal
+
+Currency = Literal["BGN", "CHF", "EUR", "HUF", "PLN", "RON", "UAH"]
+
+CURRENCY_VALUES: set[Currency] = {
+    "BGN",
+    "CHF",
+    "EUR",
+    "HUF",
+    "PLN",
+    "RON",
+    "UAH",
+}
 
 
-class Currency(str, Enum):
-    BGN = "BGN"
-    CHF = "CHF"
-    EUR = "EUR"
-    HUF = "HUF"
-    PLN = "PLN"
-    RON = "RON"
-    UAH = "UAH"
-
-    def __str__(self) -> str:
-        return str(self.value)
+def check_currency(value: str) -> Currency:
+    if value in CURRENCY_VALUES:
+        return value
+    raise TypeError(f"Unexpected value {value!r}. Expected one of {CURRENCY_VALUES!r}")

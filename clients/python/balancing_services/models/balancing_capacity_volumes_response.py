@@ -1,14 +1,13 @@
 from __future__ import annotations
 
+import datetime
 from collections.abc import Mapping
-from typing import Any, TypeVar, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, TypeVar, cast
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
 from ..types import UNSET, Unset
-
-from typing import cast
 
 if TYPE_CHECKING:
     from ..models.balancing_capacity_volumes import BalancingCapacityVolumes
@@ -25,6 +24,10 @@ class BalancingCapacityVolumesResponse:
         queried_period (Period):
         data (list[BalancingCapacityVolumes]):
         has_more (bool): Indicates whether there are more results available
+        next_updated_since (datetime.datetime): The watermark to pass as `updated-since` on the next poll. Every page of
+            one drain reports the same value. It deliberately lags real time to cover writes that were still committing, so
+            consecutive polls overlap slightly and a record may be delivered more than once — upsert on consume. Example:
+            2025-01-02T09:15:00Z.
         next_cursor (None | str | Unset): Cursor to fetch the next page of results. Null if no more results. Example:
             v1:AAAAAYwBAgMEBQYHCAkKCw==.
     """
@@ -32,6 +35,7 @@ class BalancingCapacityVolumesResponse:
     queried_period: Period
     data: list[BalancingCapacityVolumes]
     has_more: bool
+    next_updated_since: datetime.datetime
     next_cursor: None | str | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
@@ -44,6 +48,8 @@ class BalancingCapacityVolumesResponse:
             data.append(data_item)
 
         has_more = self.has_more
+
+        next_updated_since = self.next_updated_since.isoformat()
 
         next_cursor: None | str | Unset
         if isinstance(self.next_cursor, Unset):
@@ -58,6 +64,7 @@ class BalancingCapacityVolumesResponse:
                 "queriedPeriod": queried_period,
                 "data": data,
                 "hasMore": has_more,
+                "nextUpdatedSince": next_updated_since,
             }
         )
         if next_cursor is not UNSET:
@@ -82,6 +89,8 @@ class BalancingCapacityVolumesResponse:
 
         has_more = d.pop("hasMore")
 
+        next_updated_since = datetime.datetime.fromisoformat(d.pop("nextUpdatedSince").replace("Z", "+00:00"))
+
         def _parse_next_cursor(data: object) -> None | str | Unset:
             if data is None:
                 return data
@@ -95,6 +104,7 @@ class BalancingCapacityVolumesResponse:
             queried_period=queried_period,
             data=data,
             has_more=has_more,
+            next_updated_since=next_updated_since,
             next_cursor=next_cursor,
         )
 

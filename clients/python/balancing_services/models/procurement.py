@@ -1,37 +1,36 @@
 from __future__ import annotations
 
+import datetime
 from collections.abc import Mapping
 from typing import Any, TypeVar
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
-T = TypeVar("T", bound="EnergyBid")
+T = TypeVar("T", bound="Procurement")
 
 
 @_attrs_define
-class EnergyBid:
+class Procurement:
     """
     Attributes:
-        volume_in_mw (float): Bid volume in MW Example: 100.
-        price_per_mwh (float): Bid price per MWh in the specified currency Example: 55.25.
+        procured_at (datetime.datetime): Timestamp when the capacity was procured (allocation time or gate closure
+            time).
+            Used to distinguish different procurements (e.g. yearly vs hourly, or multiple procurement rounds).
+             Example: 2024-08-15T14:30:00Z.
     """
 
-    volume_in_mw: float
-    price_per_mwh: float
+    procured_at: datetime.datetime
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
-        volume_in_mw = self.volume_in_mw
-
-        price_per_mwh = self.price_per_mwh
+        procured_at = self.procured_at.isoformat()
 
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
             {
-                "volumeInMw": volume_in_mw,
-                "pricePerMwh": price_per_mwh,
+                "procuredAt": procured_at,
             }
         )
 
@@ -40,17 +39,14 @@ class EnergyBid:
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         d = dict(src_dict)
-        volume_in_mw = d.pop("volumeInMw")
+        procured_at = datetime.datetime.fromisoformat(d.pop("procuredAt").replace("Z", "+00:00"))
 
-        price_per_mwh = d.pop("pricePerMwh")
-
-        energy_bid = cls(
-            volume_in_mw=volume_in_mw,
-            price_per_mwh=price_per_mwh,
+        procurement = cls(
+            procured_at=procured_at,
         )
 
-        energy_bid.additional_properties = d
-        return energy_bid
+        procurement.additional_properties = d
+        return procurement
 
     @property
     def additional_keys(self) -> list[str]:

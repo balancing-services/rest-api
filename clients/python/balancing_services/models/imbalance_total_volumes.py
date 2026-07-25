@@ -1,14 +1,13 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, TypeVar
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
-
-from ..models.area import Area
-from ..models.eic_code import EicCode
+from ..models.area import Area, check_area
+from ..models.eic_code import EicCode, check_eic_code
 
 if TYPE_CHECKING:
     from ..models.total_imbalance_volume import TotalImbalanceVolume
@@ -33,9 +32,9 @@ class ImbalanceTotalVolumes:
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
-        area = self.area.value
+        area: str = self.area
 
-        eic_code = self.eic_code.value
+        eic_code: str = self.eic_code
 
         volumes = []
         for volumes_item_data in self.volumes:
@@ -59,9 +58,9 @@ class ImbalanceTotalVolumes:
         from ..models.total_imbalance_volume import TotalImbalanceVolume
 
         d = dict(src_dict)
-        area = Area(d.pop("area"))
+        area = check_area(d.pop("area"))
 
-        eic_code = EicCode(d.pop("eicCode"))
+        eic_code = check_eic_code(d.pop("eicCode"))
 
         volumes = []
         _volumes = d.pop("volumes")

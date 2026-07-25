@@ -1,9 +1,16 @@
-from enum import Enum
+from typing import Literal
+
+DemandBasis = Literal["additive", "substitutive"]
+
+DEMAND_BASIS_VALUES: set[DemandBasis] = {
+    "additive",
+    "substitutive",
+}
 
 
-class DemandBasis(str, Enum):
-    ADDITIVE = "additive"
-    SUBSTITUTIVE = "substitutive"
-
-    def __str__(self) -> str:
-        return str(self.value)
+def check_demand_basis(value: str) -> DemandBasis:
+    if value in DEMAND_BASIS_VALUES:
+        return value
+    raise TypeError(
+        f"Unexpected value {value!r}. Expected one of {DEMAND_BASIS_VALUES!r}"
+    )

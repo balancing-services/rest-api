@@ -1,16 +1,15 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, TypeVar
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
-
-from ..models.area import Area
-from ..models.currency import Currency
-from ..models.eic_code import EicCode
-from ..models.imbalance_direction import ImbalanceDirection
+from ..models.area import Area, check_area
+from ..models.currency import Currency, check_currency
+from ..models.eic_code import EicCode, check_eic_code
+from ..models.imbalance_direction import ImbalanceDirection, check_imbalance_direction
 
 if TYPE_CHECKING:
     from ..models.imbalance_price import ImbalancePrice
@@ -38,13 +37,13 @@ class ImbalancePrices:
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
-        area = self.area.value
+        area: str = self.area
 
-        eic_code = self.eic_code.value
+        eic_code: str = self.eic_code
 
-        currency = self.currency.value
+        currency: str = self.currency
 
-        direction = self.direction.value
+        direction: str = self.direction
 
         prices = []
         for prices_item_data in self.prices:
@@ -70,13 +69,13 @@ class ImbalancePrices:
         from ..models.imbalance_price import ImbalancePrice
 
         d = dict(src_dict)
-        area = Area(d.pop("area"))
+        area = check_area(d.pop("area"))
 
-        eic_code = EicCode(d.pop("eicCode"))
+        eic_code = check_eic_code(d.pop("eicCode"))
 
-        currency = Currency(d.pop("currency"))
+        currency = check_currency(d.pop("currency"))
 
-        direction = ImbalanceDirection(d.pop("direction"))
+        direction = check_imbalance_direction(d.pop("direction"))
 
         prices = []
         _prices = d.pop("prices")

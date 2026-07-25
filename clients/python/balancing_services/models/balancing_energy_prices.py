@@ -1,18 +1,17 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, TypeVar
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
-
-from ..models.activation_type import ActivationType
-from ..models.area import Area
-from ..models.currency import Currency
-from ..models.direction import Direction
-from ..models.eic_code import EicCode
-from ..models.reserve_type import ReserveType
+from ..models.activation_type import ActivationType, check_activation_type
+from ..models.area import Area, check_area
+from ..models.currency import Currency, check_currency
+from ..models.direction import Direction, check_direction
+from ..models.eic_code import EicCode, check_eic_code
+from ..models.reserve_type import ReserveType, check_reserve_type
 
 if TYPE_CHECKING:
     from ..models.balancing_energy_price import BalancingEnergyPrice
@@ -29,7 +28,13 @@ class BalancingEnergyPrices:
         eic_code (EicCode): Energy Identification Code (EIC)
         reserve_type (ReserveType): Reserve type
         direction (Direction): Balancing direction
-        activation_type (ActivationType): Activation type (only applicable for mFRR)
+        activation_type (ActivationType): Activation type of the balancing energy. Only mFRR distinguishes activation
+            types:
+            - direct: mFRR activated directly
+            - scheduled: mFRR activated on a schedule
+            - unspecified: mFRR without a direct/scheduled breakdown — the source does not publish one, or the product does
+            not define one
+            - notApplicable: the reserve type has no activation-type concept (FCR, aFRR, RR)
         currency (Currency): Currency code
         standard_product (bool): Indicates if this is a European standard balancing product Example: True.
         prices (list[BalancingEnergyPrice]):
@@ -46,17 +51,17 @@ class BalancingEnergyPrices:
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
-        area = self.area.value
+        area: str = self.area
 
-        eic_code = self.eic_code.value
+        eic_code: str = self.eic_code
 
-        reserve_type = self.reserve_type.value
+        reserve_type: str = self.reserve_type
 
-        direction = self.direction.value
+        direction: str = self.direction
 
-        activation_type = self.activation_type.value
+        activation_type: str = self.activation_type
 
-        currency = self.currency.value
+        currency: str = self.currency
 
         standard_product = self.standard_product
 
@@ -87,17 +92,17 @@ class BalancingEnergyPrices:
         from ..models.balancing_energy_price import BalancingEnergyPrice
 
         d = dict(src_dict)
-        area = Area(d.pop("area"))
+        area = check_area(d.pop("area"))
 
-        eic_code = EicCode(d.pop("eicCode"))
+        eic_code = check_eic_code(d.pop("eicCode"))
 
-        reserve_type = ReserveType(d.pop("reserveType"))
+        reserve_type = check_reserve_type(d.pop("reserveType"))
 
-        direction = Direction(d.pop("direction"))
+        direction = check_direction(d.pop("direction"))
 
-        activation_type = ActivationType(d.pop("activationType"))
+        activation_type = check_activation_type(d.pop("activationType"))
 
-        currency = Currency(d.pop("currency"))
+        currency = check_currency(d.pop("currency"))
 
         standard_product = d.pop("standardProduct")
 

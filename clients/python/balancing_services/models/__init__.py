@@ -2,6 +2,7 @@
 
 from .activation_type import ActivationType
 from .area import Area
+from .balancing_capacity_bid_period import BalancingCapacityBidPeriod
 from .balancing_capacity_bids import BalancingCapacityBids
 from .balancing_capacity_bids_response import BalancingCapacityBidsResponse
 from .balancing_capacity_demand import BalancingCapacityDemand
@@ -13,6 +14,7 @@ from .balancing_capacity_prices_response import BalancingCapacityPricesResponse
 from .balancing_capacity_volume import BalancingCapacityVolume
 from .balancing_capacity_volumes import BalancingCapacityVolumes
 from .balancing_capacity_volumes_response import BalancingCapacityVolumesResponse
+from .balancing_energy_bid_period import BalancingEnergyBidPeriod
 from .balancing_energy_bids import BalancingEnergyBids
 from .balancing_energy_bids_response import BalancingEnergyBidsResponse
 from .balancing_energy_price import BalancingEnergyPrice
@@ -53,7 +55,7 @@ from .imbalance_total_volumes import ImbalanceTotalVolumes
 from .imbalance_total_volumes_response import ImbalanceTotalVolumesResponse
 from .period import Period
 from .problem import Problem
-from .problem_type import ProblemType
+from .procurement import Procurement
 from .reserve_type import ReserveType
 from .total_imbalance_direction import TotalImbalanceDirection
 from .total_imbalance_volume import TotalImbalanceVolume
@@ -61,6 +63,7 @@ from .total_imbalance_volume import TotalImbalanceVolume
 __all__ = (
     "ActivationType",
     "Area",
+    "BalancingCapacityBidPeriod",
     "BalancingCapacityBids",
     "BalancingCapacityBidsResponse",
     "BalancingCapacityDemand",
@@ -72,6 +75,7 @@ __all__ = (
     "BalancingCapacityVolume",
     "BalancingCapacityVolumes",
     "BalancingCapacityVolumesResponse",
+    "BalancingEnergyBidPeriod",
     "BalancingEnergyBids",
     "BalancingEnergyBidsResponse",
     "BalancingEnergyPrice",
@@ -108,7 +112,7 @@ __all__ = (
     "ImbalanceTotalVolumesResponse",
     "Period",
     "Problem",
-    "ProblemType",
+    "Procurement",
     "ReserveType",
     "TotalImbalanceDirection",
     "TotalImbalanceVolume",

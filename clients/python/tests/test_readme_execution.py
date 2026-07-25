@@ -49,6 +49,7 @@ def mock_success_response():
             "endAt": "2025-01-02T00:00:00Z"
         },
         "hasMore": False,
+        "nextUpdatedSince": "2025-01-02T09:15:00Z",
         "data": [
             {
                 "area": "EE",
@@ -61,7 +62,6 @@ def mock_success_response():
                             "startAt": "2025-01-01T00:00:00Z",
                             "endAt": "2025-01-01T01:00:00Z"
                         },
-                        "price": 45.5,
                         "pricePerMwh": 45.5
                     }
                 ]
@@ -79,6 +79,7 @@ def mock_bids_response():
             "endAt": "2025-01-02T00:00:00Z"
         },
         "hasMore": True,
+        "nextUpdatedSince": "2025-01-02T09:15:00Z",
         "nextCursor": "v1:test_cursor",
         "data": [
             {
@@ -86,19 +87,20 @@ def mock_bids_response():
                 "eicCode": "10Y1001A1001A39I",
                 "reserveType": "aFRR",
                 "direction": "up",
-                "standardProduct": "15MIN",
+                "standardProduct": True,
                 "currency": "EUR",
-                "bids": [
+                "periods": [
                     {
                         "period": {
                             "startAt": "2025-01-01T00:00:00Z",
                             "endAt": "2025-01-01T00:15:00Z"
                         },
-                        "volume": 10.5,
-                        "volumeInMw": 10.5,
-                        "price": 25.0,
-                        "pricePerMwh": 25.0,
-                        "status": "accepted"
+                        "bids": [
+                            {
+                                "volumeInMw": 10.5,
+                                "pricePerMwh": 25.0
+                            }
+                        ]
                     }
                 ]
             }
@@ -219,15 +221,15 @@ def test_error_handling_example_executes(mock_error_401):
 
 
 @respx.mock
-def test_old_string_based_approach_fails():
-    """Test that old approach with strings would fail (validates our fix)."""
-    # Mock the API endpoint
+def test_string_based_approach_works(mock_success_response):
+    """Under literal_enums, passing bare string values is the correct approach."""
     respx.get("https://api.balancing.services/v1/imbalance/prices").mock(
-        return_value=Response(200, json={})
+        return_value=Response(200, json=mock_success_response)
     )
 
-    # Old broken code with strings
-    old_broken_code = """
+    string_based_code = """
+from datetime import datetime, timezone
+
 from balancing_services import AuthenticatedClient
 from balancing_services.api.default import get_imbalance_prices
 
@@ -236,18 +238,18 @@ client = AuthenticatedClient(
     token="test"
 )
 
-# This should fail because area should be Area.EE not "EE"
+# Bare string values are the correct, only way to call the API under literal_enums
 response = get_imbalance_prices.sync_detailed(
     client=client,
-    area="EE",  # Wrong: string instead of Area enum
-    period_start_at="2025-01-01T00:00:00Z",  # Wrong: string instead of datetime
-    period_end_at="2025-01-02T00:00:00Z"
+    area="EE",
+    period_start_at=datetime(2025, 1, 1, tzinfo=timezone.utc),
+    period_end_at=datetime(2025, 1, 2, tzinfo=timezone.utc),
 )
+assert response.status_code == 200
 """
 
-    # This should raise an AttributeError
-    with pytest.raises(AttributeError, match="'str' object has no attribute 'value'"):
-        exec(old_broken_code, {})
+    exec_globals = {}
+    exec(string_based_code, exec_globals)
 
 
 def test_all_readme_examples_are_tested():

@@ -1,54 +1,107 @@
-from enum import Enum
+from typing import Literal
+
+EicCode = Literal[
+    "10Y1001A1001A39I",
+    "10Y1001A1001A44P",
+    "10Y1001A1001A45N",
+    "10Y1001A1001A46L",
+    "10Y1001A1001A47J",
+    "10Y1001A1001A48H",
+    "10Y1001A1001A70O",
+    "10Y1001A1001A71M",
+    "10Y1001A1001A73I",
+    "10Y1001A1001A74G",
+    "10Y1001A1001A75E",
+    "10Y1001A1001A788",
+    "10Y1001A1001A83F",
+    "10Y1001A1001A94A",
+    "10Y1001C--000182",
+    "10Y1001C--00096J",
+    "10YAT-APG------L",
+    "10YBE----------2",
+    "10YCA-BULGARIA-R",
+    "10YCH-SWISSGRIDZ",
+    "10YCS-SERBIATSOV",
+    "10YCZ-CEPS-----N",
+    "10YDE-ENBW-----N",
+    "10YDE-EON------1",
+    "10YDE-RWENET---I",
+    "10YDE-VE-------2",
+    "10YDK-1--------W",
+    "10YDK-2--------M",
+    "10YES-REE------0",
+    "10YFI-1--------U",
+    "10YFR-RTE------C",
+    "10YGR-HTSO-----Y",
+    "10YHR-HEP------M",
+    "10YHU-MAVIR----U",
+    "10YIT-GRTN-----B",
+    "10YLT-1001A0008Q",
+    "10YLV-1001A00074",
+    "10YNL----------L",
+    "10YNO-1--------2",
+    "10YNO-2--------T",
+    "10YNO-3--------J",
+    "10YNO-4--------9",
+    "10YPL-AREA-----S",
+    "10YPT-REN------W",
+    "10YRO-TEL------P",
+    "10YSI-ELES-----O",
+    "10YSK-SEPS-----K",
+]
+
+EIC_CODE_VALUES: set[EicCode] = {
+    "10Y1001A1001A39I",
+    "10Y1001A1001A44P",
+    "10Y1001A1001A45N",
+    "10Y1001A1001A46L",
+    "10Y1001A1001A47J",
+    "10Y1001A1001A48H",
+    "10Y1001A1001A70O",
+    "10Y1001A1001A71M",
+    "10Y1001A1001A73I",
+    "10Y1001A1001A74G",
+    "10Y1001A1001A75E",
+    "10Y1001A1001A788",
+    "10Y1001A1001A83F",
+    "10Y1001A1001A94A",
+    "10Y1001C--000182",
+    "10Y1001C--00096J",
+    "10YAT-APG------L",
+    "10YBE----------2",
+    "10YCA-BULGARIA-R",
+    "10YCH-SWISSGRIDZ",
+    "10YCS-SERBIATSOV",
+    "10YCZ-CEPS-----N",
+    "10YDE-ENBW-----N",
+    "10YDE-EON------1",
+    "10YDE-RWENET---I",
+    "10YDE-VE-------2",
+    "10YDK-1--------W",
+    "10YDK-2--------M",
+    "10YES-REE------0",
+    "10YFI-1--------U",
+    "10YFR-RTE------C",
+    "10YGR-HTSO-----Y",
+    "10YHR-HEP------M",
+    "10YHU-MAVIR----U",
+    "10YIT-GRTN-----B",
+    "10YLT-1001A0008Q",
+    "10YLV-1001A00074",
+    "10YNL----------L",
+    "10YNO-1--------2",
+    "10YNO-2--------T",
+    "10YNO-3--------J",
+    "10YNO-4--------9",
+    "10YPL-AREA-----S",
+    "10YPT-REN------W",
+    "10YRO-TEL------P",
+    "10YSI-ELES-----O",
+    "10YSK-SEPS-----K",
+}
 
 
-class EicCode(str, Enum):
-    VALUE_0 = "10YAT-APG------L"
-    VALUE_1 = "10YBE----------2"
-    VALUE_10 = "10YDK-1--------W"
-    VALUE_11 = "10YDK-2--------M"
-    VALUE_12 = "10Y1001A1001A39I"
-    VALUE_13 = "10YES-REE------0"
-    VALUE_14 = "10YFI-1--------U"
-    VALUE_15 = "10YFR-RTE------C"
-    VALUE_16 = "10YGR-HTSO-----Y"
-    VALUE_17 = "10YHR-HEP------M"
-    VALUE_18 = "10YHU-MAVIR----U"
-    VALUE_19 = "10YIT-GRTN-----B"
-    VALUE_2 = "10YCA-BULGARIA-R"
-    VALUE_20 = "10Y1001A1001A73I"
-    VALUE_21 = "10Y1001A1001A70O"
-    VALUE_22 = "10Y1001A1001A71M"
-    VALUE_23 = "10Y1001A1001A788"
-    VALUE_24 = "10Y1001C--00096J"
-    VALUE_25 = "10Y1001A1001A75E"
-    VALUE_26 = "10Y1001A1001A74G"
-    VALUE_27 = "10YLT-1001A0008Q"
-    VALUE_28 = "10YLV-1001A00074"
-    VALUE_29 = "10YNL----------L"
-    VALUE_3 = "10YCH-SWISSGRIDZ"
-    VALUE_30 = "10YNO-1--------2"
-    VALUE_31 = "10YNO-2--------T"
-    VALUE_32 = "10YNO-3--------J"
-    VALUE_33 = "10YNO-4--------9"
-    VALUE_34 = "10Y1001A1001A48H"
-    VALUE_35 = "10YPL-AREA-----S"
-    VALUE_36 = "10YPT-REN------W"
-    VALUE_37 = "10YRO-TEL------P"
-    VALUE_38 = "10YCS-SERBIATSOV"
-    VALUE_39 = "10Y1001A1001A44P"
-    VALUE_4 = "10YCZ-CEPS-----N"
-    VALUE_40 = "10Y1001A1001A45N"
-    VALUE_41 = "10Y1001A1001A46L"
-    VALUE_42 = "10Y1001A1001A47J"
-    VALUE_43 = "10YSI-ELES-----O"
-    VALUE_44 = "10YSK-SEPS-----K"
-    VALUE_45 = "10Y1001A1001A94A"
-    VALUE_46 = "10Y1001C--000182"
-    VALUE_5 = "10Y1001A1001A83F"
-    VALUE_6 = "10YDE-VE-------2"
-    VALUE_7 = "10YDE-RWENET---I"
-    VALUE_8 = "10YDE-EON------1"
-    VALUE_9 = "10YDE-ENBW-----N"
-
-    def __str__(self) -> str:
-        return str(self.value)
+def check_eic_code(value: str) -> EicCode:
+    if value in EIC_CODE_VALUES:
+        return value
+    raise TypeError(f"Unexpected value {value!r}. Expected one of {EIC_CODE_VALUES!r}")

@@ -25,15 +25,15 @@ from balancing_services.api.default import (
     get_imbalance_prices,
     get_imbalance_total_volumes,
 )
-from balancing_services.models import (
-    ActivationType,
-    Area,
-    BidStatus,
-    Currency,
-    Direction,
-    ImbalanceDirection,
-    ReserveType,
-    TotalImbalanceDirection,
+from balancing_services.models.activation_type import ACTIVATION_TYPE_VALUES
+from balancing_services.models.area import AREA_VALUES
+from balancing_services.models.bid_status import BID_STATUS_VALUES
+from balancing_services.models.currency import CURRENCY_VALUES
+from balancing_services.models.direction import DIRECTION_VALUES
+from balancing_services.models.imbalance_direction import IMBALANCE_DIRECTION_VALUES
+from balancing_services.models.reserve_type import RESERVE_TYPE_VALUES
+from balancing_services.models.total_imbalance_direction import (
+    TOTAL_IMBALANCE_DIRECTION_VALUES,
 )
 
 
@@ -115,56 +115,61 @@ class TestAPIEndpointsExist:
 
 
 class TestEnums:
-    """Test that all expected enums are available with correct values."""
+    """Test that all expected enum string values are recognized.
 
-    def test_area_enum(self):
-        """Test Area enum."""
-        assert Area.EE == "EE"
-        assert Area.FI == "FI"
-        assert Area.LV == "LV"
-        # Verify it's a comprehensive enum
-        assert len(Area) >= 40  # At least 40 areas as per spec
+    Under ``literal_enums`` the generated types are ``Literal`` string aliases
+    with a companion ``*_VALUES`` set of accepted wire strings; there is no
+    member access (``Area.EE``) any more.
+    """
 
-    def test_reserve_type_enum(self):
-        """Test ReserveType enum."""
-        assert ReserveType.FCR == "FCR"
-        assert ReserveType.AFRR == "aFRR"
-        assert ReserveType.MFRR == "mFRR"
-        assert ReserveType.RR == "RR"
+    def test_area_values(self):
+        """Test Area accepted values."""
+        assert "EE" in AREA_VALUES
+        assert "FI" in AREA_VALUES
+        assert "LV" in AREA_VALUES
+        # Verify it's a comprehensive set
+        assert len(AREA_VALUES) >= 40  # At least 40 areas as per spec
 
-    def test_direction_enum(self):
-        """Test Direction enum."""
-        assert Direction.UP == "up"
-        assert Direction.DOWN == "down"
+    def test_reserve_type_values(self):
+        """Test ReserveType accepted values."""
+        assert "FCR" in RESERVE_TYPE_VALUES
+        assert "aFRR" in RESERVE_TYPE_VALUES
+        assert "mFRR" in RESERVE_TYPE_VALUES
+        assert "RR" in RESERVE_TYPE_VALUES
 
-    def test_imbalance_direction_enum(self):
-        """Test ImbalanceDirection enum."""
-        assert ImbalanceDirection.POSITIVE == "positive"
-        assert ImbalanceDirection.SYMMETRIC == "symmetric"
-        assert ImbalanceDirection.NEGATIVE == "negative"
+    def test_direction_values(self):
+        """Test Direction accepted values."""
+        assert "up" in DIRECTION_VALUES
+        assert "down" in DIRECTION_VALUES
 
-    def test_total_imbalance_direction_enum(self):
-        """Test TotalImbalanceDirection enum."""
-        assert TotalImbalanceDirection.SURPLUS == "surplus"
-        assert TotalImbalanceDirection.DEFICIT == "deficit"
-        assert TotalImbalanceDirection.BALANCED == "balanced"
+    def test_imbalance_direction_values(self):
+        """Test ImbalanceDirection accepted values."""
+        assert "positive" in IMBALANCE_DIRECTION_VALUES
+        assert "symmetric" in IMBALANCE_DIRECTION_VALUES
+        assert "negative" in IMBALANCE_DIRECTION_VALUES
 
-    def test_currency_enum(self):
-        """Test Currency enum."""
-        assert Currency.EUR == "EUR"
-        assert Currency.BGN == "BGN"
-        assert Currency.CHF == "CHF"
+    def test_total_imbalance_direction_values(self):
+        """Test TotalImbalanceDirection accepted values."""
+        assert "surplus" in TOTAL_IMBALANCE_DIRECTION_VALUES
+        assert "deficit" in TOTAL_IMBALANCE_DIRECTION_VALUES
+        assert "balanced" in TOTAL_IMBALANCE_DIRECTION_VALUES
 
-    def test_activation_type_enum(self):
-        """Test ActivationType enum."""
-        assert ActivationType.DIRECT == "direct"
-        assert ActivationType.SCHEDULED == "scheduled"
-        assert ActivationType.NOT_APPLICABLE == "not_applicable"
+    def test_currency_values(self):
+        """Test Currency accepted values."""
+        assert "EUR" in CURRENCY_VALUES
+        assert "BGN" in CURRENCY_VALUES
+        assert "CHF" in CURRENCY_VALUES
 
-    def test_bid_status_enum(self):
-        """Test BidStatus enum."""
-        assert BidStatus.OFFERED == "offered"
-        assert BidStatus.ACCEPTED == "accepted"
+    def test_activation_type_values(self):
+        """Test ActivationType accepted values."""
+        assert "direct" in ACTIVATION_TYPE_VALUES
+        assert "scheduled" in ACTIVATION_TYPE_VALUES
+        assert "notApplicable" in ACTIVATION_TYPE_VALUES
+
+    def test_bid_status_values(self):
+        """Test BidStatus accepted values."""
+        assert "offered" in BID_STATUS_VALUES
+        assert "accepted" in BID_STATUS_VALUES
 
 
 class TestClientConfiguration:
