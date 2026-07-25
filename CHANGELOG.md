@@ -5,7 +5,7 @@ All notable changes to the Balancing Services REST API will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased - 2.0.0]
+## [2.0.0] - 2026-07-25
 
 ### Added
 - Incremental polling on every data endpoint: an optional `updated-since` query parameter filters to records changed strictly after the given timestamp, and every paginated response carries a `nextUpdatedSince` watermark to pass back on the next poll over the same window. Every page of one drain reports the same watermark; it deliberately lags real time so consecutive polls overlap slightly — a record may be delivered more than once, so upsert on consume
