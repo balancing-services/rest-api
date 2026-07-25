@@ -2111,15 +2111,14 @@ components:
       properties:
         type:
           type: string
-          enum:
-            - missing-parameter
-            - invalid-parameter
-            - unauthorized
-            - forbidden
-            - not-implemented
-            - rate-limited
-            - internal-error
-          description: Problem type identifier
+          description: |
+            Machine-readable slug identifying the problem type. Treat this as an open
+            set: new types may be introduced without a major-version bump, so match the
+            values you handle and fall back on `status` for anything you don't recognise.
+            Currently defined:
+            `missing-parameter`, `invalid-parameter`, `unauthorized`, `forbidden`,
+            `not-found`, `rate-limited`, `not-implemented`, `internal-error`.
+          example: not-found
         title:
           type: string
           description: Short, human-readable summary of the problem type
