@@ -71,19 +71,20 @@ We provide an official Python client library generated from the OpenAPI specific
 **Quick example:**
 
 ```python
+from datetime import datetime
+
 from balancing_services import AuthenticatedClient
 from balancing_services.api.default import get_imbalance_prices
-from balancing_services.models import Area
-from datetime import datetime
 
 client = AuthenticatedClient(
     base_url="https://api.balancing.services/v1",
     token="YOUR_API_TOKEN"
 )
 
+# Enum-typed parameters take plain string values (e.g. area="EE").
 response = get_imbalance_prices.sync_detailed(
     client=client,
-    area=Area.EE,
+    area="EE",
     period_start_at=datetime.fromisoformat("2025-01-01T00:00:00Z"),
     period_end_at=datetime.fromisoformat("2025-01-02T00:00:00Z")
 )

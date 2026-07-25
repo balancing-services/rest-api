@@ -1,10 +1,17 @@
-from enum import Enum
+from typing import Literal
+
+ImbalanceDirection = Literal["negative", "positive", "symmetric"]
+
+IMBALANCE_DIRECTION_VALUES: set[ImbalanceDirection] = {
+    "negative",
+    "positive",
+    "symmetric",
+}
 
 
-class ImbalanceDirection(str, Enum):
-    NEGATIVE = "negative"
-    POSITIVE = "positive"
-    SYMMETRIC = "symmetric"
-
-    def __str__(self) -> str:
-        return str(self.value)
+def check_imbalance_direction(value: str) -> ImbalanceDirection:
+    if value in IMBALANCE_DIRECTION_VALUES:
+        return value
+    raise TypeError(
+        f"Unexpected value {value!r}. Expected one of {IMBALANCE_DIRECTION_VALUES!r}"
+    )

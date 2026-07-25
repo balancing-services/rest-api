@@ -1,11 +1,18 @@
-from enum import Enum
+from typing import Literal
+
+ReserveType = Literal["aFRR", "FCR", "mFRR", "RR"]
+
+RESERVE_TYPE_VALUES: set[ReserveType] = {
+    "aFRR",
+    "FCR",
+    "mFRR",
+    "RR",
+}
 
 
-class ReserveType(str, Enum):
-    AFRR = "aFRR"
-    FCR = "FCR"
-    MFRR = "mFRR"
-    RR = "RR"
-
-    def __str__(self) -> str:
-        return str(self.value)
+def check_reserve_type(value: str) -> ReserveType:
+    if value in RESERVE_TYPE_VALUES:
+        return value
+    raise TypeError(
+        f"Unexpected value {value!r}. Expected one of {RESERVE_TYPE_VALUES!r}"
+    )

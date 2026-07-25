@@ -1,11 +1,10 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, TypeVar
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
-
 
 if TYPE_CHECKING:
     from ..models.period import Period
@@ -19,20 +18,15 @@ class CrossBorderMarginalPrice:
     """
     Attributes:
         period (Period):
-        price (float): Deprecated — use `pricePerMwh` instead. Marginal price per MWh in the specified currency Example:
-            45.5.
         price_per_mwh (float): Marginal price per MWh in the specified currency Example: 45.5.
     """
 
     period: Period
-    price: float
     price_per_mwh: float
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         period = self.period.to_dict()
-
-        price = self.price
 
         price_per_mwh = self.price_per_mwh
 
@@ -41,7 +35,6 @@ class CrossBorderMarginalPrice:
         field_dict.update(
             {
                 "period": period,
-                "price": price,
                 "pricePerMwh": price_per_mwh,
             }
         )
@@ -55,13 +48,10 @@ class CrossBorderMarginalPrice:
         d = dict(src_dict)
         period = Period.from_dict(d.pop("period"))
 
-        price = d.pop("price")
-
         price_per_mwh = d.pop("pricePerMwh")
 
         cross_border_marginal_price = cls(
             period=period,
-            price=price,
             price_per_mwh=price_per_mwh,
         )
 

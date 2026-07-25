@@ -1,21 +1,20 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, TypeVar
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
-
-from ..models.area import Area
-from ..models.demand_basis import DemandBasis
-from ..models.direction import Direction
-from ..models.eic_code import EicCode
-from ..models.reserve_type import ReserveType
-import datetime
+from ..models.area import Area, check_area
+from ..models.demand_basis import DemandBasis, check_demand_basis
+from ..models.direction import Direction, check_direction
+from ..models.eic_code import EicCode, check_eic_code
+from ..models.reserve_type import ReserveType, check_reserve_type
 
 if TYPE_CHECKING:
     from ..models.balancing_capacity_demand import BalancingCapacityDemand
+    from ..models.procurement import Procurement
 
 
 T = TypeVar("T", bound="BalancingCapacityDemands")
@@ -29,10 +28,7 @@ class BalancingCapacityDemands:
         eic_code (EicCode): Energy Identification Code (EIC)
         reserve_type (ReserveType): Reserve type
         direction (Direction): Balancing direction
-        procured_at (datetime.datetime): Timestamp when the capacity was procured (allocation time or gate closure
-            time).
-            Used to distinguish different procurements (e.g., yearly vs hourly, or multiple procurement rounds).
-             Example: 2024-08-15T14:30:00Z.
+        procurement (Procurement):
         demand_basis (DemandBasis): Whether the demand adds to the delivery period's total requirement (`additive`) or
             restates demand
             already represented by another procurement of the same period (`substitutive`), e.g. a re-run after
@@ -44,23 +40,23 @@ class BalancingCapacityDemands:
     eic_code: EicCode
     reserve_type: ReserveType
     direction: Direction
-    procured_at: datetime.datetime
+    procurement: Procurement
     demand_basis: DemandBasis
     demands: list[BalancingCapacityDemand]
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
-        area = self.area.value
+        area: str = self.area
 
-        eic_code = self.eic_code.value
+        eic_code: str = self.eic_code
 
-        reserve_type = self.reserve_type.value
+        reserve_type: str = self.reserve_type
 
-        direction = self.direction.value
+        direction: str = self.direction
 
-        procured_at = self.procured_at.isoformat()
+        procurement = self.procurement.to_dict()
 
-        demand_basis = self.demand_basis.value
+        demand_basis: str = self.demand_basis
 
         demands = []
         for demands_item_data in self.demands:
@@ -75,7 +71,7 @@ class BalancingCapacityDemands:
                 "eicCode": eic_code,
                 "reserveType": reserve_type,
                 "direction": direction,
-                "procuredAt": procured_at,
+                "procurement": procurement,
                 "demandBasis": demand_basis,
                 "demands": demands,
             }
@@ -86,19 +82,20 @@ class BalancingCapacityDemands:
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         from ..models.balancing_capacity_demand import BalancingCapacityDemand
+        from ..models.procurement import Procurement
 
         d = dict(src_dict)
-        area = Area(d.pop("area"))
+        area = check_area(d.pop("area"))
 
-        eic_code = EicCode(d.pop("eicCode"))
+        eic_code = check_eic_code(d.pop("eicCode"))
 
-        reserve_type = ReserveType(d.pop("reserveType"))
+        reserve_type = check_reserve_type(d.pop("reserveType"))
 
-        direction = Direction(d.pop("direction"))
+        direction = check_direction(d.pop("direction"))
 
-        procured_at = datetime.datetime.fromisoformat(d.pop("procuredAt").replace("Z", "+00:00"))
+        procurement = Procurement.from_dict(d.pop("procurement"))
 
-        demand_basis = DemandBasis(d.pop("demandBasis"))
+        demand_basis = check_demand_basis(d.pop("demandBasis"))
 
         demands = []
         _demands = d.pop("demands")
@@ -112,7 +109,7 @@ class BalancingCapacityDemands:
             eic_code=eic_code,
             reserve_type=reserve_type,
             direction=direction,
-            procured_at=procured_at,
+            procurement=procurement,
             demand_basis=demand_basis,
             demands=demands,
         )

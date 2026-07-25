@@ -1,36 +1,39 @@
+import datetime
 from http import HTTPStatus
 from typing import Any
 
 import httpx
 
-from ...client import AuthenticatedClient, Client
-from ...types import Response, UNSET
 from ... import errors
-
+from ...client import AuthenticatedClient, Client
 from ...models.area import Area
 from ...models.cross_border_energy_volumes_response import (
     CrossBorderEnergyVolumesResponse,
 )
 from ...models.problem import Problem
 from ...models.reserve_type import ReserveType
-from ...types import Unset
-import datetime
+from ...types import UNSET, Response, Unset
 
 
 def _get_kwargs(
     *,
     area: Area,
+    other_area: Area,
     period_start_at: datetime.datetime,
     period_end_at: datetime.datetime,
     reserve_type: ReserveType,
     cursor: str | Unset = UNSET,
-    limit: int | Unset = UNSET,
+    limit: int | Unset = 100,
+    updated_since: datetime.datetime | Unset = UNSET,
 ) -> dict[str, Any]:
 
     params: dict[str, Any] = {}
 
-    json_area = area.value
+    json_area: str = area
     params["area"] = json_area
+
+    json_other_area: str = other_area
+    params["other-area"] = json_other_area
 
     json_period_start_at = period_start_at.isoformat()
     params["period-start-at"] = json_period_start_at
@@ -38,12 +41,17 @@ def _get_kwargs(
     json_period_end_at = period_end_at.isoformat()
     params["period-end-at"] = json_period_end_at
 
-    json_reserve_type = reserve_type.value
+    json_reserve_type: str = reserve_type
     params["reserve-type"] = json_reserve_type
 
     params["cursor"] = cursor
 
     params["limit"] = limit
+
+    json_updated_since: str | Unset = UNSET
+    if not isinstance(updated_since, Unset):
+        json_updated_since = updated_since.isoformat()
+    params["updated-since"] = json_updated_since
 
     params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
@@ -120,40 +128,35 @@ def sync_detailed(
     *,
     client: AuthenticatedClient | Client,
     area: Area,
+    other_area: Area,
     period_start_at: datetime.datetime,
     period_end_at: datetime.datetime,
     reserve_type: ReserveType,
     cursor: str | Unset = UNSET,
-    limit: int | Unset = UNSET,
+    limit: int | Unset = 100,
+    updated_since: datetime.datetime | Unset = UNSET,
 ) -> Response[CrossBorderEnergyVolumesResponse | Problem]:
     """Get cross-border balancing energy volumes
 
-     **EXPERIMENTAL**: Returns cross-border balancing energy volumes for the specified area and reserve
-    type within the given time period.
-    Returns both imports (where area is the destination) and exports (where area is the source). Volumes
-    are expressed as average power in MW
-    and split by activation type — for mFRR, DIRECT and SCHEDULED activations are returned as separate
-    entries.
+     Returns cross-border balancing energy volumes across the border between two areas,
+    for the specified reserve type and time period. Both border ends must be given (`area` and `other-
+    area`);
+    results cover both directions (area → other-area and other-area → area). Volumes are expressed as
+    average power in MW
+    and split by activation type — for mFRR, direct and scheduled activations are returned as separate
+    entries,
+    and volumes without a direct/scheduled breakdown come back as a single unspecified entry.
     Supports cursor-based pagination for large result sets.
-
-    **Deprecated:** The non-paginated mode — omitting both `cursor` and `limit` to receive the full
-    result set in a single
-    response (bounded to a 32-day period) — is deprecated. In the next major version `limit` will take a
-    default value when
-    omitted, so requests that omit `cursor` and `limit` will be paginated automatically (returning the
-    first page) instead of
-    returning the full result set. Opt into pagination now by passing `limit` and following
-    `nextCursor`.
-
-    This endpoint is experimental and may be changed or removed without a deprecation period.
 
     Args:
         area (Area): Area code
+        other_area (Area): Area code
         period_start_at (datetime.datetime):  Example: 2025-01-01T00:00:00Z.
         period_end_at (datetime.datetime):  Example: 2025-01-02T00:00:00Z.
         reserve_type (ReserveType): Reserve type
         cursor (str | Unset):  Example: v1:AAAAAYwBAgMEBQYHCAkKCw==.
-        limit (int | Unset):  Example: 100.
+        limit (int | Unset):  Default: 100. Example: 100.
+        updated_since (datetime.datetime | Unset):  Example: 2025-01-02T09:15:00Z.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -165,11 +168,13 @@ def sync_detailed(
 
     kwargs = _get_kwargs(
         area=area,
+        other_area=other_area,
         period_start_at=period_start_at,
         period_end_at=period_end_at,
         reserve_type=reserve_type,
         cursor=cursor,
         limit=limit,
+        updated_since=updated_since,
     )
 
     response = client.get_httpx_client().request(
@@ -183,40 +188,35 @@ def sync(
     *,
     client: AuthenticatedClient | Client,
     area: Area,
+    other_area: Area,
     period_start_at: datetime.datetime,
     period_end_at: datetime.datetime,
     reserve_type: ReserveType,
     cursor: str | Unset = UNSET,
-    limit: int | Unset = UNSET,
+    limit: int | Unset = 100,
+    updated_since: datetime.datetime | Unset = UNSET,
 ) -> CrossBorderEnergyVolumesResponse | Problem | None:
     """Get cross-border balancing energy volumes
 
-     **EXPERIMENTAL**: Returns cross-border balancing energy volumes for the specified area and reserve
-    type within the given time period.
-    Returns both imports (where area is the destination) and exports (where area is the source). Volumes
-    are expressed as average power in MW
-    and split by activation type — for mFRR, DIRECT and SCHEDULED activations are returned as separate
-    entries.
+     Returns cross-border balancing energy volumes across the border between two areas,
+    for the specified reserve type and time period. Both border ends must be given (`area` and `other-
+    area`);
+    results cover both directions (area → other-area and other-area → area). Volumes are expressed as
+    average power in MW
+    and split by activation type — for mFRR, direct and scheduled activations are returned as separate
+    entries,
+    and volumes without a direct/scheduled breakdown come back as a single unspecified entry.
     Supports cursor-based pagination for large result sets.
-
-    **Deprecated:** The non-paginated mode — omitting both `cursor` and `limit` to receive the full
-    result set in a single
-    response (bounded to a 32-day period) — is deprecated. In the next major version `limit` will take a
-    default value when
-    omitted, so requests that omit `cursor` and `limit` will be paginated automatically (returning the
-    first page) instead of
-    returning the full result set. Opt into pagination now by passing `limit` and following
-    `nextCursor`.
-
-    This endpoint is experimental and may be changed or removed without a deprecation period.
 
     Args:
         area (Area): Area code
+        other_area (Area): Area code
         period_start_at (datetime.datetime):  Example: 2025-01-01T00:00:00Z.
         period_end_at (datetime.datetime):  Example: 2025-01-02T00:00:00Z.
         reserve_type (ReserveType): Reserve type
         cursor (str | Unset):  Example: v1:AAAAAYwBAgMEBQYHCAkKCw==.
-        limit (int | Unset):  Example: 100.
+        limit (int | Unset):  Default: 100. Example: 100.
+        updated_since (datetime.datetime | Unset):  Example: 2025-01-02T09:15:00Z.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -229,11 +229,13 @@ def sync(
     return sync_detailed(
         client=client,
         area=area,
+        other_area=other_area,
         period_start_at=period_start_at,
         period_end_at=period_end_at,
         reserve_type=reserve_type,
         cursor=cursor,
         limit=limit,
+        updated_since=updated_since,
     ).parsed
 
 
@@ -241,40 +243,35 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient | Client,
     area: Area,
+    other_area: Area,
     period_start_at: datetime.datetime,
     period_end_at: datetime.datetime,
     reserve_type: ReserveType,
     cursor: str | Unset = UNSET,
-    limit: int | Unset = UNSET,
+    limit: int | Unset = 100,
+    updated_since: datetime.datetime | Unset = UNSET,
 ) -> Response[CrossBorderEnergyVolumesResponse | Problem]:
     """Get cross-border balancing energy volumes
 
-     **EXPERIMENTAL**: Returns cross-border balancing energy volumes for the specified area and reserve
-    type within the given time period.
-    Returns both imports (where area is the destination) and exports (where area is the source). Volumes
-    are expressed as average power in MW
-    and split by activation type — for mFRR, DIRECT and SCHEDULED activations are returned as separate
-    entries.
+     Returns cross-border balancing energy volumes across the border between two areas,
+    for the specified reserve type and time period. Both border ends must be given (`area` and `other-
+    area`);
+    results cover both directions (area → other-area and other-area → area). Volumes are expressed as
+    average power in MW
+    and split by activation type — for mFRR, direct and scheduled activations are returned as separate
+    entries,
+    and volumes without a direct/scheduled breakdown come back as a single unspecified entry.
     Supports cursor-based pagination for large result sets.
-
-    **Deprecated:** The non-paginated mode — omitting both `cursor` and `limit` to receive the full
-    result set in a single
-    response (bounded to a 32-day period) — is deprecated. In the next major version `limit` will take a
-    default value when
-    omitted, so requests that omit `cursor` and `limit` will be paginated automatically (returning the
-    first page) instead of
-    returning the full result set. Opt into pagination now by passing `limit` and following
-    `nextCursor`.
-
-    This endpoint is experimental and may be changed or removed without a deprecation period.
 
     Args:
         area (Area): Area code
+        other_area (Area): Area code
         period_start_at (datetime.datetime):  Example: 2025-01-01T00:00:00Z.
         period_end_at (datetime.datetime):  Example: 2025-01-02T00:00:00Z.
         reserve_type (ReserveType): Reserve type
         cursor (str | Unset):  Example: v1:AAAAAYwBAgMEBQYHCAkKCw==.
-        limit (int | Unset):  Example: 100.
+        limit (int | Unset):  Default: 100. Example: 100.
+        updated_since (datetime.datetime | Unset):  Example: 2025-01-02T09:15:00Z.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -286,11 +283,13 @@ async def asyncio_detailed(
 
     kwargs = _get_kwargs(
         area=area,
+        other_area=other_area,
         period_start_at=period_start_at,
         period_end_at=period_end_at,
         reserve_type=reserve_type,
         cursor=cursor,
         limit=limit,
+        updated_since=updated_since,
     )
 
     response = await client.get_async_httpx_client().request(**kwargs)
@@ -302,40 +301,35 @@ async def asyncio(
     *,
     client: AuthenticatedClient | Client,
     area: Area,
+    other_area: Area,
     period_start_at: datetime.datetime,
     period_end_at: datetime.datetime,
     reserve_type: ReserveType,
     cursor: str | Unset = UNSET,
-    limit: int | Unset = UNSET,
+    limit: int | Unset = 100,
+    updated_since: datetime.datetime | Unset = UNSET,
 ) -> CrossBorderEnergyVolumesResponse | Problem | None:
     """Get cross-border balancing energy volumes
 
-     **EXPERIMENTAL**: Returns cross-border balancing energy volumes for the specified area and reserve
-    type within the given time period.
-    Returns both imports (where area is the destination) and exports (where area is the source). Volumes
-    are expressed as average power in MW
-    and split by activation type — for mFRR, DIRECT and SCHEDULED activations are returned as separate
-    entries.
+     Returns cross-border balancing energy volumes across the border between two areas,
+    for the specified reserve type and time period. Both border ends must be given (`area` and `other-
+    area`);
+    results cover both directions (area → other-area and other-area → area). Volumes are expressed as
+    average power in MW
+    and split by activation type — for mFRR, direct and scheduled activations are returned as separate
+    entries,
+    and volumes without a direct/scheduled breakdown come back as a single unspecified entry.
     Supports cursor-based pagination for large result sets.
-
-    **Deprecated:** The non-paginated mode — omitting both `cursor` and `limit` to receive the full
-    result set in a single
-    response (bounded to a 32-day period) — is deprecated. In the next major version `limit` will take a
-    default value when
-    omitted, so requests that omit `cursor` and `limit` will be paginated automatically (returning the
-    first page) instead of
-    returning the full result set. Opt into pagination now by passing `limit` and following
-    `nextCursor`.
-
-    This endpoint is experimental and may be changed or removed without a deprecation period.
 
     Args:
         area (Area): Area code
+        other_area (Area): Area code
         period_start_at (datetime.datetime):  Example: 2025-01-01T00:00:00Z.
         period_end_at (datetime.datetime):  Example: 2025-01-02T00:00:00Z.
         reserve_type (ReserveType): Reserve type
         cursor (str | Unset):  Example: v1:AAAAAYwBAgMEBQYHCAkKCw==.
-        limit (int | Unset):  Example: 100.
+        limit (int | Unset):  Default: 100. Example: 100.
+        updated_since (datetime.datetime | Unset):  Example: 2025-01-02T09:15:00Z.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -349,10 +343,12 @@ async def asyncio(
         await asyncio_detailed(
             client=client,
             area=area,
+            other_area=other_area,
             period_start_at=period_start_at,
             period_end_at=period_end_at,
             reserve_type=reserve_type,
             cursor=cursor,
             limit=limit,
+            updated_since=updated_since,
         )
     ).parsed

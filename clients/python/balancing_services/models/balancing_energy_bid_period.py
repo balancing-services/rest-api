@@ -6,49 +6,41 @@ from typing import TYPE_CHECKING, Any, TypeVar
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
-from ..models.total_imbalance_direction import (
-    TotalImbalanceDirection,
-    check_total_imbalance_direction,
-)
-
 if TYPE_CHECKING:
+    from ..models.energy_bid import EnergyBid
     from ..models.period import Period
 
 
-T = TypeVar("T", bound="TotalImbalanceVolume")
+T = TypeVar("T", bound="BalancingEnergyBidPeriod")
 
 
 @_attrs_define
-class TotalImbalanceVolume:
+class BalancingEnergyBidPeriod:
     """
     Attributes:
         period (Period):
-        average_power_in_mw (float): Average power in MW during the period Example: 60.5.
-        direction (TotalImbalanceDirection): Total imbalance volume direction (ENTSO-E regulatory terminology):
-            - surplus: Generation exceeds consumption (D > 0, positive imbalance)
-            - deficit: Consumption exceeds generation (D < 0, negative imbalance)
-            - balanced: Generation equals consumption (D = 0)
+        bids (list[EnergyBid]): The bids for this delivery period. No ordering is guaranteed — sort by price client-side
+            if you need the merit order.
     """
 
     period: Period
-    average_power_in_mw: float
-    direction: TotalImbalanceDirection
+    bids: list[EnergyBid]
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         period = self.period.to_dict()
 
-        average_power_in_mw = self.average_power_in_mw
-
-        direction: str = self.direction
+        bids = []
+        for bids_item_data in self.bids:
+            bids_item = bids_item_data.to_dict()
+            bids.append(bids_item)
 
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
             {
                 "period": period,
-                "averagePowerInMw": average_power_in_mw,
-                "direction": direction,
+                "bids": bids,
             }
         )
 
@@ -56,23 +48,26 @@ class TotalImbalanceVolume:
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
+        from ..models.energy_bid import EnergyBid
         from ..models.period import Period
 
         d = dict(src_dict)
         period = Period.from_dict(d.pop("period"))
 
-        average_power_in_mw = d.pop("averagePowerInMw")
+        bids = []
+        _bids = d.pop("bids")
+        for bids_item_data in _bids:
+            bids_item = EnergyBid.from_dict(bids_item_data)
 
-        direction = check_total_imbalance_direction(d.pop("direction"))
+            bids.append(bids_item)
 
-        total_imbalance_volume = cls(
+        balancing_energy_bid_period = cls(
             period=period,
-            average_power_in_mw=average_power_in_mw,
-            direction=direction,
+            bids=bids,
         )
 
-        total_imbalance_volume.additional_properties = d
-        return total_imbalance_volume
+        balancing_energy_bid_period.additional_properties = d
+        return balancing_energy_bid_period
 
     @property
     def additional_keys(self) -> list[str]:

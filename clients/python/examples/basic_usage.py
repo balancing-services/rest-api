@@ -16,7 +16,6 @@ from datetime import datetime, timedelta, timezone
 
 from balancing_services import AuthenticatedClient
 from balancing_services.api.default import get_imbalance_prices
-from balancing_services.models import Area
 
 
 def main():
@@ -40,7 +39,7 @@ def main():
 
     response = get_imbalance_prices.sync_detailed(
         client=client,
-        area=Area.EE,
+        area="EE",
         period_start_at=yesterday_start,
         period_end_at=yesterday_end,
     )
@@ -55,17 +54,17 @@ def main():
 
         # Process each imbalance price group
         for imbalance_prices in data.data:
-            print(f"Area: {imbalance_prices.area.value}")
-            print(f"EIC Code: {imbalance_prices.eic_code.value}")
-            print(f"Direction: {imbalance_prices.direction.value}")
-            print(f"Currency: {imbalance_prices.currency.value}")
+            print(f"Area: {imbalance_prices.area}")
+            print(f"EIC Code: {imbalance_prices.eic_code}")
+            print(f"Direction: {imbalance_prices.direction}")
+            print(f"Currency: {imbalance_prices.currency}")
             print("Prices:")
 
             # Print individual prices for each period
             for price in imbalance_prices.prices:
                 print(
                     f"  {price.period.start_at} to {price.period.end_at}: "
-                    f"{price.price} {imbalance_prices.currency.value}/MWh"
+                    f"{price.price_per_mwh} {imbalance_prices.currency}/MWh"
                 )
             print()
 

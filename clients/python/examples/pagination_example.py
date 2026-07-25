@@ -16,7 +16,6 @@ from datetime import datetime, timedelta, timezone
 
 from balancing_services import AuthenticatedClient
 from balancing_services.api.default import get_balancing_energy_bids
-from balancing_services.models import Area, ReserveType
 
 
 def main():
@@ -38,11 +37,11 @@ def main():
     yesterday_start = today - timedelta(days=1)
     yesterday_end = today
 
-    area = Area.EE
-    reserve_type = ReserveType.AFRR
+    area = "EE"
+    reserve_type = "aFRR"
     page_size = 100
 
-    print(f"Fetching balancing energy bids for {area.value}, reserve type: {reserve_type.value}")
+    print(f"Fetching balancing energy bids for {area}, reserve type: {reserve_type}")
     print(f"Period: {yesterday_start} to {yesterday_end}")
     print()
 
@@ -72,22 +71,33 @@ def main():
         data = response.parsed
         total_bid_groups += len(data.data)
 
-        # Process the current page
+        # Process the current page. Each group carries one entry per delivery
+        # period, and each period entry holds that period's bids.
         for bid_group in data.data:
-            print(f"  Area: {bid_group.area.value}, Direction: {bid_group.direction.value}")
-            print(f"  Reserve Type: {bid_group.reserve_type.value}")
+            print(f"  Area: {bid_group.area}, Direction: {bid_group.direction}")
+            print(f"  Reserve Type: {bid_group.reserve_type}")
             print(f"  Standard Product: {bid_group.standard_product}")
-            print(f"  Number of bids: {len(bid_group.bids)}")
 
-            total_bids += len(bid_group.bids)
+            group_bids = sum(len(period.bids) for period in bid_group.periods)
+            print(f"  Number of bids: {group_bids}")
+
+            total_bids += group_bids
 
             # Show first few bids as examples
-            for i, bid in enumerate(bid_group.bids[:3]):
-                print(f"    Bid {i + 1}: {bid.volume} MW @ {bid.price} {bid_group.currency.value}/MWh")
-                print(f"           Period: {bid.period.start_at} to {bid.period.end_at}")
+            shown = 0
+            for period in bid_group.periods:
+                for bid in period.bids:
+                    if shown >= 3:
+                        break
+                    print(
+                        f"    Bid {shown + 1}: {bid.volume_in_mw} MW @ "
+                        f"{bid.price_per_mwh} {bid_group.currency}/MWh"
+                    )
+                    print(f"           Period: {period.period.start_at} to {period.period.end_at}")
+                    shown += 1
 
-            if len(bid_group.bids) > 3:
-                print(f"    ... and {len(bid_group.bids) - 3} more bids")
+            if group_bids > 3:
+                print(f"    ... and {group_bids - 3} more bids")
             print()
 
         # Check if there are more pages

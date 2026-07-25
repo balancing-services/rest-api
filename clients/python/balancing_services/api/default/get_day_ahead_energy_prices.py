@@ -1,17 +1,15 @@
+import datetime
 from http import HTTPStatus
 from typing import Any
 
 import httpx
 
-from ...client import AuthenticatedClient, Client
-from ...types import Response, UNSET
 from ... import errors
-
+from ...client import AuthenticatedClient, Client
 from ...models.area import Area
 from ...models.day_ahead_energy_prices_response import DayAheadEnergyPricesResponse
 from ...models.problem import Problem
-from ...types import Unset
-import datetime
+from ...types import UNSET, Response, Unset
 
 
 def _get_kwargs(
@@ -21,11 +19,12 @@ def _get_kwargs(
     period_end_at: datetime.datetime,
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
+    updated_since: datetime.datetime | Unset = UNSET,
 ) -> dict[str, Any]:
 
     params: dict[str, Any] = {}
 
-    json_area = area.value
+    json_area: str = area
     params["area"] = json_area
 
     json_period_start_at = period_start_at.isoformat()
@@ -37,6 +36,11 @@ def _get_kwargs(
     params["cursor"] = cursor
 
     params["limit"] = limit
+
+    json_updated_since: str | Unset = UNSET
+    if not isinstance(updated_since, Unset):
+        json_updated_since = updated_since.isoformat()
+    params["updated-since"] = json_updated_since
 
     params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
@@ -117,6 +121,7 @@ def sync_detailed(
     period_end_at: datetime.datetime,
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
+    updated_since: datetime.datetime | Unset = UNSET,
 ) -> Response[DayAheadEnergyPricesResponse | Problem]:
     """Get day-ahead energy prices
 
@@ -136,6 +141,7 @@ def sync_detailed(
         period_end_at (datetime.datetime):  Example: 2025-01-02T00:00:00Z.
         cursor (str | Unset):  Example: v1:AAAAAYwBAgMEBQYHCAkKCw==.
         limit (int | Unset):  Default: 100. Example: 100.
+        updated_since (datetime.datetime | Unset):  Example: 2025-01-02T09:15:00Z.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -151,6 +157,7 @@ def sync_detailed(
         period_end_at=period_end_at,
         cursor=cursor,
         limit=limit,
+        updated_since=updated_since,
     )
 
     response = client.get_httpx_client().request(
@@ -168,6 +175,7 @@ def sync(
     period_end_at: datetime.datetime,
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
+    updated_since: datetime.datetime | Unset = UNSET,
 ) -> DayAheadEnergyPricesResponse | Problem | None:
     """Get day-ahead energy prices
 
@@ -187,6 +195,7 @@ def sync(
         period_end_at (datetime.datetime):  Example: 2025-01-02T00:00:00Z.
         cursor (str | Unset):  Example: v1:AAAAAYwBAgMEBQYHCAkKCw==.
         limit (int | Unset):  Default: 100. Example: 100.
+        updated_since (datetime.datetime | Unset):  Example: 2025-01-02T09:15:00Z.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -203,6 +212,7 @@ def sync(
         period_end_at=period_end_at,
         cursor=cursor,
         limit=limit,
+        updated_since=updated_since,
     ).parsed
 
 
@@ -214,6 +224,7 @@ async def asyncio_detailed(
     period_end_at: datetime.datetime,
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
+    updated_since: datetime.datetime | Unset = UNSET,
 ) -> Response[DayAheadEnergyPricesResponse | Problem]:
     """Get day-ahead energy prices
 
@@ -233,6 +244,7 @@ async def asyncio_detailed(
         period_end_at (datetime.datetime):  Example: 2025-01-02T00:00:00Z.
         cursor (str | Unset):  Example: v1:AAAAAYwBAgMEBQYHCAkKCw==.
         limit (int | Unset):  Default: 100. Example: 100.
+        updated_since (datetime.datetime | Unset):  Example: 2025-01-02T09:15:00Z.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -248,6 +260,7 @@ async def asyncio_detailed(
         period_end_at=period_end_at,
         cursor=cursor,
         limit=limit,
+        updated_since=updated_since,
     )
 
     response = await client.get_async_httpx_client().request(**kwargs)
@@ -263,6 +276,7 @@ async def asyncio(
     period_end_at: datetime.datetime,
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
+    updated_since: datetime.datetime | Unset = UNSET,
 ) -> DayAheadEnergyPricesResponse | Problem | None:
     """Get day-ahead energy prices
 
@@ -282,6 +296,7 @@ async def asyncio(
         period_end_at (datetime.datetime):  Example: 2025-01-02T00:00:00Z.
         cursor (str | Unset):  Example: v1:AAAAAYwBAgMEBQYHCAkKCw==.
         limit (int | Unset):  Default: 100. Example: 100.
+        updated_since (datetime.datetime | Unset):  Example: 2025-01-02T09:15:00Z.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -299,5 +314,6 @@ async def asyncio(
             period_end_at=period_end_at,
             cursor=cursor,
             limit=limit,
+            updated_since=updated_since,
         )
     ).parsed

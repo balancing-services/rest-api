@@ -1,20 +1,19 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, TypeVar
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
-
-from ..models.area import Area
-from ..models.currency import Currency
-from ..models.direction import Direction
-from ..models.eic_code import EicCode
-from ..models.reserve_type import ReserveType
+from ..models.area import Area, check_area
+from ..models.currency import Currency, check_currency
+from ..models.direction import Direction, check_direction
+from ..models.eic_code import EicCode, check_eic_code
+from ..models.reserve_type import ReserveType, check_reserve_type
 
 if TYPE_CHECKING:
-    from ..models.capacity_bid import CapacityBid
+    from ..models.balancing_capacity_bid_period import BalancingCapacityBidPeriod
 
 
 T = TypeVar("T", bound="BalancingCapacityBids")
@@ -29,7 +28,9 @@ class BalancingCapacityBids:
         reserve_type (ReserveType): Reserve type
         direction (Direction): Balancing direction
         currency (Currency): Currency code
-        bids (list[CapacityBid]):
+        periods (list[BalancingCapacityBidPeriod]): One entry per delivery period for this group, ascending by period
+            start. When a page ends inside a delivery period (`hasMore` is true), the next page continues the same entry —
+            merge entries on the group's dimensions plus the period when accumulating pages.
     """
 
     area: Area
@@ -37,24 +38,24 @@ class BalancingCapacityBids:
     reserve_type: ReserveType
     direction: Direction
     currency: Currency
-    bids: list[CapacityBid]
+    periods: list[BalancingCapacityBidPeriod]
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
-        area = self.area.value
+        area: str = self.area
 
-        eic_code = self.eic_code.value
+        eic_code: str = self.eic_code
 
-        reserve_type = self.reserve_type.value
+        reserve_type: str = self.reserve_type
 
-        direction = self.direction.value
+        direction: str = self.direction
 
-        currency = self.currency.value
+        currency: str = self.currency
 
-        bids = []
-        for bids_item_data in self.bids:
-            bids_item = bids_item_data.to_dict()
-            bids.append(bids_item)
+        periods = []
+        for periods_item_data in self.periods:
+            periods_item = periods_item_data.to_dict()
+            periods.append(periods_item)
 
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
@@ -65,7 +66,7 @@ class BalancingCapacityBids:
                 "reserveType": reserve_type,
                 "direction": direction,
                 "currency": currency,
-                "bids": bids,
+                "periods": periods,
             }
         )
 
@@ -73,25 +74,25 @@ class BalancingCapacityBids:
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
-        from ..models.capacity_bid import CapacityBid
+        from ..models.balancing_capacity_bid_period import BalancingCapacityBidPeriod
 
         d = dict(src_dict)
-        area = Area(d.pop("area"))
+        area = check_area(d.pop("area"))
 
-        eic_code = EicCode(d.pop("eicCode"))
+        eic_code = check_eic_code(d.pop("eicCode"))
 
-        reserve_type = ReserveType(d.pop("reserveType"))
+        reserve_type = check_reserve_type(d.pop("reserveType"))
 
-        direction = Direction(d.pop("direction"))
+        direction = check_direction(d.pop("direction"))
 
-        currency = Currency(d.pop("currency"))
+        currency = check_currency(d.pop("currency"))
 
-        bids = []
-        _bids = d.pop("bids")
-        for bids_item_data in _bids:
-            bids_item = CapacityBid.from_dict(bids_item_data)
+        periods = []
+        _periods = d.pop("periods")
+        for periods_item_data in _periods:
+            periods_item = BalancingCapacityBidPeriod.from_dict(periods_item_data)
 
-            bids.append(bids_item)
+            periods.append(periods_item)
 
         balancing_capacity_bids = cls(
             area=area,
@@ -99,7 +100,7 @@ class BalancingCapacityBids:
             reserve_type=reserve_type,
             direction=direction,
             currency=currency,
-            bids=bids,
+            periods=periods,
         )
 
         balancing_capacity_bids.additional_properties = d

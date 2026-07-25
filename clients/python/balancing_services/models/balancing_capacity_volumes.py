@@ -1,22 +1,19 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, TypeVar
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
-from ..types import UNSET, Unset
-
-from ..models.area import Area
-from ..models.direction import Direction
-from ..models.eic_code import EicCode
-from ..models.reserve_type import ReserveType
-from typing import cast
-import datetime
+from ..models.area import Area, check_area
+from ..models.direction import Direction, check_direction
+from ..models.eic_code import EicCode, check_eic_code
+from ..models.reserve_type import ReserveType, check_reserve_type
 
 if TYPE_CHECKING:
     from ..models.balancing_capacity_volume import BalancingCapacityVolume
+    from ..models.procurement import Procurement
 
 
 T = TypeVar("T", bound="BalancingCapacityVolumes")
@@ -30,43 +27,33 @@ class BalancingCapacityVolumes:
         eic_code (EicCode): Energy Identification Code (EIC)
         reserve_type (ReserveType): Reserve type
         direction (Direction): Balancing direction
+        procurement (Procurement):
         volumes (list[BalancingCapacityVolume]):
-        procured_at (datetime.datetime | None | Unset): **EXPERIMENTAL**: Timestamp when the capacity was procured
-            (allocation time or gate closure time).
-            Used to distinguish different auctions (e.g., yearly vs hourly, or multiple procurement rounds).
-            This field is experimental and may be changed or removed without a deprecation period.
-             Example: 2024-08-15T14:30:00Z.
     """
 
     area: Area
     eic_code: EicCode
     reserve_type: ReserveType
     direction: Direction
+    procurement: Procurement
     volumes: list[BalancingCapacityVolume]
-    procured_at: datetime.datetime | None | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
-        area = self.area.value
+        area: str = self.area
 
-        eic_code = self.eic_code.value
+        eic_code: str = self.eic_code
 
-        reserve_type = self.reserve_type.value
+        reserve_type: str = self.reserve_type
 
-        direction = self.direction.value
+        direction: str = self.direction
+
+        procurement = self.procurement.to_dict()
 
         volumes = []
         for volumes_item_data in self.volumes:
             volumes_item = volumes_item_data.to_dict()
             volumes.append(volumes_item)
-
-        procured_at: None | str | Unset
-        if isinstance(self.procured_at, Unset):
-            procured_at = UNSET
-        elif isinstance(self.procured_at, datetime.datetime):
-            procured_at = self.procured_at.isoformat()
-        else:
-            procured_at = self.procured_at
 
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
@@ -76,26 +63,28 @@ class BalancingCapacityVolumes:
                 "eicCode": eic_code,
                 "reserveType": reserve_type,
                 "direction": direction,
+                "procurement": procurement,
                 "volumes": volumes,
             }
         )
-        if procured_at is not UNSET:
-            field_dict["procuredAt"] = procured_at
 
         return field_dict
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         from ..models.balancing_capacity_volume import BalancingCapacityVolume
+        from ..models.procurement import Procurement
 
         d = dict(src_dict)
-        area = Area(d.pop("area"))
+        area = check_area(d.pop("area"))
 
-        eic_code = EicCode(d.pop("eicCode"))
+        eic_code = check_eic_code(d.pop("eicCode"))
 
-        reserve_type = ReserveType(d.pop("reserveType"))
+        reserve_type = check_reserve_type(d.pop("reserveType"))
 
-        direction = Direction(d.pop("direction"))
+        direction = check_direction(d.pop("direction"))
+
+        procurement = Procurement.from_dict(d.pop("procurement"))
 
         volumes = []
         _volumes = d.pop("volumes")
@@ -104,30 +93,13 @@ class BalancingCapacityVolumes:
 
             volumes.append(volumes_item)
 
-        def _parse_procured_at(data: object) -> datetime.datetime | None | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            try:
-                if not isinstance(data, str):
-                    raise TypeError()
-                procured_at_type_0 = datetime.datetime.fromisoformat(data.replace("Z", "+00:00"))
-
-                return procured_at_type_0
-            except (TypeError, ValueError, AttributeError, KeyError):
-                pass
-            return cast(datetime.datetime | None | Unset, data)
-
-        procured_at = _parse_procured_at(d.pop("procuredAt", UNSET))
-
         balancing_capacity_volumes = cls(
             area=area,
             eic_code=eic_code,
             reserve_type=reserve_type,
             direction=direction,
+            procurement=procurement,
             volumes=volumes,
-            procured_at=procured_at,
         )
 
         balancing_capacity_volumes.additional_properties = d

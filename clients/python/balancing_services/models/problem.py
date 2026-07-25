@@ -8,9 +8,6 @@ from attrs import field as _attrs_field
 
 from ..types import UNSET, Unset
 
-from ..models.problem_type import ProblemType
-
-
 T = TypeVar("T", bound="Problem")
 
 
@@ -18,20 +15,26 @@ T = TypeVar("T", bound="Problem")
 class Problem:
     """
     Attributes:
-        type_ (ProblemType): Problem type identifier
+        type_ (str): Machine-readable slug identifying the problem type. Treat this as an open
+            set: new types may be introduced without a major-version bump, so match the
+            values you handle and fall back on `status` for anything you don't recognise.
+            Currently defined:
+            `missing-parameter`, `invalid-parameter`, `unauthorized`, `forbidden`,
+            `not-found`, `rate-limited`, `not-implemented`, `internal-error`.
+             Example: not-found.
         title (str): Short, human-readable summary of the problem type
         status (int): HTTP status code
         detail (str | Unset): Human-readable explanation specific to this occurrence
     """
 
-    type_: ProblemType
+    type_: str
     title: str
     status: int
     detail: str | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
-        type_ = self.type_.value
+        type_ = self.type_
 
         title = self.title
 
@@ -56,7 +59,7 @@ class Problem:
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         d = dict(src_dict)
-        type_ = ProblemType(d.pop("type"))
+        type_ = d.pop("type")
 
         title = d.pop("title")
 

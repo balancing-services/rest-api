@@ -1,20 +1,18 @@
+import datetime
 from http import HTTPStatus
 from typing import Any
 
 import httpx
 
-from ...client import AuthenticatedClient, Client
-from ...types import Response, UNSET
 from ... import errors
-
+from ...client import AuthenticatedClient, Client
 from ...models.area import Area
 from ...models.cross_border_available_capacity_response import (
     CrossBorderAvailableCapacityResponse,
 )
 from ...models.problem import Problem
 from ...models.reserve_type import ReserveType
-from ...types import Unset
-import datetime
+from ...types import UNSET, Response, Unset
 
 
 def _get_kwargs(
@@ -25,15 +23,16 @@ def _get_kwargs(
     period_end_at: datetime.datetime,
     reserve_type: ReserveType,
     cursor: str | Unset = UNSET,
-    limit: int | Unset = UNSET,
+    limit: int | Unset = 100,
+    updated_since: datetime.datetime | Unset = UNSET,
 ) -> dict[str, Any]:
 
     params: dict[str, Any] = {}
 
-    json_area = area.value
+    json_area: str = area
     params["area"] = json_area
 
-    json_other_area = other_area.value
+    json_other_area: str = other_area
     params["other-area"] = json_other_area
 
     json_period_start_at = period_start_at.isoformat()
@@ -42,12 +41,17 @@ def _get_kwargs(
     json_period_end_at = period_end_at.isoformat()
     params["period-end-at"] = json_period_end_at
 
-    json_reserve_type = reserve_type.value
+    json_reserve_type: str = reserve_type
     params["reserve-type"] = json_reserve_type
 
     params["cursor"] = cursor
 
     params["limit"] = limit
+
+    json_updated_since: str | Unset = UNSET
+    if not isinstance(updated_since, Unset):
+        json_updated_since = updated_since.isoformat()
+    params["updated-since"] = json_updated_since
 
     params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
@@ -119,11 +123,12 @@ def sync_detailed(
     period_end_at: datetime.datetime,
     reserve_type: ReserveType,
     cursor: str | Unset = UNSET,
-    limit: int | Unset = UNSET,
+    limit: int | Unset = 100,
+    updated_since: datetime.datetime | Unset = UNSET,
 ) -> Response[CrossBorderAvailableCapacityResponse | Problem]:
     """Get cross-border available capacity
 
-     **EXPERIMENTAL**: Returns the available capacity for balancing energy exchange across the border
+     Returns the available capacity for balancing energy exchange across the border
     between two areas, for the specified reserve type and time period. Both border ends must be given
     (`area` and `other-area`); results cover both directions (area → other-area and other-area → area).
     The value is the per-direction capacity available for balancing energy exchange.
@@ -133,8 +138,6 @@ def sync_detailed(
     each
     response until `hasMore` is false.
 
-    This endpoint is experimental and may be changed or removed without a deprecation period.
-
     Args:
         area (Area): Area code
         other_area (Area): Area code
@@ -142,7 +145,8 @@ def sync_detailed(
         period_end_at (datetime.datetime):  Example: 2025-01-02T00:00:00Z.
         reserve_type (ReserveType): Reserve type
         cursor (str | Unset):  Example: v1:AAAAAYwBAgMEBQYHCAkKCw==.
-        limit (int | Unset):  Example: 100.
+        limit (int | Unset):  Default: 100. Example: 100.
+        updated_since (datetime.datetime | Unset):  Example: 2025-01-02T09:15:00Z.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -160,6 +164,7 @@ def sync_detailed(
         reserve_type=reserve_type,
         cursor=cursor,
         limit=limit,
+        updated_since=updated_since,
     )
 
     response = client.get_httpx_client().request(
@@ -178,11 +183,12 @@ def sync(
     period_end_at: datetime.datetime,
     reserve_type: ReserveType,
     cursor: str | Unset = UNSET,
-    limit: int | Unset = UNSET,
+    limit: int | Unset = 100,
+    updated_since: datetime.datetime | Unset = UNSET,
 ) -> CrossBorderAvailableCapacityResponse | Problem | None:
     """Get cross-border available capacity
 
-     **EXPERIMENTAL**: Returns the available capacity for balancing energy exchange across the border
+     Returns the available capacity for balancing energy exchange across the border
     between two areas, for the specified reserve type and time period. Both border ends must be given
     (`area` and `other-area`); results cover both directions (area → other-area and other-area → area).
     The value is the per-direction capacity available for balancing energy exchange.
@@ -192,8 +198,6 @@ def sync(
     each
     response until `hasMore` is false.
 
-    This endpoint is experimental and may be changed or removed without a deprecation period.
-
     Args:
         area (Area): Area code
         other_area (Area): Area code
@@ -201,7 +205,8 @@ def sync(
         period_end_at (datetime.datetime):  Example: 2025-01-02T00:00:00Z.
         reserve_type (ReserveType): Reserve type
         cursor (str | Unset):  Example: v1:AAAAAYwBAgMEBQYHCAkKCw==.
-        limit (int | Unset):  Example: 100.
+        limit (int | Unset):  Default: 100. Example: 100.
+        updated_since (datetime.datetime | Unset):  Example: 2025-01-02T09:15:00Z.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -220,6 +225,7 @@ def sync(
         reserve_type=reserve_type,
         cursor=cursor,
         limit=limit,
+        updated_since=updated_since,
     ).parsed
 
 
@@ -232,11 +238,12 @@ async def asyncio_detailed(
     period_end_at: datetime.datetime,
     reserve_type: ReserveType,
     cursor: str | Unset = UNSET,
-    limit: int | Unset = UNSET,
+    limit: int | Unset = 100,
+    updated_since: datetime.datetime | Unset = UNSET,
 ) -> Response[CrossBorderAvailableCapacityResponse | Problem]:
     """Get cross-border available capacity
 
-     **EXPERIMENTAL**: Returns the available capacity for balancing energy exchange across the border
+     Returns the available capacity for balancing energy exchange across the border
     between two areas, for the specified reserve type and time period. Both border ends must be given
     (`area` and `other-area`); results cover both directions (area → other-area and other-area → area).
     The value is the per-direction capacity available for balancing energy exchange.
@@ -246,8 +253,6 @@ async def asyncio_detailed(
     each
     response until `hasMore` is false.
 
-    This endpoint is experimental and may be changed or removed without a deprecation period.
-
     Args:
         area (Area): Area code
         other_area (Area): Area code
@@ -255,7 +260,8 @@ async def asyncio_detailed(
         period_end_at (datetime.datetime):  Example: 2025-01-02T00:00:00Z.
         reserve_type (ReserveType): Reserve type
         cursor (str | Unset):  Example: v1:AAAAAYwBAgMEBQYHCAkKCw==.
-        limit (int | Unset):  Example: 100.
+        limit (int | Unset):  Default: 100. Example: 100.
+        updated_since (datetime.datetime | Unset):  Example: 2025-01-02T09:15:00Z.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -273,6 +279,7 @@ async def asyncio_detailed(
         reserve_type=reserve_type,
         cursor=cursor,
         limit=limit,
+        updated_since=updated_since,
     )
 
     response = await client.get_async_httpx_client().request(**kwargs)
@@ -289,11 +296,12 @@ async def asyncio(
     period_end_at: datetime.datetime,
     reserve_type: ReserveType,
     cursor: str | Unset = UNSET,
-    limit: int | Unset = UNSET,
+    limit: int | Unset = 100,
+    updated_since: datetime.datetime | Unset = UNSET,
 ) -> CrossBorderAvailableCapacityResponse | Problem | None:
     """Get cross-border available capacity
 
-     **EXPERIMENTAL**: Returns the available capacity for balancing energy exchange across the border
+     Returns the available capacity for balancing energy exchange across the border
     between two areas, for the specified reserve type and time period. Both border ends must be given
     (`area` and `other-area`); results cover both directions (area → other-area and other-area → area).
     The value is the per-direction capacity available for balancing energy exchange.
@@ -303,8 +311,6 @@ async def asyncio(
     each
     response until `hasMore` is false.
 
-    This endpoint is experimental and may be changed or removed without a deprecation period.
-
     Args:
         area (Area): Area code
         other_area (Area): Area code
@@ -312,7 +318,8 @@ async def asyncio(
         period_end_at (datetime.datetime):  Example: 2025-01-02T00:00:00Z.
         reserve_type (ReserveType): Reserve type
         cursor (str | Unset):  Example: v1:AAAAAYwBAgMEBQYHCAkKCw==.
-        limit (int | Unset):  Example: 100.
+        limit (int | Unset):  Default: 100. Example: 100.
+        updated_since (datetime.datetime | Unset):  Example: 2025-01-02T09:15:00Z.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -332,5 +339,6 @@ async def asyncio(
             reserve_type=reserve_type,
             cursor=cursor,
             limit=limit,
+            updated_since=updated_since,
         )
     ).parsed

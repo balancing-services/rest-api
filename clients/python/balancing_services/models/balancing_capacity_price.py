@@ -1,11 +1,10 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, TypeVar
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
-
 
 if TYPE_CHECKING:
     from ..models.period import Period
@@ -19,20 +18,15 @@ class BalancingCapacityPrice:
     """
     Attributes:
         period (Period):
-        price (float): Deprecated — use `pricePerMwPerHour` instead. Price per MW per hour in the specified currency
-            Example: 12.5.
         price_per_mw_per_hour (float): Price per MW per hour in the specified currency Example: 12.5.
     """
 
     period: Period
-    price: float
     price_per_mw_per_hour: float
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         period = self.period.to_dict()
-
-        price = self.price
 
         price_per_mw_per_hour = self.price_per_mw_per_hour
 
@@ -41,7 +35,6 @@ class BalancingCapacityPrice:
         field_dict.update(
             {
                 "period": period,
-                "price": price,
                 "pricePerMwPerHour": price_per_mw_per_hour,
             }
         )
@@ -55,13 +48,10 @@ class BalancingCapacityPrice:
         d = dict(src_dict)
         period = Period.from_dict(d.pop("period"))
 
-        price = d.pop("price")
-
         price_per_mw_per_hour = d.pop("pricePerMwPerHour")
 
         balancing_capacity_price = cls(
             period=period,
-            price=price,
             price_per_mw_per_hour=price_per_mw_per_hour,
         )
 

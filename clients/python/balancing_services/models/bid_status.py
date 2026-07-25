@@ -1,9 +1,16 @@
-from enum import Enum
+from typing import Literal
+
+BidStatus = Literal["accepted", "offered"]
+
+BID_STATUS_VALUES: set[BidStatus] = {
+    "accepted",
+    "offered",
+}
 
 
-class BidStatus(str, Enum):
-    ACCEPTED = "accepted"
-    OFFERED = "offered"
-
-    def __str__(self) -> str:
-        return str(self.value)
+def check_bid_status(value: str) -> BidStatus:
+    if value in BID_STATUS_VALUES:
+        return value
+    raise TypeError(
+        f"Unexpected value {value!r}. Expected one of {BID_STATUS_VALUES!r}"
+    )

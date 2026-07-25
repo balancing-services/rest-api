@@ -42,7 +42,10 @@ fi
 
 # Generate the client
 echo "Generating Python client from OpenAPI spec..."
-uvx openapi-python-client generate \
+# Pin the generator version so regeneration is reproducible: an unpinned uvx
+# silently upgrades to whatever is latest, which can churn the generated output
+# (formatting, type shapes) independently of any spec change. Bump deliberately.
+uvx openapi-python-client@0.29.0 generate \
     --path ../../openapi.yaml \
     --config config.yaml \
     --meta none

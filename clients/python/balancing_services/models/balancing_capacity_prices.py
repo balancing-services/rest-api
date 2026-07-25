@@ -1,23 +1,20 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, TypeVar
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
-from ..types import UNSET, Unset
-
-from ..models.area import Area
-from ..models.currency import Currency
-from ..models.direction import Direction
-from ..models.eic_code import EicCode
-from ..models.reserve_type import ReserveType
-from typing import cast
-import datetime
+from ..models.area import Area, check_area
+from ..models.currency import Currency, check_currency
+from ..models.direction import Direction, check_direction
+from ..models.eic_code import EicCode, check_eic_code
+from ..models.reserve_type import ReserveType, check_reserve_type
 
 if TYPE_CHECKING:
     from ..models.balancing_capacity_price import BalancingCapacityPrice
+    from ..models.procurement import Procurement
 
 
 T = TypeVar("T", bound="BalancingCapacityPrices")
@@ -32,12 +29,8 @@ class BalancingCapacityPrices:
         reserve_type (ReserveType): Reserve type
         direction (Direction): Balancing direction
         currency (Currency): Currency code
+        procurement (Procurement):
         prices (list[BalancingCapacityPrice]):
-        procured_at (datetime.datetime | None | Unset): **EXPERIMENTAL**: Timestamp when the capacity was procured
-            (allocation time or gate closure time).
-            Used to distinguish different auctions (e.g., yearly vs hourly, or multiple procurement rounds).
-            This field is experimental and may be changed or removed without a deprecation period.
-             Example: 2024-08-15T14:30:00Z.
     """
 
     area: Area
@@ -45,33 +38,27 @@ class BalancingCapacityPrices:
     reserve_type: ReserveType
     direction: Direction
     currency: Currency
+    procurement: Procurement
     prices: list[BalancingCapacityPrice]
-    procured_at: datetime.datetime | None | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
-        area = self.area.value
+        area: str = self.area
 
-        eic_code = self.eic_code.value
+        eic_code: str = self.eic_code
 
-        reserve_type = self.reserve_type.value
+        reserve_type: str = self.reserve_type
 
-        direction = self.direction.value
+        direction: str = self.direction
 
-        currency = self.currency.value
+        currency: str = self.currency
+
+        procurement = self.procurement.to_dict()
 
         prices = []
         for prices_item_data in self.prices:
             prices_item = prices_item_data.to_dict()
             prices.append(prices_item)
-
-        procured_at: None | str | Unset
-        if isinstance(self.procured_at, Unset):
-            procured_at = UNSET
-        elif isinstance(self.procured_at, datetime.datetime):
-            procured_at = self.procured_at.isoformat()
-        else:
-            procured_at = self.procured_at
 
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
@@ -82,28 +69,30 @@ class BalancingCapacityPrices:
                 "reserveType": reserve_type,
                 "direction": direction,
                 "currency": currency,
+                "procurement": procurement,
                 "prices": prices,
             }
         )
-        if procured_at is not UNSET:
-            field_dict["procuredAt"] = procured_at
 
         return field_dict
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         from ..models.balancing_capacity_price import BalancingCapacityPrice
+        from ..models.procurement import Procurement
 
         d = dict(src_dict)
-        area = Area(d.pop("area"))
+        area = check_area(d.pop("area"))
 
-        eic_code = EicCode(d.pop("eicCode"))
+        eic_code = check_eic_code(d.pop("eicCode"))
 
-        reserve_type = ReserveType(d.pop("reserveType"))
+        reserve_type = check_reserve_type(d.pop("reserveType"))
 
-        direction = Direction(d.pop("direction"))
+        direction = check_direction(d.pop("direction"))
 
-        currency = Currency(d.pop("currency"))
+        currency = check_currency(d.pop("currency"))
+
+        procurement = Procurement.from_dict(d.pop("procurement"))
 
         prices = []
         _prices = d.pop("prices")
@@ -112,31 +101,14 @@ class BalancingCapacityPrices:
 
             prices.append(prices_item)
 
-        def _parse_procured_at(data: object) -> datetime.datetime | None | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            try:
-                if not isinstance(data, str):
-                    raise TypeError()
-                procured_at_type_0 = datetime.datetime.fromisoformat(data.replace("Z", "+00:00"))
-
-                return procured_at_type_0
-            except (TypeError, ValueError, AttributeError, KeyError):
-                pass
-            return cast(datetime.datetime | None | Unset, data)
-
-        procured_at = _parse_procured_at(d.pop("procuredAt", UNSET))
-
         balancing_capacity_prices = cls(
             area=area,
             eic_code=eic_code,
             reserve_type=reserve_type,
             direction=direction,
             currency=currency,
+            procurement=procurement,
             prices=prices,
-            procured_at=procured_at,
         )
 
         balancing_capacity_prices.additional_properties = d

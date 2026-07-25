@@ -1,10 +1,15 @@
-from enum import Enum
+from typing import Literal
+
+Direction = Literal["down", "symmetric", "up"]
+
+DIRECTION_VALUES: set[Direction] = {
+    "down",
+    "symmetric",
+    "up",
+}
 
 
-class Direction(str, Enum):
-    DOWN = "down"
-    SYMMETRIC = "symmetric"
-    UP = "up"
-
-    def __str__(self) -> str:
-        return str(self.value)
+def check_direction(value: str) -> Direction:
+    if value in DIRECTION_VALUES:
+        return value
+    raise TypeError(f"Unexpected value {value!r}. Expected one of {DIRECTION_VALUES!r}")

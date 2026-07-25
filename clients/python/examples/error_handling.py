@@ -118,8 +118,6 @@ def fetch_with_retry(client, area, reserve_type, period_start, period_end, max_r
 def main():
     from dateutil.parser import isoparse
 
-    from balancing_services.models import Area, ReserveType
-
     parser = argparse.ArgumentParser(description="Demonstrate error handling with retry logic")
     parser.add_argument(
         "--api-token",
@@ -136,8 +134,8 @@ def main():
     # Fetch data with retry logic
     data = fetch_with_retry(
         client,
-        area=Area.EE,
-        reserve_type=ReserveType.AFRR,
+        area="EE",
+        reserve_type="aFRR",
         period_start=isoparse("2025-01-01T00:00:00Z"),
         period_end=isoparse("2025-01-02T00:00:00Z"),
         max_retries=3
@@ -148,14 +146,15 @@ def main():
         print(f"Number of price groups: {len(data.data)}")
 
         for price_group in data.data:
-            print(f"\nArea: {price_group.area.value}")
-            print(f"Reserve Type: {price_group.reserve_type.value}")
-            print(f"Direction: {price_group.direction.value}")
+            print(f"\nArea: {price_group.area}")
+            print(f"Reserve Type: {price_group.reserve_type}")
+            print(f"Direction: {price_group.direction}")
+            print(f"Procured at: {price_group.procurement.procured_at}")
             print(f"Number of prices: {len(price_group.prices)}")
 
             # Show first few prices
             for i, price in enumerate(price_group.prices[:3]):
-                print(f"  {price.period.start_at}: {price.price} {price_group.currency.value}/MW/h")
+                print(f"  {price.period.start_at}: {price.price_per_mw_per_hour} {price_group.currency}/MW/h")
 
             if len(price_group.prices) > 3:
                 print(f"  ... and {len(price_group.prices) - 3} more prices")

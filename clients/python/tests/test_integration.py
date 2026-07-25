@@ -23,15 +23,6 @@ from balancing_services.api.default import (
     get_day_ahead_energy_prices,
     get_imbalance_prices,
 )
-from balancing_services.models import (
-    ActivationType,
-    Area,
-    Currency,
-    DemandBasis,
-    Direction,
-    ReserveType,
-    TotalImbalanceDirection,
-)
 
 
 @pytest.fixture
@@ -52,6 +43,7 @@ def mock_imbalance_prices_response():
             "endAt": "2025-01-02T00:00:00Z"
         },
         "hasMore": False,
+        "nextUpdatedSince": "2025-01-02T09:15:00Z",
         "data": [
             {
                 "area": "EE",
@@ -64,7 +56,6 @@ def mock_imbalance_prices_response():
                             "startAt": "2025-01-01T00:00:00Z",
                             "endAt": "2025-01-01T01:00:00Z"
                         },
-                        "price": 45.5,
                         "pricePerMwh": 45.5
                     }
                 ]
@@ -82,6 +73,7 @@ def mock_balancing_energy_bids_response():
             "endAt": "2025-01-02T00:00:00Z"
         },
         "hasMore": True,
+        "nextUpdatedSince": "2025-01-02T09:15:00Z",
         "nextCursor": "v1:AAAAAYwBAgMEBQYHCAkKCw==",
         "data": [
             {
@@ -89,19 +81,20 @@ def mock_balancing_energy_bids_response():
                 "eicCode": "10Y1001A1001A39I",
                 "reserveType": "aFRR",
                 "direction": "up",
-                "standardProduct": "15MIN",
+                "standardProduct": True,
                 "currency": "EUR",
-                "bids": [
+                "periods": [
                     {
                         "period": {
                             "startAt": "2025-01-01T00:00:00Z",
                             "endAt": "2025-01-01T00:15:00Z"
                         },
-                        "volume": 10.5,
-                        "volumeInMw": 10.5,
-                        "price": 25.0,
-                        "pricePerMwh": 25.0,
-                        "status": "accepted"
+                        "bids": [
+                            {
+                                "volumeInMw": 10.5,
+                                "pricePerMwh": 25.0
+                            }
+                        ]
                     }
                 ]
             }
@@ -118,7 +111,7 @@ def test_get_imbalance_prices_success(authenticated_client, mock_imbalance_price
 
     response = get_imbalance_prices.sync_detailed(
         client=authenticated_client,
-        area=Area.EE,
+        area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc)
     )
@@ -127,7 +120,7 @@ def test_get_imbalance_prices_success(authenticated_client, mock_imbalance_price
     assert response.parsed is not None
     assert response.parsed.has_more is False
     assert len(response.parsed.data) == 1
-    assert response.parsed.data[0].area == Area.EE
+    assert response.parsed.data[0].area == "EE"
     assert response.parsed.data[0].prices[0].price_per_mwh == 45.5
 
 
@@ -147,7 +140,7 @@ def test_get_imbalance_prices_unauthorized(authenticated_client):
 
     response = get_imbalance_prices.sync_detailed(
         client=authenticated_client,
-        area=Area.EE,
+        area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc)
     )
@@ -173,7 +166,7 @@ def test_get_imbalance_prices_bad_request(authenticated_client):
 
     response = get_imbalance_prices.sync_detailed(
         client=authenticated_client,
-        area=Area.EE,
+        area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc)
     )
@@ -192,10 +185,10 @@ def test_get_balancing_energy_bids_pagination(authenticated_client, mock_balanci
 
     response = get_balancing_energy_bids.sync_detailed(
         client=authenticated_client,
-        area=Area.EE,
+        area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
-        reserve_type=ReserveType.AFRR,
+        reserve_type="aFRR",
         limit=100
     )
 
@@ -204,8 +197,8 @@ def test_get_balancing_energy_bids_pagination(authenticated_client, mock_balanci
     assert response.parsed.has_more is True
     assert response.parsed.next_cursor == "v1:AAAAAYwBAgMEBQYHCAkKCw=="
     assert len(response.parsed.data) == 1
-    assert response.parsed.data[0].bids[0].volume_in_mw == 10.5
-    assert response.parsed.data[0].bids[0].price_per_mwh == 25.0
+    assert response.parsed.data[0].periods[0].bids[0].volume_in_mw == 10.5
+    assert response.parsed.data[0].periods[0].bids[0].price_per_mwh == 25.0
 
 
 @respx.mock
@@ -218,7 +211,7 @@ def test_authentication_header_included(authenticated_client, mock_imbalance_pri
 
     response = get_imbalance_prices.sync_detailed(
         client=authenticated_client,
-        area=Area.EE,
+        area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc)
     )
@@ -237,7 +230,7 @@ async def test_async_get_imbalance_prices(authenticated_client, mock_imbalance_p
 
     response = await get_imbalance_prices.asyncio_detailed(
         client=authenticated_client,
-        area=Area.EE,
+        area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc)
     )
@@ -257,6 +250,7 @@ def mock_offered_volumes_response():
             "endAt": "2025-01-02T00:00:00Z"
         },
         "hasMore": False,
+        "nextUpdatedSince": "2025-01-02T09:15:00Z",
         "data": [
             {
                 "area": "EE",
@@ -271,7 +265,6 @@ def mock_offered_volumes_response():
                             "startAt": "2025-01-01T00:00:00Z",
                             "endAt": "2025-01-01T01:00:00Z"
                         },
-                        "volume": 50.0,
                         "volumeInMw": 50.0
                     }
                 ]
@@ -289,6 +282,7 @@ def mock_cross_zonal_allocation_response():
             "endAt": "2025-01-02T00:00:00Z"
         },
         "hasMore": False,
+        "nextUpdatedSince": "2025-01-02T09:15:00Z",
         "data": [
             {
                 "fromArea": "EE",
@@ -302,7 +296,6 @@ def mock_cross_zonal_allocation_response():
                             "startAt": "2025-01-01T00:00:00Z",
                             "endAt": "2025-01-01T01:00:00Z"
                         },
-                        "volume": 25.0,
                         "volumeInMw": 25.0
                     }
                 ]
@@ -320,17 +313,17 @@ def test_get_balancing_energy_offered_volumes_success(authenticated_client, mock
 
     response = get_balancing_energy_offered_volumes.sync_detailed(
         client=authenticated_client,
-        area=Area.EE,
+        area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
-        reserve_type=ReserveType.AFRR
+        reserve_type="aFRR"
     )
 
     assert response.status_code == 200
     assert response.parsed is not None
     assert response.parsed.has_more is False
     assert len(response.parsed.data) == 1
-    assert response.parsed.data[0].area == Area.EE
+    assert response.parsed.data[0].area == "EE"
     assert response.parsed.data[0].volumes[0].volume_in_mw == 50.0
 
 
@@ -350,10 +343,10 @@ def test_get_balancing_energy_offered_volumes_unauthorized(authenticated_client)
 
     response = get_balancing_energy_offered_volumes.sync_detailed(
         client=authenticated_client,
-        area=Area.EE,
+        area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
-        reserve_type=ReserveType.AFRR
+        reserve_type="aFRR"
     )
 
     assert response.status_code == 401
@@ -371,10 +364,10 @@ async def test_async_get_balancing_energy_offered_volumes(authenticated_client, 
 
     response = await get_balancing_energy_offered_volumes.asyncio_detailed(
         client=authenticated_client,
-        area=Area.EE,
+        area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
-        reserve_type=ReserveType.AFRR
+        reserve_type="aFRR"
     )
 
     assert response.status_code == 200
@@ -392,18 +385,19 @@ def test_get_cross_zonal_capacity_allocation_success(authenticated_client, mock_
 
     response = get_cross_zonal_capacity_allocation.sync_detailed(
         client=authenticated_client,
-        area=Area.EE,
+        area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
-        reserve_type=ReserveType.AFRR
+        reserve_type="aFRR",
+        other_area="LV"
     )
 
     assert response.status_code == 200
     assert response.parsed is not None
     assert response.parsed.has_more is False
     assert len(response.parsed.data) == 1
-    assert response.parsed.data[0].from_area == Area.EE
-    assert response.parsed.data[0].to_area == Area.LV
+    assert response.parsed.data[0].from_area == "EE"
+    assert response.parsed.data[0].to_area == "LV"
     assert response.parsed.data[0].volumes[0].volume_in_mw == 25.0
 
 
@@ -423,10 +417,11 @@ def test_get_cross_zonal_capacity_allocation_unauthorized(authenticated_client):
 
     response = get_cross_zonal_capacity_allocation.sync_detailed(
         client=authenticated_client,
-        area=Area.EE,
+        area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
-        reserve_type=ReserveType.AFRR
+        reserve_type="aFRR",
+        other_area="LV"
     )
 
     assert response.status_code == 401
@@ -444,10 +439,11 @@ async def test_async_get_cross_zonal_capacity_allocation(authenticated_client, m
 
     response = await get_cross_zonal_capacity_allocation.asyncio_detailed(
         client=authenticated_client,
-        area=Area.EE,
+        area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
-        reserve_type=ReserveType.AFRR
+        reserve_type="aFRR",
+        other_area="LV"
     )
 
     assert response.status_code == 200
@@ -465,13 +461,14 @@ def mock_balancing_energy_demand_response():
             "endAt": "2025-01-02T00:00:00Z"
         },
         "hasMore": False,
+        "nextUpdatedSince": "2025-01-02T09:15:00Z",
         "data": [
             {
                 "area": "EE",
                 "eicCode": "10Y1001A1001A39I",
                 "reserveType": "aFRR",
                 "direction": "up",
-                "activationType": "not_applicable",
+                "activationType": "notApplicable",
                 "standardProduct": True,
                 "volumes": [
                     {
@@ -479,7 +476,6 @@ def mock_balancing_energy_demand_response():
                             "startAt": "2025-01-01T00:00:00Z",
                             "endAt": "2025-01-01T01:00:00Z"
                         },
-                        "volume": 80.0,
                         "volumeInMw": 80.0
                     }
                 ]
@@ -497,19 +493,19 @@ def test_get_balancing_energy_demand_success(authenticated_client, mock_balancin
 
     response = get_balancing_energy_demand.sync_detailed(
         client=authenticated_client,
-        area=Area.EE,
+        area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
-        reserve_type=ReserveType.AFRR
+        reserve_type="aFRR"
     )
 
     assert response.status_code == 200
     assert response.parsed is not None
     assert response.parsed.has_more is False
     assert len(response.parsed.data) == 1
-    assert response.parsed.data[0].area == Area.EE
-    assert response.parsed.data[0].reserve_type == ReserveType.AFRR
-    assert response.parsed.data[0].direction == Direction.UP
+    assert response.parsed.data[0].area == "EE"
+    assert response.parsed.data[0].reserve_type == "aFRR"
+    assert response.parsed.data[0].direction == "up"
     assert response.parsed.data[0].volumes[0].volume_in_mw == 80.0
 
 
@@ -519,6 +515,7 @@ def test_get_balancing_energy_demand_pagination(authenticated_client, mock_balan
     paginated_response = {
         **mock_balancing_energy_demand_response,
         "hasMore": True,
+        "nextUpdatedSince": "2025-01-02T09:15:00Z",
         "nextCursor": "v1:AAAAAYwBAgMEBQYHCAkKCw==",
     }
 
@@ -528,10 +525,10 @@ def test_get_balancing_energy_demand_pagination(authenticated_client, mock_balan
 
     response = get_balancing_energy_demand.sync_detailed(
         client=authenticated_client,
-        area=Area.EE,
+        area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
-        reserve_type=ReserveType.AFRR,
+        reserve_type="aFRR",
         cursor="v1:AAAAAYwBAgMEBQYHCAkKCw==",
         limit=100,
     )
@@ -561,10 +558,10 @@ def test_get_balancing_energy_demand_unauthorized(authenticated_client):
 
     response = get_balancing_energy_demand.sync_detailed(
         client=authenticated_client,
-        area=Area.EE,
+        area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
-        reserve_type=ReserveType.AFRR
+        reserve_type="aFRR"
     )
 
     assert response.status_code == 401
@@ -582,10 +579,10 @@ async def test_async_get_balancing_energy_demand(authenticated_client, mock_bala
 
     response = await get_balancing_energy_demand.asyncio_detailed(
         client=authenticated_client,
-        area=Area.EE,
+        area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
-        reserve_type=ReserveType.AFRR
+        reserve_type="aFRR"
     )
 
     assert response.status_code == 200
@@ -603,18 +600,18 @@ def test_get_balancing_energy_satisfied_demand_success(authenticated_client, moc
 
     response = get_balancing_energy_satisfied_demand.sync_detailed(
         client=authenticated_client,
-        area=Area.EE,
+        area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
-        reserve_type=ReserveType.AFRR
+        reserve_type="aFRR"
     )
 
     assert response.status_code == 200
     assert response.parsed is not None
     assert response.parsed.has_more is False
     assert len(response.parsed.data) == 1
-    assert response.parsed.data[0].area == Area.EE
-    assert response.parsed.data[0].reserve_type == ReserveType.AFRR
+    assert response.parsed.data[0].area == "EE"
+    assert response.parsed.data[0].reserve_type == "aFRR"
     assert response.parsed.data[0].volumes[0].volume_in_mw == 80.0
 
 
@@ -624,6 +621,7 @@ def test_get_balancing_energy_satisfied_demand_pagination(authenticated_client, 
     paginated_response = {
         **mock_balancing_energy_demand_response,
         "hasMore": True,
+        "nextUpdatedSince": "2025-01-02T09:15:00Z",
         "nextCursor": "v1:AAAAAYwBAgMEBQYHCAkKCw==",
     }
 
@@ -633,10 +631,10 @@ def test_get_balancing_energy_satisfied_demand_pagination(authenticated_client, 
 
     response = get_balancing_energy_satisfied_demand.sync_detailed(
         client=authenticated_client,
-        area=Area.EE,
+        area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
-        reserve_type=ReserveType.AFRR,
+        reserve_type="aFRR",
         cursor="v1:AAAAAYwBAgMEBQYHCAkKCw==",
         limit=100,
     )
@@ -666,10 +664,10 @@ def test_get_balancing_energy_satisfied_demand_unauthorized(authenticated_client
 
     response = get_balancing_energy_satisfied_demand.sync_detailed(
         client=authenticated_client,
-        area=Area.EE,
+        area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
-        reserve_type=ReserveType.AFRR
+        reserve_type="aFRR"
     )
 
     assert response.status_code == 401
@@ -687,10 +685,10 @@ async def test_async_get_balancing_energy_satisfied_demand(authenticated_client,
 
     response = await get_balancing_energy_satisfied_demand.asyncio_detailed(
         client=authenticated_client,
-        area=Area.EE,
+        area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
-        reserve_type=ReserveType.AFRR
+        reserve_type="aFRR"
     )
 
     assert response.status_code == 200
@@ -708,13 +706,14 @@ def mock_balancing_capacity_demand_response():
             "endAt": "2025-01-02T00:00:00Z"
         },
         "hasMore": False,
+        "nextUpdatedSince": "2025-01-02T09:15:00Z",
         "data": [
             {
                 "area": "EE",
                 "eicCode": "10Y1001A1001A39I",
                 "reserveType": "aFRR",
                 "direction": "up",
-                "procuredAt": "2024-12-31T09:00:00Z",
+                "procurement": {"procuredAt": "2024-12-31T09:00:00Z"},
                 "demandBasis": "additive",
                 "demands": [
                     {
@@ -740,20 +739,20 @@ def test_get_balancing_capacity_demand_success(authenticated_client, mock_balanc
 
     response = get_balancing_capacity_demand.sync_detailed(
         client=authenticated_client,
-        area=Area.EE,
+        area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
-        reserve_type=ReserveType.AFRR
+        reserve_type="aFRR"
     )
 
     assert response.status_code == 200
     assert response.parsed is not None
     assert response.parsed.has_more is False
     assert len(response.parsed.data) == 1
-    assert response.parsed.data[0].area == Area.EE
-    assert response.parsed.data[0].reserve_type == ReserveType.AFRR
-    assert response.parsed.data[0].direction == Direction.UP
-    assert response.parsed.data[0].demand_basis == DemandBasis.ADDITIVE
+    assert response.parsed.data[0].area == "EE"
+    assert response.parsed.data[0].reserve_type == "aFRR"
+    assert response.parsed.data[0].direction == "up"
+    assert response.parsed.data[0].demand_basis == "additive"
     assert response.parsed.data[0].demands[0].total_demand_in_mw == 80.0
     assert response.parsed.data[0].demands[0].local_demand_in_mw == 30.0
 
@@ -764,6 +763,7 @@ def test_get_balancing_capacity_demand_pagination(authenticated_client, mock_bal
     paginated_response = {
         **mock_balancing_capacity_demand_response,
         "hasMore": True,
+        "nextUpdatedSince": "2025-01-02T09:15:00Z",
         "nextCursor": "v1:AAAAAYwBAgMEBQYHCAkKCw==",
     }
 
@@ -773,10 +773,10 @@ def test_get_balancing_capacity_demand_pagination(authenticated_client, mock_bal
 
     response = get_balancing_capacity_demand.sync_detailed(
         client=authenticated_client,
-        area=Area.EE,
+        area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
-        reserve_type=ReserveType.AFRR,
+        reserve_type="aFRR",
         cursor="v1:AAAAAYwBAgMEBQYHCAkKCw==",
         limit=100,
     )
@@ -806,10 +806,10 @@ def test_get_balancing_capacity_demand_unauthorized(authenticated_client):
 
     response = get_balancing_capacity_demand.sync_detailed(
         client=authenticated_client,
-        area=Area.EE,
+        area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
-        reserve_type=ReserveType.AFRR
+        reserve_type="aFRR"
     )
 
     assert response.status_code == 401
@@ -827,10 +827,10 @@ async def test_async_get_balancing_capacity_demand(authenticated_client, mock_ba
 
     response = await get_balancing_capacity_demand.asyncio_detailed(
         client=authenticated_client,
-        area=Area.EE,
+        area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
-        reserve_type=ReserveType.AFRR
+        reserve_type="aFRR"
     )
 
     assert response.status_code == 200
@@ -848,6 +848,7 @@ def mock_cross_border_marginal_prices_response():
             "endAt": "2026-03-01T01:00:00Z"
         },
         "hasMore": True,
+        "nextUpdatedSince": "2025-01-02T09:15:00Z",
         "nextCursor": "v1:AAAAAYwBAgMEBQYHCAkKCw==",
         "data": [
             {
@@ -862,7 +863,6 @@ def mock_cross_border_marginal_prices_response():
                             "startAt": "2026-03-01T00:00:00Z",
                             "endAt": "2026-03-01T00:15:00Z"
                         },
-                        "price": 45.50,
                         "pricePerMwh": 45.50
                     }
                 ]
@@ -880,10 +880,10 @@ def test_get_cross_border_marginal_prices_success(authenticated_client, mock_cro
 
     response = get_cross_border_marginal_prices.sync_detailed(
         client=authenticated_client,
-        area=Area.AT,
+        area="AT",
         period_start_at=datetime(2026, 3, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2026, 3, 1, 1, 0, 0, tzinfo=timezone.utc),
-        reserve_type=ReserveType.AFRR,
+        reserve_type="aFRR",
     )
 
     assert response.status_code == 200
@@ -891,9 +891,8 @@ def test_get_cross_border_marginal_prices_success(authenticated_client, mock_cro
     assert response.parsed.has_more is True
     assert response.parsed.next_cursor == "v1:AAAAAYwBAgMEBQYHCAkKCw=="
     assert len(response.parsed.data) == 1
-    assert response.parsed.data[0].area == Area.AT
-    assert response.parsed.data[0].direction == Direction.UP
-    assert response.parsed.data[0].prices[0].price == 45.50
+    assert response.parsed.data[0].area == "AT"
+    assert response.parsed.data[0].direction == "up"
     assert response.parsed.data[0].prices[0].price_per_mwh == 45.50
 
 
@@ -913,10 +912,10 @@ def test_get_cross_border_marginal_prices_unauthorized(authenticated_client):
 
     response = get_cross_border_marginal_prices.sync_detailed(
         client=authenticated_client,
-        area=Area.AT,
+        area="AT",
         period_start_at=datetime(2026, 3, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2026, 3, 1, 1, 0, 0, tzinfo=timezone.utc),
-        reserve_type=ReserveType.AFRR,
+        reserve_type="aFRR",
     )
 
     assert response.status_code == 401
@@ -934,10 +933,10 @@ async def test_async_get_cross_border_marginal_prices(authenticated_client, mock
 
     response = await get_cross_border_marginal_prices.asyncio_detailed(
         client=authenticated_client,
-        area=Area.AT,
+        area="AT",
         period_start_at=datetime(2026, 3, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2026, 3, 1, 1, 0, 0, tzinfo=timezone.utc),
-        reserve_type=ReserveType.AFRR,
+        reserve_type="aFRR",
     )
 
     assert response.status_code == 200
@@ -955,6 +954,7 @@ def mock_cross_border_energy_volumes_response():
             "endAt": "2026-03-01T01:00:00Z"
         },
         "hasMore": False,
+        "nextUpdatedSince": "2025-01-02T09:15:00Z",
         "data": [
             {
                 "fromArea": "EE",
@@ -962,14 +962,13 @@ def mock_cross_border_energy_volumes_response():
                 "toArea": "FI",
                 "toEicCode": "10YFI-1--------U",
                 "reserveType": "aFRR",
-                "activationType": "not_applicable",
+                "activationType": "notApplicable",
                 "volumes": [
                     {
                         "period": {
                             "startAt": "2026-03-01T00:00:00Z",
                             "endAt": "2026-03-01T00:15:00Z"
                         },
-                        "volume": 250.5,
                         "volumeInMw": 250.5
                     }
                 ]
@@ -987,21 +986,21 @@ def test_get_cross_border_energy_volumes_success(authenticated_client, mock_cros
 
     response = get_cross_border_energy_volumes.sync_detailed(
         client=authenticated_client,
-        area=Area.FI,
+        area="FI",
         period_start_at=datetime(2026, 3, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2026, 3, 1, 1, 0, 0, tzinfo=timezone.utc),
-        reserve_type=ReserveType.AFRR,
+        reserve_type="aFRR",
+        other_area="EE",
     )
 
     assert response.status_code == 200
     assert response.parsed is not None
     assert response.parsed.has_more is False
     assert len(response.parsed.data) == 1
-    assert response.parsed.data[0].from_area == Area.EE
-    assert response.parsed.data[0].to_area == Area.FI
-    assert response.parsed.data[0].reserve_type == ReserveType.AFRR
-    assert response.parsed.data[0].activation_type == ActivationType.NOT_APPLICABLE
-    assert response.parsed.data[0].volumes[0].volume == 250.5
+    assert response.parsed.data[0].from_area == "EE"
+    assert response.parsed.data[0].to_area == "FI"
+    assert response.parsed.data[0].reserve_type == "aFRR"
+    assert response.parsed.data[0].activation_type == "notApplicable"
     assert response.parsed.data[0].volumes[0].volume_in_mw == 250.5
 
 
@@ -1021,10 +1020,11 @@ def test_get_cross_border_energy_volumes_unauthorized(authenticated_client):
 
     response = get_cross_border_energy_volumes.sync_detailed(
         client=authenticated_client,
-        area=Area.FI,
+        area="FI",
         period_start_at=datetime(2026, 3, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2026, 3, 1, 1, 0, 0, tzinfo=timezone.utc),
-        reserve_type=ReserveType.AFRR,
+        reserve_type="aFRR",
+        other_area="EE",
     )
 
     assert response.status_code == 401
@@ -1042,10 +1042,11 @@ async def test_async_get_cross_border_energy_volumes(authenticated_client, mock_
 
     response = await get_cross_border_energy_volumes.asyncio_detailed(
         client=authenticated_client,
-        area=Area.FI,
+        area="FI",
         period_start_at=datetime(2026, 3, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2026, 3, 1, 1, 0, 0, tzinfo=timezone.utc),
-        reserve_type=ReserveType.AFRR,
+        reserve_type="aFRR",
+        other_area="EE",
     )
 
     assert response.status_code == 200
@@ -1060,6 +1061,7 @@ def test_get_cross_border_energy_volumes_pagination(authenticated_client, mock_c
     paginated_response = {
         **mock_cross_border_energy_volumes_response,
         "hasMore": True,
+        "nextUpdatedSince": "2025-01-02T09:15:00Z",
         "nextCursor": "v1:AAAAAYwBAgMEBQYHCAkKCw==",
     }
 
@@ -1069,10 +1071,11 @@ def test_get_cross_border_energy_volumes_pagination(authenticated_client, mock_c
 
     response = get_cross_border_energy_volumes.sync_detailed(
         client=authenticated_client,
-        area=Area.FI,
+        area="FI",
         period_start_at=datetime(2026, 3, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2026, 3, 1, 1, 0, 0, tzinfo=timezone.utc),
-        reserve_type=ReserveType.AFRR,
+        reserve_type="aFRR",
+        other_area="EE",
         cursor="v1:AAAAAYwBAgMEBQYHCAkKCw==",
         limit=100,
     )
@@ -1098,6 +1101,7 @@ def mock_cross_border_available_capacity_response():
             "endAt": "2025-01-02T00:00:00Z"
         },
         "hasMore": False,
+        "nextUpdatedSince": "2025-01-02T09:15:00Z",
         "data": [
             {
                 "fromArea": "FI",
@@ -1146,11 +1150,11 @@ def test_get_cross_border_available_capacity_success(
 
     response = get_cross_border_available_capacity.sync_detailed(
         client=authenticated_client,
-        area=Area.FI,
-        other_area=Area.SE3,
+        area="FI",
+        other_area="SE3",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
-        reserve_type=ReserveType.AFRR,
+        reserve_type="aFRR",
     )
 
     assert response.status_code == 200
@@ -1158,12 +1162,12 @@ def test_get_cross_border_available_capacity_success(
     assert response.parsed.has_more is False
     # Both border directions are returned (area -> other-area and other-area -> area).
     assert len(response.parsed.data) == 2
-    assert response.parsed.data[0].from_area == Area.FI
-    assert response.parsed.data[0].to_area == Area.SE3
-    assert response.parsed.data[0].reserve_type == ReserveType.AFRR
+    assert response.parsed.data[0].from_area == "FI"
+    assert response.parsed.data[0].to_area == "SE3"
+    assert response.parsed.data[0].reserve_type == "aFRR"
     assert response.parsed.data[0].available_capacities[0].available_capacity_in_mw == 150.0
-    assert response.parsed.data[1].from_area == Area.SE3
-    assert response.parsed.data[1].to_area == Area.FI
+    assert response.parsed.data[1].from_area == "SE3"
+    assert response.parsed.data[1].to_area == "FI"
     assert response.parsed.data[1].available_capacities[0].available_capacity_in_mw == 80.5
 
 
@@ -1183,11 +1187,11 @@ def test_get_cross_border_available_capacity_unauthorized(authenticated_client):
 
     response = get_cross_border_available_capacity.sync_detailed(
         client=authenticated_client,
-        area=Area.FI,
-        other_area=Area.SE3,
+        area="FI",
+        other_area="SE3",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
-        reserve_type=ReserveType.AFRR,
+        reserve_type="aFRR",
     )
 
     assert response.status_code == 401
@@ -1207,11 +1211,11 @@ async def test_async_get_cross_border_available_capacity(
 
     response = await get_cross_border_available_capacity.asyncio_detailed(
         client=authenticated_client,
-        area=Area.FI,
-        other_area=Area.SE3,
+        area="FI",
+        other_area="SE3",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
-        reserve_type=ReserveType.AFRR,
+        reserve_type="aFRR",
     )
 
     assert response.status_code == 200
@@ -1228,6 +1232,7 @@ def test_get_cross_border_available_capacity_pagination(
     paginated_response = {
         **mock_cross_border_available_capacity_response,
         "hasMore": True,
+        "nextUpdatedSince": "2025-01-02T09:15:00Z",
         "nextCursor": "v1:AAAAAYwBAgMEBQYHCAkKCw==",
     }
 
@@ -1237,11 +1242,11 @@ def test_get_cross_border_available_capacity_pagination(
 
     response = get_cross_border_available_capacity.sync_detailed(
         client=authenticated_client,
-        area=Area.FI,
-        other_area=Area.SE3,
+        area="FI",
+        other_area="SE3",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
-        reserve_type=ReserveType.AFRR,
+        reserve_type="aFRR",
         cursor="v1:AAAAAYwBAgMEBQYHCAkKCw==",
         limit=100,
     )
@@ -1267,6 +1272,7 @@ def mock_current_imbalance_total_volumes_response():
             "endAt": "2025-01-01T02:00:00Z"
         },
         "hasMore": False,
+        "nextUpdatedSince": "2025-01-02T09:15:00Z",
         "data": [
             {
                 "area": "EE",
@@ -1307,7 +1313,7 @@ def test_get_current_imbalance_total_volumes_success(
 
     response = get_current_imbalance_total_volumes.sync_detailed(
         client=authenticated_client,
-        area=Area.EE,
+        area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 1, 2, 0, 0, tzinfo=timezone.utc),
     )
@@ -1316,12 +1322,12 @@ def test_get_current_imbalance_total_volumes_success(
     assert response.parsed is not None
     assert response.parsed.has_more is False
     assert len(response.parsed.data) == 1
-    assert response.parsed.data[0].area == Area.EE
+    assert response.parsed.data[0].area == "EE"
     # Per-minute values carry an unsigned magnitude plus a direction.
     assert response.parsed.data[0].volumes[0].average_power_in_mw == 4.2
-    assert response.parsed.data[0].volumes[0].direction == TotalImbalanceDirection.SURPLUS
+    assert response.parsed.data[0].volumes[0].direction == "surplus"
     assert response.parsed.data[0].volumes[1].average_power_in_mw == 7.5
-    assert response.parsed.data[0].volumes[1].direction == TotalImbalanceDirection.DEFICIT
+    assert response.parsed.data[0].volumes[1].direction == "deficit"
 
 
 @respx.mock
@@ -1340,7 +1346,7 @@ def test_get_current_imbalance_total_volumes_unauthorized(authenticated_client):
 
     response = get_current_imbalance_total_volumes.sync_detailed(
         client=authenticated_client,
-        area=Area.EE,
+        area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 1, 2, 0, 0, tzinfo=timezone.utc),
     )
@@ -1362,7 +1368,7 @@ async def test_async_get_current_imbalance_total_volumes(
 
     response = await get_current_imbalance_total_volumes.asyncio_detailed(
         client=authenticated_client,
-        area=Area.EE,
+        area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 1, 2, 0, 0, tzinfo=timezone.utc),
     )
@@ -1381,6 +1387,7 @@ def test_get_current_imbalance_total_volumes_pagination(
     paginated_response = {
         **mock_current_imbalance_total_volumes_response,
         "hasMore": True,
+        "nextUpdatedSince": "2025-01-02T09:15:00Z",
         "nextCursor": "v1:AAAAAYwBAgMEBQYHCAkKCw==",
     }
 
@@ -1390,7 +1397,7 @@ def test_get_current_imbalance_total_volumes_pagination(
 
     response = get_current_imbalance_total_volumes.sync_detailed(
         client=authenticated_client,
-        area=Area.EE,
+        area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 1, 2, 0, 0, tzinfo=timezone.utc),
         cursor="v1:AAAAAYwBAgMEBQYHCAkKCw==",
@@ -1415,6 +1422,7 @@ def mock_day_ahead_energy_prices_response():
             "endAt": "2025-01-02T00:00:00Z"
         },
         "hasMore": False,
+        "nextUpdatedSince": "2025-01-02T09:15:00Z",
         "data": [
             {
                 "area": "FI",
@@ -1426,7 +1434,6 @@ def mock_day_ahead_energy_prices_response():
                             "startAt": "2025-01-01T00:00:00Z",
                             "endAt": "2025-01-01T01:00:00Z"
                         },
-                        "price": 45.67,
                         "pricePerMwh": 45.67
                     },
                     {
@@ -1434,7 +1441,6 @@ def mock_day_ahead_energy_prices_response():
                             "startAt": "2025-01-01T01:00:00Z",
                             "endAt": "2025-01-01T02:00:00Z"
                         },
-                        "price": 38.21,
                         "pricePerMwh": 38.21
                     }
                 ]
@@ -1452,7 +1458,7 @@ def test_get_day_ahead_energy_prices_success(authenticated_client, mock_day_ahea
 
     response = get_day_ahead_energy_prices.sync_detailed(
         client=authenticated_client,
-        area=Area.FI,
+        area="FI",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
     )
@@ -1461,12 +1467,10 @@ def test_get_day_ahead_energy_prices_success(authenticated_client, mock_day_ahea
     assert response.parsed is not None
     assert response.parsed.has_more is False
     assert len(response.parsed.data) == 1
-    assert response.parsed.data[0].area == Area.FI
-    assert response.parsed.data[0].currency == Currency.EUR
+    assert response.parsed.data[0].area == "FI"
+    assert response.parsed.data[0].currency == "EUR"
     assert len(response.parsed.data[0].prices) == 2
-    assert response.parsed.data[0].prices[0].price == 45.67
     assert response.parsed.data[0].prices[0].price_per_mwh == 45.67
-    assert response.parsed.data[0].prices[1].price == 38.21
     assert response.parsed.data[0].prices[1].price_per_mwh == 38.21
 
 
@@ -1479,6 +1483,7 @@ def test_get_day_ahead_energy_prices_pagination(authenticated_client):
             "endAt": "2025-01-08T00:00:00Z"
         },
         "hasMore": True,
+        "nextUpdatedSince": "2025-01-02T09:15:00Z",
         "nextCursor": "v1:AAAAAYwBAgMEBQYHCAkKCw==",
         "data": [
             {
@@ -1491,7 +1496,6 @@ def test_get_day_ahead_energy_prices_pagination(authenticated_client):
                             "startAt": "2025-01-01T00:00:00Z",
                             "endAt": "2025-01-01T01:00:00Z"
                         },
-                        "price": 45.67,
                         "pricePerMwh": 45.67
                     }
                 ]
@@ -1505,7 +1509,7 @@ def test_get_day_ahead_energy_prices_pagination(authenticated_client):
 
     response = get_day_ahead_energy_prices.sync_detailed(
         client=authenticated_client,
-        area=Area.FI,
+        area="FI",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 8, 0, 0, 0, tzinfo=timezone.utc),
         limit=100,
@@ -1534,7 +1538,7 @@ def test_get_day_ahead_energy_prices_unauthorized(authenticated_client):
 
     response = get_day_ahead_energy_prices.sync_detailed(
         client=authenticated_client,
-        area=Area.FI,
+        area="FI",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
     )
@@ -1560,7 +1564,7 @@ def test_get_day_ahead_energy_prices_not_implemented(authenticated_client):
 
     response = get_day_ahead_energy_prices.sync_detailed(
         client=authenticated_client,
-        area=Area.EE,
+        area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
     )
@@ -1580,7 +1584,7 @@ async def test_async_get_day_ahead_energy_prices(authenticated_client, mock_day_
 
     response = await get_day_ahead_energy_prices.asyncio_detailed(
         client=authenticated_client,
-        area=Area.FI,
+        area="FI",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
     )
@@ -1588,5 +1592,5 @@ async def test_async_get_day_ahead_energy_prices(authenticated_client, mock_day_
     assert response.status_code == 200
     assert response.parsed is not None
     assert len(response.parsed.data) == 1
-    assert response.parsed.data[0].area == Area.FI
+    assert response.parsed.data[0].area == "FI"
     assert response.parsed.data[0].prices[0].price_per_mwh == 45.67
