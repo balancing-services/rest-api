@@ -2,21 +2,20 @@ project_name_override: "balancing-services"
 package_name_override: "balancing_services"
 python_version: "3.10"
 use_union_operator: true
-# Enum generation: we currently emit Python `Enum` classes. When an enum's values
-# are not valid Python identifiers (e.g. EicCode's "10YIT-GRTN-----B"),
-# openapi-python-client cannot derive names and falls back to positional ones —
-# VALUE_0, VALUE_1, ... — bound purely by each value's order in openapi.yaml.
-# Inserting or reordering a value silently rebinds every VALUE_N after it to a
-# different code, so e.g. `EicCode.VALUE_19` can point at a different EIC across
-# releases. Until this is fixed, append new EicCode values at the END of the enum
-# in openapi.yaml rather than inserting them in sorted order.
+# Enum generation: we emit `Literal[...]` string types rather than Python `Enum`
+# classes (`literal_enums: true` below). Each enum schema becomes a
+# `Literal["10YIT-GRTN-----B", ...]` type alias plus a generated `<NAME>_VALUES`
+# set and a `check_<name>` helper. Consumers pass and compare the bare string
+# values directly (e.g. `area="EE"`); there are no enum members such as `Area.AT`
+# or positional `EicCode.VALUE_19`, and model fields typed as these enums hold
+# plain `str` (no `.value` accessor).
 #
-# REST API 2.0 (breaking change): set `literal_enums: true` below. That generates
-# `Literal["10YIT-GRTN-----B", ...]` types instead of Enum classes — consumers use
-# the string values directly and no positional member names exist, so adding or
-# reordering enum values can never rebind anything. It is breaking because it
-# removes enum-member access such as `Area.AT` and `EicCode.VALUE_19`.
-# literal_enums: true
+# Because a Literal has no member names bound to value order, adding or reordering
+# enum values in openapi.yaml can never silently rebind a positional name — the
+# old caveat about appending new EicCode values at the END no longer applies.
+#
+# This is a REST API 2.0 breaking change: it removes enum-member access.
+literal_enums: true
 # Format generated code at 88 columns (black's width) rather than letting
 # `ruff format` pick up the project's line-length of 120. Keeps the generated
 # client stable across regenerations regardless of the formatter's default.
