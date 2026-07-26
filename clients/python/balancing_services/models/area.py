@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Literal, cast
 
 Area = Literal[
     "AT",
@@ -103,5 +103,5 @@ AREA_VALUES: set[Area] = {
 
 def check_area(value: str) -> Area:
     if value in AREA_VALUES:
-        return value
+        return cast(Area, value)
     raise TypeError(f"Unexpected value {value!r}. Expected one of {AREA_VALUES!r}")

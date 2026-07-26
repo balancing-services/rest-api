@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Literal, cast
 
 Currency = Literal["BGN", "CHF", "EUR", "HUF", "PLN", "RON", "UAH"]
 
@@ -15,5 +15,5 @@ CURRENCY_VALUES: set[Currency] = {
 
 def check_currency(value: str) -> Currency:
     if value in CURRENCY_VALUES:
-        return value
+        return cast(Currency, value)
     raise TypeError(f"Unexpected value {value!r}. Expected one of {CURRENCY_VALUES!r}")

@@ -50,6 +50,9 @@ uvx openapi-python-client@0.29.0 generate \
     --config config.yaml \
     --meta none
 
+echo "Making literal-enum validators mypy-version-independent..."
+python3 fix_enum_validator_casts.py
+
 echo "Fixing types with Ruff..."
 uvx ruff check --fix balancing_services --exit-zero --quiet || true
 

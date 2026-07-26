@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Literal, cast
 
 Direction = Literal["down", "symmetric", "up"]
 
@@ -11,5 +11,5 @@ DIRECTION_VALUES: set[Direction] = {
 
 def check_direction(value: str) -> Direction:
     if value in DIRECTION_VALUES:
-        return value
+        return cast(Direction, value)
     raise TypeError(f"Unexpected value {value!r}. Expected one of {DIRECTION_VALUES!r}")
