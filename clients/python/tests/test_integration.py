@@ -29,7 +29,7 @@ from balancing_services.api.default import (
 def authenticated_client():
     """Create an authenticated client for testing."""
     return AuthenticatedClient(
-        base_url="https://api.balancing.services/v1",
+        base_url="https://api.balancing.services/v2",
         token="test_token_12345"
     )
 
@@ -106,7 +106,7 @@ def mock_balancing_energy_bids_response():
 def test_get_imbalance_prices_success(authenticated_client, mock_imbalance_prices_response):
     """Test successful imbalance prices request."""
     respx.get(
-        "https://api.balancing.services/v1/imbalance/prices"
+        "https://api.balancing.services/v2/imbalance/prices"
     ).mock(return_value=Response(200, json=mock_imbalance_prices_response))
 
     response = get_imbalance_prices.sync_detailed(
@@ -135,7 +135,7 @@ def test_get_imbalance_prices_unauthorized(authenticated_client):
     }
 
     respx.get(
-        "https://api.balancing.services/v1/imbalance/prices"
+        "https://api.balancing.services/v2/imbalance/prices"
     ).mock(return_value=Response(401, json=error_response))
 
     response = get_imbalance_prices.sync_detailed(
@@ -161,7 +161,7 @@ def test_get_imbalance_prices_bad_request(authenticated_client):
     }
 
     respx.get(
-        "https://api.balancing.services/v1/imbalance/prices"
+        "https://api.balancing.services/v2/imbalance/prices"
     ).mock(return_value=Response(400, json=error_response))
 
     response = get_imbalance_prices.sync_detailed(
@@ -180,7 +180,7 @@ def test_get_imbalance_prices_bad_request(authenticated_client):
 def test_get_balancing_energy_bids_pagination(authenticated_client, mock_balancing_energy_bids_response):
     """Test pagination with balancing energy bids."""
     respx.get(
-        "https://api.balancing.services/v1/balancing/energy/bids"
+        "https://api.balancing.services/v2/balancing/energy/bids"
     ).mock(return_value=Response(200, json=mock_balancing_energy_bids_response))
 
     response = get_balancing_energy_bids.sync_detailed(
@@ -205,7 +205,7 @@ def test_get_balancing_energy_bids_pagination(authenticated_client, mock_balanci
 def test_authentication_header_included(authenticated_client, mock_imbalance_prices_response):
     """Test that authentication header is included in requests."""
     route = respx.get(
-        "https://api.balancing.services/v1/imbalance/prices",
+        "https://api.balancing.services/v2/imbalance/prices",
         headers={"Authorization": "Bearer test_token_12345"}
     ).mock(return_value=Response(200, json=mock_imbalance_prices_response))
 
@@ -225,7 +225,7 @@ def test_authentication_header_included(authenticated_client, mock_imbalance_pri
 async def test_async_get_imbalance_prices(authenticated_client, mock_imbalance_prices_response):
     """Test async request for imbalance prices."""
     respx.get(
-        "https://api.balancing.services/v1/imbalance/prices"
+        "https://api.balancing.services/v2/imbalance/prices"
     ).mock(return_value=Response(200, json=mock_imbalance_prices_response))
 
     response = await get_imbalance_prices.asyncio_detailed(
@@ -308,7 +308,7 @@ def mock_cross_zonal_allocation_response():
 def test_get_balancing_energy_offered_volumes_success(authenticated_client, mock_offered_volumes_response):
     """Test successful offered balancing energy volumes request."""
     respx.get(
-        "https://api.balancing.services/v1/balancing/energy/offered-volumes"
+        "https://api.balancing.services/v2/balancing/energy/offered-volumes"
     ).mock(return_value=Response(200, json=mock_offered_volumes_response))
 
     response = get_balancing_energy_offered_volumes.sync_detailed(
@@ -338,7 +338,7 @@ def test_get_balancing_energy_offered_volumes_unauthorized(authenticated_client)
     }
 
     respx.get(
-        "https://api.balancing.services/v1/balancing/energy/offered-volumes"
+        "https://api.balancing.services/v2/balancing/energy/offered-volumes"
     ).mock(return_value=Response(401, json=error_response))
 
     response = get_balancing_energy_offered_volumes.sync_detailed(
@@ -359,7 +359,7 @@ def test_get_balancing_energy_offered_volumes_unauthorized(authenticated_client)
 async def test_async_get_balancing_energy_offered_volumes(authenticated_client, mock_offered_volumes_response):
     """Test async request for offered balancing energy volumes."""
     respx.get(
-        "https://api.balancing.services/v1/balancing/energy/offered-volumes"
+        "https://api.balancing.services/v2/balancing/energy/offered-volumes"
     ).mock(return_value=Response(200, json=mock_offered_volumes_response))
 
     response = await get_balancing_energy_offered_volumes.asyncio_detailed(
@@ -380,7 +380,7 @@ async def test_async_get_balancing_energy_offered_volumes(authenticated_client, 
 def test_get_cross_zonal_capacity_allocation_success(authenticated_client, mock_cross_zonal_allocation_response):
     """Test successful cross-zonal capacity allocation request."""
     respx.get(
-        "https://api.balancing.services/v1/balancing/capacity/cross-zonal-allocation"
+        "https://api.balancing.services/v2/balancing/capacity/cross-zonal-allocation"
     ).mock(return_value=Response(200, json=mock_cross_zonal_allocation_response))
 
     response = get_cross_zonal_capacity_allocation.sync_detailed(
@@ -412,7 +412,7 @@ def test_get_cross_zonal_capacity_allocation_unauthorized(authenticated_client):
     }
 
     respx.get(
-        "https://api.balancing.services/v1/balancing/capacity/cross-zonal-allocation"
+        "https://api.balancing.services/v2/balancing/capacity/cross-zonal-allocation"
     ).mock(return_value=Response(401, json=error_response))
 
     response = get_cross_zonal_capacity_allocation.sync_detailed(
@@ -434,7 +434,7 @@ def test_get_cross_zonal_capacity_allocation_unauthorized(authenticated_client):
 async def test_async_get_cross_zonal_capacity_allocation(authenticated_client, mock_cross_zonal_allocation_response):
     """Test async request for cross-zonal capacity allocation."""
     respx.get(
-        "https://api.balancing.services/v1/balancing/capacity/cross-zonal-allocation"
+        "https://api.balancing.services/v2/balancing/capacity/cross-zonal-allocation"
     ).mock(return_value=Response(200, json=mock_cross_zonal_allocation_response))
 
     response = await get_cross_zonal_capacity_allocation.asyncio_detailed(
@@ -488,7 +488,7 @@ def mock_balancing_energy_demand_response():
 def test_get_balancing_energy_demand_success(authenticated_client, mock_balancing_energy_demand_response):
     """Test successful balancing energy demand request."""
     respx.get(
-        "https://api.balancing.services/v1/balancing/energy/demand"
+        "https://api.balancing.services/v2/balancing/energy/demand"
     ).mock(return_value=Response(200, json=mock_balancing_energy_demand_response))
 
     response = get_balancing_energy_demand.sync_detailed(
@@ -520,7 +520,7 @@ def test_get_balancing_energy_demand_pagination(authenticated_client, mock_balan
     }
 
     route = respx.get(
-        "https://api.balancing.services/v1/balancing/energy/demand"
+        "https://api.balancing.services/v2/balancing/energy/demand"
     ).mock(return_value=Response(200, json=paginated_response))
 
     response = get_balancing_energy_demand.sync_detailed(
@@ -553,7 +553,7 @@ def test_get_balancing_energy_demand_unauthorized(authenticated_client):
     }
 
     respx.get(
-        "https://api.balancing.services/v1/balancing/energy/demand"
+        "https://api.balancing.services/v2/balancing/energy/demand"
     ).mock(return_value=Response(401, json=error_response))
 
     response = get_balancing_energy_demand.sync_detailed(
@@ -574,7 +574,7 @@ def test_get_balancing_energy_demand_unauthorized(authenticated_client):
 async def test_async_get_balancing_energy_demand(authenticated_client, mock_balancing_energy_demand_response):
     """Test async request for balancing energy demand."""
     respx.get(
-        "https://api.balancing.services/v1/balancing/energy/demand"
+        "https://api.balancing.services/v2/balancing/energy/demand"
     ).mock(return_value=Response(200, json=mock_balancing_energy_demand_response))
 
     response = await get_balancing_energy_demand.asyncio_detailed(
@@ -595,7 +595,7 @@ async def test_async_get_balancing_energy_demand(authenticated_client, mock_bala
 def test_get_balancing_energy_satisfied_demand_success(authenticated_client, mock_balancing_energy_demand_response):
     """Test successful satisfied balancing energy demand request."""
     respx.get(
-        "https://api.balancing.services/v1/balancing/energy/satisfied-demand"
+        "https://api.balancing.services/v2/balancing/energy/satisfied-demand"
     ).mock(return_value=Response(200, json=mock_balancing_energy_demand_response))
 
     response = get_balancing_energy_satisfied_demand.sync_detailed(
@@ -626,7 +626,7 @@ def test_get_balancing_energy_satisfied_demand_pagination(authenticated_client, 
     }
 
     route = respx.get(
-        "https://api.balancing.services/v1/balancing/energy/satisfied-demand"
+        "https://api.balancing.services/v2/balancing/energy/satisfied-demand"
     ).mock(return_value=Response(200, json=paginated_response))
 
     response = get_balancing_energy_satisfied_demand.sync_detailed(
@@ -659,7 +659,7 @@ def test_get_balancing_energy_satisfied_demand_unauthorized(authenticated_client
     }
 
     respx.get(
-        "https://api.balancing.services/v1/balancing/energy/satisfied-demand"
+        "https://api.balancing.services/v2/balancing/energy/satisfied-demand"
     ).mock(return_value=Response(401, json=error_response))
 
     response = get_balancing_energy_satisfied_demand.sync_detailed(
@@ -680,7 +680,7 @@ def test_get_balancing_energy_satisfied_demand_unauthorized(authenticated_client
 async def test_async_get_balancing_energy_satisfied_demand(authenticated_client, mock_balancing_energy_demand_response):
     """Test async request for satisfied balancing energy demand."""
     respx.get(
-        "https://api.balancing.services/v1/balancing/energy/satisfied-demand"
+        "https://api.balancing.services/v2/balancing/energy/satisfied-demand"
     ).mock(return_value=Response(200, json=mock_balancing_energy_demand_response))
 
     response = await get_balancing_energy_satisfied_demand.asyncio_detailed(
@@ -734,7 +734,7 @@ def mock_balancing_capacity_demand_response():
 def test_get_balancing_capacity_demand_success(authenticated_client, mock_balancing_capacity_demand_response):
     """Test successful balancing capacity demand request."""
     respx.get(
-        "https://api.balancing.services/v1/balancing/capacity/demand"
+        "https://api.balancing.services/v2/balancing/capacity/demand"
     ).mock(return_value=Response(200, json=mock_balancing_capacity_demand_response))
 
     response = get_balancing_capacity_demand.sync_detailed(
@@ -768,7 +768,7 @@ def test_get_balancing_capacity_demand_pagination(authenticated_client, mock_bal
     }
 
     route = respx.get(
-        "https://api.balancing.services/v1/balancing/capacity/demand"
+        "https://api.balancing.services/v2/balancing/capacity/demand"
     ).mock(return_value=Response(200, json=paginated_response))
 
     response = get_balancing_capacity_demand.sync_detailed(
@@ -801,7 +801,7 @@ def test_get_balancing_capacity_demand_unauthorized(authenticated_client):
     }
 
     respx.get(
-        "https://api.balancing.services/v1/balancing/capacity/demand"
+        "https://api.balancing.services/v2/balancing/capacity/demand"
     ).mock(return_value=Response(401, json=error_response))
 
     response = get_balancing_capacity_demand.sync_detailed(
@@ -822,7 +822,7 @@ def test_get_balancing_capacity_demand_unauthorized(authenticated_client):
 async def test_async_get_balancing_capacity_demand(authenticated_client, mock_balancing_capacity_demand_response):
     """Test async request for balancing capacity demand."""
     respx.get(
-        "https://api.balancing.services/v1/balancing/capacity/demand"
+        "https://api.balancing.services/v2/balancing/capacity/demand"
     ).mock(return_value=Response(200, json=mock_balancing_capacity_demand_response))
 
     response = await get_balancing_capacity_demand.asyncio_detailed(
@@ -875,7 +875,7 @@ def mock_cross_border_marginal_prices_response():
 def test_get_cross_border_marginal_prices_success(authenticated_client, mock_cross_border_marginal_prices_response):
     """Test successful cross-border marginal prices request."""
     respx.get(
-        "https://api.balancing.services/v1/balancing/energy/cross-border-marginal-prices"
+        "https://api.balancing.services/v2/balancing/energy/cross-border-marginal-prices"
     ).mock(return_value=Response(200, json=mock_cross_border_marginal_prices_response))
 
     response = get_cross_border_marginal_prices.sync_detailed(
@@ -907,7 +907,7 @@ def test_get_cross_border_marginal_prices_unauthorized(authenticated_client):
     }
 
     respx.get(
-        "https://api.balancing.services/v1/balancing/energy/cross-border-marginal-prices"
+        "https://api.balancing.services/v2/balancing/energy/cross-border-marginal-prices"
     ).mock(return_value=Response(401, json=error_response))
 
     response = get_cross_border_marginal_prices.sync_detailed(
@@ -928,7 +928,7 @@ def test_get_cross_border_marginal_prices_unauthorized(authenticated_client):
 async def test_async_get_cross_border_marginal_prices(authenticated_client, mock_cross_border_marginal_prices_response):
     """Test async request for cross-border marginal prices."""
     respx.get(
-        "https://api.balancing.services/v1/balancing/energy/cross-border-marginal-prices"
+        "https://api.balancing.services/v2/balancing/energy/cross-border-marginal-prices"
     ).mock(return_value=Response(200, json=mock_cross_border_marginal_prices_response))
 
     response = await get_cross_border_marginal_prices.asyncio_detailed(
@@ -981,7 +981,7 @@ def mock_cross_border_energy_volumes_response():
 def test_get_cross_border_energy_volumes_success(authenticated_client, mock_cross_border_energy_volumes_response):
     """Test successful cross-border balancing energy volumes request."""
     respx.get(
-        "https://api.balancing.services/v1/balancing/energy/cross-border-volumes"
+        "https://api.balancing.services/v2/balancing/energy/cross-border-volumes"
     ).mock(return_value=Response(200, json=mock_cross_border_energy_volumes_response))
 
     response = get_cross_border_energy_volumes.sync_detailed(
@@ -1015,7 +1015,7 @@ def test_get_cross_border_energy_volumes_unauthorized(authenticated_client):
     }
 
     respx.get(
-        "https://api.balancing.services/v1/balancing/energy/cross-border-volumes"
+        "https://api.balancing.services/v2/balancing/energy/cross-border-volumes"
     ).mock(return_value=Response(401, json=error_response))
 
     response = get_cross_border_energy_volumes.sync_detailed(
@@ -1037,7 +1037,7 @@ def test_get_cross_border_energy_volumes_unauthorized(authenticated_client):
 async def test_async_get_cross_border_energy_volumes(authenticated_client, mock_cross_border_energy_volumes_response):
     """Test async request for cross-border balancing energy volumes."""
     respx.get(
-        "https://api.balancing.services/v1/balancing/energy/cross-border-volumes"
+        "https://api.balancing.services/v2/balancing/energy/cross-border-volumes"
     ).mock(return_value=Response(200, json=mock_cross_border_energy_volumes_response))
 
     response = await get_cross_border_energy_volumes.asyncio_detailed(
@@ -1066,7 +1066,7 @@ def test_get_cross_border_energy_volumes_pagination(authenticated_client, mock_c
     }
 
     route = respx.get(
-        "https://api.balancing.services/v1/balancing/energy/cross-border-volumes"
+        "https://api.balancing.services/v2/balancing/energy/cross-border-volumes"
     ).mock(return_value=Response(200, json=paginated_response))
 
     response = get_cross_border_energy_volumes.sync_detailed(
@@ -1145,7 +1145,7 @@ def test_get_cross_border_available_capacity_success(
 ):
     """Test successful cross-border available capacity request."""
     respx.get(
-        "https://api.balancing.services/v1/balancing/cross-border/available-capacity"
+        "https://api.balancing.services/v2/balancing/cross-border/available-capacity"
     ).mock(return_value=Response(200, json=mock_cross_border_available_capacity_response))
 
     response = get_cross_border_available_capacity.sync_detailed(
@@ -1182,7 +1182,7 @@ def test_get_cross_border_available_capacity_unauthorized(authenticated_client):
     }
 
     respx.get(
-        "https://api.balancing.services/v1/balancing/cross-border/available-capacity"
+        "https://api.balancing.services/v2/balancing/cross-border/available-capacity"
     ).mock(return_value=Response(401, json=error_response))
 
     response = get_cross_border_available_capacity.sync_detailed(
@@ -1206,7 +1206,7 @@ async def test_async_get_cross_border_available_capacity(
 ):
     """Test async request for cross-border available capacity."""
     respx.get(
-        "https://api.balancing.services/v1/balancing/cross-border/available-capacity"
+        "https://api.balancing.services/v2/balancing/cross-border/available-capacity"
     ).mock(return_value=Response(200, json=mock_cross_border_available_capacity_response))
 
     response = await get_cross_border_available_capacity.asyncio_detailed(
@@ -1237,7 +1237,7 @@ def test_get_cross_border_available_capacity_pagination(
     }
 
     route = respx.get(
-        "https://api.balancing.services/v1/balancing/cross-border/available-capacity"
+        "https://api.balancing.services/v2/balancing/cross-border/available-capacity"
     ).mock(return_value=Response(200, json=paginated_response))
 
     response = get_cross_border_available_capacity.sync_detailed(
@@ -1308,7 +1308,7 @@ def test_get_current_imbalance_total_volumes_success(
 ):
     """Test successful current imbalance total volumes request."""
     respx.get(
-        "https://api.balancing.services/v1/imbalance/total-volumes/current"
+        "https://api.balancing.services/v2/imbalance/total-volumes/current"
     ).mock(return_value=Response(200, json=mock_current_imbalance_total_volumes_response))
 
     response = get_current_imbalance_total_volumes.sync_detailed(
@@ -1341,7 +1341,7 @@ def test_get_current_imbalance_total_volumes_unauthorized(authenticated_client):
     }
 
     respx.get(
-        "https://api.balancing.services/v1/imbalance/total-volumes/current"
+        "https://api.balancing.services/v2/imbalance/total-volumes/current"
     ).mock(return_value=Response(401, json=error_response))
 
     response = get_current_imbalance_total_volumes.sync_detailed(
@@ -1363,7 +1363,7 @@ async def test_async_get_current_imbalance_total_volumes(
 ):
     """Test async request for current imbalance total volumes."""
     respx.get(
-        "https://api.balancing.services/v1/imbalance/total-volumes/current"
+        "https://api.balancing.services/v2/imbalance/total-volumes/current"
     ).mock(return_value=Response(200, json=mock_current_imbalance_total_volumes_response))
 
     response = await get_current_imbalance_total_volumes.asyncio_detailed(
@@ -1392,7 +1392,7 @@ def test_get_current_imbalance_total_volumes_pagination(
     }
 
     route = respx.get(
-        "https://api.balancing.services/v1/imbalance/total-volumes/current"
+        "https://api.balancing.services/v2/imbalance/total-volumes/current"
     ).mock(return_value=Response(200, json=paginated_response))
 
     response = get_current_imbalance_total_volumes.sync_detailed(
@@ -1453,7 +1453,7 @@ def mock_day_ahead_energy_prices_response():
 def test_get_day_ahead_energy_prices_success(authenticated_client, mock_day_ahead_energy_prices_response):
     """Test successful day-ahead energy prices request."""
     respx.get(
-        "https://api.balancing.services/v1/energy/day-ahead/prices"
+        "https://api.balancing.services/v2/energy/day-ahead/prices"
     ).mock(return_value=Response(200, json=mock_day_ahead_energy_prices_response))
 
     response = get_day_ahead_energy_prices.sync_detailed(
@@ -1504,7 +1504,7 @@ def test_get_day_ahead_energy_prices_pagination(authenticated_client):
     }
 
     respx.get(
-        "https://api.balancing.services/v1/energy/day-ahead/prices"
+        "https://api.balancing.services/v2/energy/day-ahead/prices"
     ).mock(return_value=Response(200, json=paginated_response))
 
     response = get_day_ahead_energy_prices.sync_detailed(
@@ -1533,7 +1533,7 @@ def test_get_day_ahead_energy_prices_unauthorized(authenticated_client):
     }
 
     respx.get(
-        "https://api.balancing.services/v1/energy/day-ahead/prices"
+        "https://api.balancing.services/v2/energy/day-ahead/prices"
     ).mock(return_value=Response(401, json=error_response))
 
     response = get_day_ahead_energy_prices.sync_detailed(
@@ -1559,7 +1559,7 @@ def test_get_day_ahead_energy_prices_not_implemented(authenticated_client):
     }
 
     respx.get(
-        "https://api.balancing.services/v1/energy/day-ahead/prices"
+        "https://api.balancing.services/v2/energy/day-ahead/prices"
     ).mock(return_value=Response(501, json=error_response))
 
     response = get_day_ahead_energy_prices.sync_detailed(
@@ -1579,7 +1579,7 @@ def test_get_day_ahead_energy_prices_not_implemented(authenticated_client):
 async def test_async_get_day_ahead_energy_prices(authenticated_client, mock_day_ahead_energy_prices_response):
     """Test async request for day-ahead energy prices."""
     respx.get(
-        "https://api.balancing.services/v1/energy/day-ahead/prices"
+        "https://api.balancing.services/v2/energy/day-ahead/prices"
     ).mock(return_value=Response(200, json=mock_day_ahead_energy_prices_response))
 
     response = await get_day_ahead_energy_prices.asyncio_detailed(

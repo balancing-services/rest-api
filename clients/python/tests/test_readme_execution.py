@@ -123,7 +123,7 @@ def mock_error_401():
 def test_quick_start_example_executes(mock_success_response):
     """Test that Quick Start example from README executes without errors."""
     # Mock the API endpoint
-    respx.get("https://api.balancing.services/v1/imbalance/prices").mock(
+    respx.get("https://api.balancing.services/v2/imbalance/prices").mock(
         return_value=Response(200, json=mock_success_response)
     )
 
@@ -146,7 +146,7 @@ def test_quick_start_example_executes(mock_success_response):
 def test_pagination_example_executes(mock_bids_response):
     """Test that Pagination example from README executes without errors."""
     # Mock the API endpoint
-    respx.get("https://api.balancing.services/v1/balancing/energy/bids").mock(
+    respx.get("https://api.balancing.services/v2/balancing/energy/bids").mock(
         return_value=Response(200, json=mock_bids_response)
     )
 
@@ -170,7 +170,7 @@ def test_pagination_example_executes(mock_bids_response):
 async def test_async_example_executes(mock_success_response):
     """Test that Async Usage example from README executes without errors."""
     # Mock the API endpoint
-    respx.get("https://api.balancing.services/v1/imbalance/prices").mock(
+    respx.get("https://api.balancing.services/v2/imbalance/prices").mock(
         return_value=Response(200, json=mock_success_response)
     )
 
@@ -201,7 +201,7 @@ async def test_async_example_executes(mock_success_response):
 def test_error_handling_example_executes(mock_error_401):
     """Test that Error Handling example from README executes without errors."""
     # Mock the API endpoint to return 401
-    respx.get("https://api.balancing.services/v1/imbalance/prices").mock(
+    respx.get("https://api.balancing.services/v2/imbalance/prices").mock(
         return_value=Response(401, json=mock_error_401)
     )
 
@@ -223,7 +223,7 @@ def test_error_handling_example_executes(mock_error_401):
 @respx.mock
 def test_string_based_approach_works(mock_success_response):
     """Under literal_enums, passing bare string values is the correct approach."""
-    respx.get("https://api.balancing.services/v1/imbalance/prices").mock(
+    respx.get("https://api.balancing.services/v2/imbalance/prices").mock(
         return_value=Response(200, json=mock_success_response)
     )
 
@@ -234,7 +234,7 @@ from balancing_services import AuthenticatedClient
 from balancing_services.api.default import get_imbalance_prices
 
 client = AuthenticatedClient(
-    base_url="https://api.balancing.services/v1",
+    base_url="https://api.balancing.services/v2",
     token="test"
 )
 

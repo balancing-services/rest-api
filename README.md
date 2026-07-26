@@ -17,9 +17,9 @@ The Balancing Services REST API provides access to real-time and historical elec
 
 ### API Server
 
-**Production API:** https://api.balancing.services/v1
+**Production API:** https://api.balancing.services/v2
 
-**Interactive Documentation:** https://api.balancing.services/v1/documentation
+**Interactive Documentation:** https://api.balancing.services/v2/documentation
 
 The interactive documentation provides a Swagger UI interface where you can explore all endpoints, view request/response schemas, and test API calls directly in your browser.
 
@@ -41,7 +41,7 @@ To obtain an API token, please contact us:
 Fetch imbalance prices for Estonia on January 1st, 2025:
 
 ```bash
-curl -X GET "https://api.balancing.services/v1/imbalance/prices?area=EE&period-start-at=2025-01-01T00:00:00Z&period-end-at=2025-01-02T00:00:00Z" \
+curl -X GET "https://api.balancing.services/v2/imbalance/prices?area=EE&period-start-at=2025-01-01T00:00:00Z&period-end-at=2025-01-02T00:00:00Z" \
   -H "Authorization: Bearer YOUR_API_TOKEN"
 ```
 
@@ -52,7 +52,7 @@ The API provides 8 endpoints across three categories:
 - **Balancing Energy:** Activated volumes, prices, and bids
 - **Balancing Capacity:** Bids, prices, and procured volumes
 
-The API covers 40+ European areas and supports multiple reserve types (FCR, aFRR, mFRR, RR). For complete endpoint details, parameters, and response schemas, see the [OpenAPI specification](./openapi.yaml) or the [interactive documentation](https://api.balancing.services/v1/documentation).
+The API covers 40+ European areas and supports multiple reserve types (FCR, aFRR, mFRR, RR). For complete endpoint details, parameters, and response schemas, see the [OpenAPI specification](./openapi.yaml) or the [interactive documentation](https://api.balancing.services/v2/documentation).
 
 ## API Specification
 
@@ -77,7 +77,7 @@ from balancing_services import AuthenticatedClient
 from balancing_services.api.default import get_imbalance_prices
 
 client = AuthenticatedClient(
-    base_url="https://api.balancing.services/v1",
+    base_url="https://api.balancing.services/v2",
     token="YOUR_API_TOKEN"
 )
 

@@ -19,7 +19,7 @@ class TestAsyncClient:
     async def test_async_client_creation(self):
         """Test that async client can be created."""
         client = AuthenticatedClient(
-            base_url="https://api.balancing.services/v1",
+            base_url="https://api.balancing.services/v2",
             token="test_token"
         )
         async_httpx_client = client.get_async_httpx_client()
@@ -29,7 +29,7 @@ class TestAsyncClient:
     async def test_async_client_cleanup(self):
         """Test that async client can be properly closed."""
         client = AuthenticatedClient(
-            base_url="https://api.balancing.services/v1",
+            base_url="https://api.balancing.services/v2",
             token="test_token"
         )
         async_client = client.get_async_httpx_client()
@@ -42,7 +42,7 @@ class TestAsyncClient:
     async def test_async_context_manager(self):
         """Test async context manager usage."""
         client = AuthenticatedClient(
-            base_url="https://api.balancing.services/v1",
+            base_url="https://api.balancing.services/v2",
             token="test_token"
         )
 

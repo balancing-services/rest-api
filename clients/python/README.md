@@ -39,7 +39,7 @@ from balancing_services.api.default import get_imbalance_prices
 
 # Create an authenticated client
 client = AuthenticatedClient(
-    base_url="https://api.balancing.services/v1",
+    base_url="https://api.balancing.services/v2",
     token="YOUR_API_TOKEN"
 )
 
@@ -73,7 +73,7 @@ Include your token when creating the client:
 from balancing_services import AuthenticatedClient
 
 client = AuthenticatedClient(
-    base_url="https://api.balancing.services/v1",
+    base_url="https://api.balancing.services/v2",
     token="YOUR_API_TOKEN"
 )
 ```
@@ -88,7 +88,7 @@ from datetime import datetime
 from balancing_services import AuthenticatedClient
 from balancing_services.api.default import get_balancing_energy_bids
 
-client = AuthenticatedClient(base_url="https://api.balancing.services/v1", token="YOUR_TOKEN")
+client = AuthenticatedClient(base_url="https://api.balancing.services/v2", token="YOUR_TOKEN")
 
 # First page
 response = get_balancing_energy_bids.sync_detailed(
@@ -134,7 +134,7 @@ from balancing_services.api.default import get_imbalance_prices
 
 async def fetch_prices():
     client = AuthenticatedClient(
-        base_url="https://api.balancing.services/v1",
+        base_url="https://api.balancing.services/v2",
         token="YOUR_TOKEN"
     )
 
@@ -161,7 +161,7 @@ from datetime import datetime
 from balancing_services import AuthenticatedClient
 from balancing_services.api.default import get_imbalance_prices
 
-client = AuthenticatedClient(base_url="https://api.balancing.services/v1", token="YOUR_TOKEN")
+client = AuthenticatedClient(base_url="https://api.balancing.services/v2", token="YOUR_TOKEN")
 
 response = get_imbalance_prices.sync_detailed(
     client=client,
@@ -362,7 +362,7 @@ if response.status_code == 400:
 - Increase the client timeout:
 ```python
 client = AuthenticatedClient(
-    base_url="https://api.balancing.services/v1",
+    base_url="https://api.balancing.services/v2",
     token="YOUR_TOKEN",
     timeout=30.0  # Increase from default
 )
@@ -393,7 +393,7 @@ assert "EE" in AREA_VALUES
 
 ## Documentation
 
-- **API Documentation:** https://api.balancing.services/v1/documentation
+- **API Documentation:** https://api.balancing.services/v2/documentation
 - **OpenAPI Spec:** [openapi.yaml](https://github.com/Balancing-Services/rest-api/blob/main/openapi.yaml)
 - **Main Repository:** https://github.com/balancing-services/rest-api
 
