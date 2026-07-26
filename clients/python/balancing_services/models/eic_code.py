@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Literal, cast
 
 EicCode = Literal[
     "10Y1001A1001A39I",
@@ -103,5 +103,5 @@ EIC_CODE_VALUES: set[EicCode] = {
 
 def check_eic_code(value: str) -> EicCode:
     if value in EIC_CODE_VALUES:
-        return value
+        return cast(EicCode, value)
     raise TypeError(f"Unexpected value {value!r}. Expected one of {EIC_CODE_VALUES!r}")

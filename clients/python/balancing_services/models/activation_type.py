@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Literal, cast
 
 ActivationType = Literal["direct", "notApplicable", "scheduled", "unspecified"]
 
@@ -12,7 +12,7 @@ ACTIVATION_TYPE_VALUES: set[ActivationType] = {
 
 def check_activation_type(value: str) -> ActivationType:
     if value in ACTIVATION_TYPE_VALUES:
-        return value
+        return cast(ActivationType, value)
     raise TypeError(
         f"Unexpected value {value!r}. Expected one of {ACTIVATION_TYPE_VALUES!r}"
     )
