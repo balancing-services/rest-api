@@ -29,7 +29,7 @@ def main():
 
     # Create an authenticated client
     client = AuthenticatedClient(
-        base_url="https://api.balancing.services/v1", token=args.api_token
+        base_url="https://api.balancing.services/v2", token=args.api_token
     )
 
     # Fetch imbalance prices for Estonia for yesterday (full day)

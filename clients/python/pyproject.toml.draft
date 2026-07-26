@@ -45,7 +45,7 @@ dev = [
 
 [project.urls]
 Homepage = "https://balancing.services"
-Documentation = "https://api.balancing.services/v1/documentation"
+Documentation = "https://api.balancing.services/v2/documentation"
 Repository = "https://github.com/balancing-services/rest-api"
 Changelog = "https://github.com/balancing-services/rest-api/blob/main/CHANGELOG.md"
 
