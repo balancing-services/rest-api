@@ -54,7 +54,9 @@ echo "Making literal-enum validators mypy-version-independent..."
 python3 fix_enum_validator_casts.py
 
 echo "Fixing types with Ruff..."
-uvx ruff check --fix balancing_services --exit-zero --quiet || true
+# Pin ruff (see config.yaml post_hooks) so generation is reproducible: an
+# unpinned `uvx ruff` upgrades to whatever is latest and churns the output.
+uvx ruff@0.16.0 check --fix balancing_services --exit-zero --quiet || true
 
 # --- Python 3.10 compatibility shim ------------------------------------------
 # openapi-python-client (>= 0.24) generates `datetime.datetime.fromisoformat()`

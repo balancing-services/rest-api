@@ -21,6 +21,10 @@ literal_enums: true
 # client stable across regenerations regardless of the formatter's default.
 # `--exit-zero` so leftover unfixable lint (e.g. docstring whitespace) in the
 # generated code does not fail the generate step and abort generate.sh.
+# Pin ruff (via `uvx ruff@<version>`) exactly as generate.sh pins the generator:
+# a bare `ruff` resolves from PATH to whatever version happens to be cached,
+# and newer ruff applies extra pyupgrade rewrites (e.g. `-> Self`, `*args:
+# object`) that silently churn the generated client. Bump this deliberately.
 post_hooks:
-  - "ruff check --fix --exit-zero ."
-  - "ruff format --line-length 88 ."
+  - "uvx ruff@0.16.0 check --fix --exit-zero ."
+  - "uvx ruff@0.16.0 format --line-length 88 ."
