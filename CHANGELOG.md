@@ -5,7 +5,7 @@ All notable changes to the Balancing Services REST API will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.0.1] - 2026-07-25
 
 ### Fixed
 - The official Python client's generated enum validators (`check_area`, `check_currency`, and the other `check_*` helpers) now type-check under mypy 1.x. The `literal_enums` output returned a bare `str` where a `Literal[...]` was expected, which only mypy 2.x accepts by narrowing the membership test; the validators now wrap the return in `cast(...)`, so `mypy` passes on every supported version. This is purely a static-typing fix — `cast` is a no-op at runtime, so there is no API, wire, or runtime-behaviour change
