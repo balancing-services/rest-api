@@ -4,13 +4,13 @@ This directory contains automation scripts to simplify the release process for t
 
 ## Version Management
 
-The version is stored in **one place only**: `openapi.yaml`. The Python client's `pyproject.toml` is generated from `pyproject.toml.draft` which contains an invalid TOML placeholder (`version = __VERSION__`) that prevents accidental publishing without proper generation.
+The version is stored in **one place only**: `openapi.yaml`. The Python client's `pyproject.toml` is generated from `pyproject.toml.draft` which contains an invalid TOML placeholder (`version = __VERSION__`) that prevents accidental publishing without proper generation. The Claude Code plugin manifest (`.claude-plugin/plugin.json`) carries a copy of the version because the manifest format requires a literal value; `bump-version.sh` stamps it from `openapi.yaml`.
 
 ## Scripts
 
 ### `bump-version.sh`
 
-Bumps the version number in `openapi.yaml` and updates `CHANGELOG.md`.
+Bumps the version number in `openapi.yaml`, stamps it into `.claude-plugin/plugin.json`, and updates `CHANGELOG.md`.
 
 **Usage:**
 ```bash
@@ -24,6 +24,7 @@ Bumps the version number in `openapi.yaml` and updates `CHANGELOG.md`.
 
 **What it does:**
 - Updates `openapi.yaml` (info.version field) - **single source of truth**
+- Updates `.claude-plugin/plugin.json` (version field) to match
 - Adds new version section to `CHANGELOG.md` with current date
 - Shows next steps for committing and publishing
 

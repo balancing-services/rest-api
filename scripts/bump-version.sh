@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Script to bump version across the repository
-# Updates openapi.yaml, pyproject.toml, and CHANGELOG.md
+# Updates openapi.yaml, .claude-plugin/plugin.json, pyproject.toml, and CHANGELOG.md
 
 set -e
 
@@ -41,6 +41,10 @@ echo ""
 echo "Updating openapi.yaml..."
 sed -i "s/^  version: .*/  version: ${NEW_VERSION}/" openapi.yaml
 
+# Update the Claude Code plugin manifest - its version must match openapi.yaml
+echo "Updating .claude-plugin/plugin.json..."
+sed -i "s|^\(  \"version\": \"\).*\(\",\)$|\1${NEW_VERSION}\2|" .claude-plugin/plugin.json
+
 # Update CHANGELOG.md - add new Unreleased section and set date for current version
 echo "Updating CHANGELOG.md..."
 CURRENT_DATE=$(date +%Y-%m-%d)
@@ -74,6 +78,7 @@ echo -e "${GREEN}✓ Version updated successfully${NC}"
 echo ""
 echo "Files modified:"
 echo "  - openapi.yaml"
+echo "  - .claude-plugin/plugin.json"
 echo "  - CHANGELOG.md"
 echo ""
 echo "Note: pyproject.toml will be auto-generated from pyproject.toml.draft"
