@@ -5,6 +5,12 @@ All notable changes to the Balancing Services REST API will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- Claude Code skill (`skills/balancing-services-api/`) covering both integrating with the API and migrating an existing client from v1 to v2. It describes the endpoint catalogue and request semantics, the cursor-pagination and `updated-since` polling contracts, and RFC 7807 error handling, and carries a change-by-change v1 → v2 migration guide with before/after payloads and a checklist to walk against a client codebase
+- The repository doubles as a Claude Code plugin marketplace containing itself as its single plugin (`.claude-plugin/marketplace.json` and `.claude-plugin/plugin.json`), so the skill installs with `/plugin marketplace add balancing-services/rest-api` followed by `/plugin install balancing-services-rest-api@balancing-services`; see the README for preconfiguring it for a team. The plugin version tracks `openapi.yaml`'s `info.version` and is stamped by `scripts/bump-version.sh`
+
 ## [2.0.2] - 2026-07-25
 
 ### Fixed
@@ -206,7 +212,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - UTC timestamp-based period filtering
 - OpenAPI 3.0.3 specification
 
-[Unreleased - 2.0.0]: https://github.com/balancing-services/rest-api/compare/v1.20.0...HEAD
+[Unreleased]: https://github.com/balancing-services/rest-api/compare/v2.0.2...HEAD
+[2.0.2]: https://github.com/balancing-services/rest-api/compare/v2.0.1...v2.0.2
+[2.0.1]: https://github.com/balancing-services/rest-api/compare/v2.0.0...v2.0.1
+[2.0.0]: https://github.com/balancing-services/rest-api/compare/v1.20.0...v2.0.0
 [1.20.0]: https://github.com/balancing-services/rest-api/compare/v1.19.0...v1.20.0
 [1.19.0]: https://github.com/balancing-services/rest-api/compare/v1.18.0...v1.19.0
 [1.18.0]: https://github.com/balancing-services/rest-api/compare/v1.17.0...v1.18.0
@@ -219,6 +228,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [1.11.0]: https://github.com/balancing-services/rest-api/compare/v1.10.0...v1.11.0
 [1.10.0]: https://github.com/balancing-services/rest-api/compare/v1.9.0...v1.10.0
 [1.9.0]: https://github.com/balancing-services/rest-api/compare/v1.8.0...v1.9.0
+[1.8.0]: https://github.com/balancing-services/rest-api/compare/v1.7.1...v1.8.0
 [1.7.1]: https://github.com/balancing-services/rest-api/compare/v1.7.0...v1.7.1
 [1.7.0]: https://github.com/balancing-services/rest-api/compare/v1.6.0...v1.7.0
 [1.6.0]: https://github.com/balancing-services/rest-api/compare/v1.5.1...v1.6.0

@@ -1,0 +1,12 @@
+{
+  "name": "balancing-services-rest-api",
+  "version": "2.0.2",
+  "description": "Skill for integrating with the Balancing Services REST API — European electricity balancing market data.",
+  "author": {
+    "name": "Balancing Services",
+    "url": "https://balancing.services"
+  },
+  "homepage": "https://balancing.services",
+  "repository": "https://github.com/balancing-services/rest-api",
+  "license": "MIT"
+}

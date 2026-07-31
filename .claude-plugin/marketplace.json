@@ -1,0 +1,15 @@
+{
+  "name": "balancing-services",
+  "owner": {
+    "name": "Balancing Services",
+    "email": "info@balancing.services",
+    "url": "https://balancing.services"
+  },
+  "plugins": [
+    {
+      "name": "balancing-services-rest-api",
+      "source": "./",
+      "description": "Skill for integrating with the Balancing Services REST API — European electricity balancing market data."
+    }
+  ]
+}

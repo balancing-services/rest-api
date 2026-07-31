@@ -102,6 +102,33 @@ if response.status_code == 200:
 
 For complete documentation, usage examples, and API reference, see [clients/python/README.md](./clients/python/README.md).
 
+## Claude Code Skill
+
+This repository doubles as a [Claude Code](https://claude.ai/code) plugin marketplace. The
+`balancing-services-api` skill teaches Claude Code how to integrate with this API — endpoints,
+pagination, incremental polling, error handling — and how to migrate an existing v1 client to v2.
+
+```
+/plugin marketplace add balancing-services/rest-api
+/plugin install balancing-services-rest-api@balancing-services
+```
+
+Marketplace auto-update is off by default; enable it under `/plugin` → Marketplaces to pick up new
+skill revisions automatically.
+
+To preconfigure the plugin for a team, commit this to the project's `.claude/settings.json`:
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "balancing-services": {
+      "source": { "source": "github", "repo": "balancing-services/rest-api" }
+    }
+  },
+  "enabledPlugins": { "balancing-services-rest-api@balancing-services": true }
+}
+```
+
 ## Versioning
 
 This project follows [Semantic Versioning](https://semver.org/):

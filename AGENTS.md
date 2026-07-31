@@ -13,6 +13,8 @@ This is a **public specification repository** containing the OpenAPI specificati
 - `openapi.yaml` - The canonical OpenAPI 3.0.3 specification (source of truth)
 - `README.md` - Public-facing documentation for API users
 - `CHANGELOG.md` - Version history following Keep a Changelog format
+- `skills/` - Claude Code skills shipped to API users; `balancing-services-api/` covers integrating with the API and migrating a v1 client to v2
+- `.claude-plugin/` - Makes this repository a Claude Code plugin marketplace containing itself as its single plugin (`marketplace.json`, `plugin.json`)
 - `LICENSE` - MIT License
 - `.gitignore` - Standard ignore patterns
 
@@ -53,7 +55,7 @@ This project follows [Semantic Versioning](https://semver.org/):
 
 ### Release Process
 
-1. Update version in `openapi.yaml` (info.version field)
+1. Update version in `openapi.yaml` (info.version field). `scripts/bump-version.sh` does this and also stamps the same version into `.claude-plugin/plugin.json`, which must match
 2. Update CHANGELOG.md with release date and version
 3. Commit changes
 4. Create annotated git tag: `git tag -a vX.Y.Z -m "Release vX.Y.Z"`
