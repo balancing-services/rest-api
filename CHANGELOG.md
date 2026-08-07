@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Claude Code skill (`skills/balancing-services-api/`) covering both integrating with the API and migrating an existing client from v1 to v2. It describes the endpoint catalogue and request semantics, the cursor-pagination and `updated-since` polling contracts, and RFC 7807 error handling, and carries a change-by-change v1 → v2 migration guide with before/after payloads and a checklist to walk against a client codebase
 - The repository doubles as a Claude Code plugin marketplace containing itself as its single plugin (`.claude-plugin/marketplace.json` and `.claude-plugin/plugin.json`), so the skill installs with `/plugin marketplace add balancing-services/rest-api` followed by `/plugin install balancing-services-rest-api@balancing-services`; see the README for preconfiguring it for a team. The plugin version tracks `openapi.yaml`'s `info.version` and is stamped by `scripts/bump-version.sh`
 
+### Changed
+- The bid endpoints' descriptions now state the `updated-since` polling contract at bid-set granularity: change is tracked per stored bid set rather than per bid, so a changed set is re-delivered with its unchanged bids included, and a filtered response is not guaranteed to carry a period's complete bid set — re-fetch without `updated-since` to reconcile withdrawals. The shipped skill's polling guidance is restated to match and now covers bid withdrawals (a withdrawn bid is deleted without replacement; no response ever names it). Documentation only; no wire or behaviour change in the spec's schemas
+
 ## [2.0.2] - 2026-07-25
 
 ### Fixed
