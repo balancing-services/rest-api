@@ -97,7 +97,11 @@ opaque: never parse or construct one.
 that timestamp, within the (still mandatory) period window. Every response carries `nextUpdatedSince`
 — feed exactly that value into the next poll over the same window; a timestamp you derive
 yourself can silently skip changes. The watermark deliberately lags, so consecutive polls overlap
-and a record can arrive more than once: upsert on consume.
+and a record can arrive more than once: upsert on consume. On the bid endpoints the unit of change
+is a stored bid set, not an individual bid: any change re-delivers all of the set's bids, unchanged
+ones included, and since bids carry no client-visible identifier there is no key to upsert on —
+replace per set, and re-fetch without `updated-since` when exactness matters (see
+references/pagination-and-polling.md).
 
 ## Gotchas
 

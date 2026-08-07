@@ -80,7 +80,8 @@ alongside the data you have written.
 
 `updated-since` narrows a query to the records whose stored value changed strictly after the given
 timestamp, *in addition to* the mandatory period window. It is not a global change feed: the window
-still bounds the query, so polling means "re-ask for this window, but only the changes".
+still bounds the query, so polling means "re-ask for this window, but only the changes". On the bid
+endpoints change is tracked per bid set rather than per record — see below.
 
 Records carry no per-record change timestamp. Instead, every response reports `nextUpdatedSince` —
 the watermark to feed into the next poll. It comes from the server, so your clock never enters the
@@ -96,6 +97,16 @@ Contract:
 - The watermark deliberately lags real time, so consecutive polls overlap slightly and a record can
   be delivered more than once. **Delivery is at-least-once: upsert on consume.** Duplicates are the
   designed-for cost; a lost change is not tolerated, which is why the lag exists.
+- On the bid endpoints the unit of change is a **bid set** — the bids stored and tracked together
+  for one delivery period — not an individual bid: any change to a set (a new bid, a revised one, a
+  withdrawal) re-delivers all of the set's bids, including the ones that did not change themselves.
+  A period entry in a response is not always a single set — capacity bids procured in separate
+  rounds are separate sets, as are distinctions the response's grouping does not surface — so a
+  re-delivered set does not imply the period entry around it is complete. And since bids carry no
+  client-visible identifier, there is no key to upsert on: a filtered poll tells you a set changed
+  and hands you its current bids, but not which bid was added, revised, or withdrawn — it cannot
+  maintain an exact bid-level mirror on its own. When exactness matters, reconcile with an
+  unfiltered re-fetch (see below).
 - Do not mix cursors between polls; each poll is its own drain, restarted from your stored
   watermark.
 
@@ -120,7 +131,7 @@ def poll(session, url, params, store, watermark=None):
     next_watermark = watermark
     for page in drain(session, url, poll_params):
         for group in page["data"]:
-            store.upsert(group)          # idempotent: records may repeat across polls
+            store.upsert(group)          # idempotent: records may repeat across polls; bids: replace per set
         next_watermark = page["nextUpdatedSince"]   # same value on every page of one drain
 
     store.save_watermark(next_watermark)  # same transaction as the upserts, ideally
@@ -128,5 +139,17 @@ def poll(session, url, params, store, watermark=None):
 ```
 
 When merging a filtered response into stored data, merge records by period rather than by group
-identity — a filtered response carries only the records that changed, so its groups need not line
-up one-to-one with the groups of a full drain.
+identity — a filtered response carries only what changed (for bids, only the changed sets, each
+delivered whole), so its groups need not line up one-to-one with the groups of a full drain.
+
+### Withdrawals and the unfiltered re-fetch
+
+A poller only sees rows that exist. Bids are the one dataset where deletion is normal operation: a
+bid withdrawn at the source is deleted here without replacement, and no response ever names it.
+
+The withdrawal does move its bid set's change time, so the set's *surviving* bids are re-delivered.
+That narrows the blind spot but does not close it: a set whose bids were all withdrawn has no
+survivors to re-deliver, a period entry can span several independently-tracked sets, and a set that
+changes mid-drain defers its remaining bids to the next poll — so a filtered poll is not guaranteed
+to carry a period's complete bid set. If bid-level accuracy matters, periodically re-fetch the full
+window without `updated-since` and reconcile.
