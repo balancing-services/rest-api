@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-08-08
+
 ### Added
 - Experimental imbalance price forecast endpoint (`/imbalance/prices/forecast`), serving forecasts of the imbalance price — see the endpoint description for the semantics
 - Claude Code skill (`skills/balancing-services-api/`) covering both integrating with the API and migrating an existing client from v1 to v2. It describes the endpoint catalogue and request semantics, the cursor-pagination and `updated-since` polling contracts, and RFC 7807 error handling, and carries a change-by-change v1 → v2 migration guide with before/after payloads and a checklist to walk against a client codebase
@@ -216,7 +218,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - UTC timestamp-based period filtering
 - OpenAPI 3.0.3 specification
 
-[Unreleased]: https://github.com/balancing-services/rest-api/compare/v2.0.2...HEAD
+[Unreleased]: https://github.com/balancing-services/rest-api/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/balancing-services/rest-api/compare/v2.0.2...v2.1.0
 [2.0.2]: https://github.com/balancing-services/rest-api/compare/v2.0.1...v2.0.2
 [2.0.1]: https://github.com/balancing-services/rest-api/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/balancing-services/rest-api/compare/v1.20.0...v2.0.0
