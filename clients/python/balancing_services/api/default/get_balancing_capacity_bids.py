@@ -145,8 +145,12 @@ def sync_detailed(
     true the last period entry may continue on the next page, so merge entries on their group's
     dimensions plus the period when accumulating pages. Bids within a period entry are returned in no
     guaranteed order — sort by price client-side if you need the merit order. When polling with
-    `updated-since`, a page holds only the bids that changed, so the period entries of a poll are not
-    necessarily contiguous.
+    `updated-since`, change is tracked per stored bid set rather than per bid — each procurement
+    round of a period is its own set: a changed set is re-delivered with its unchanged bids
+    included, so the period entries of a poll are not necessarily contiguous. A period entry may
+    span more than one set, and a set that changes again mid-drain is deferred to the next poll,
+    so a filtered response is not guaranteed to carry a period's complete bid set — re-fetch
+    without `updated-since` to reconcile withdrawals.
 
     Args:
         area (Area): Area code
@@ -209,8 +213,12 @@ def sync(
     true the last period entry may continue on the next page, so merge entries on their group's
     dimensions plus the period when accumulating pages. Bids within a period entry are returned in no
     guaranteed order — sort by price client-side if you need the merit order. When polling with
-    `updated-since`, a page holds only the bids that changed, so the period entries of a poll are not
-    necessarily contiguous.
+    `updated-since`, change is tracked per stored bid set rather than per bid — each procurement
+    round of a period is its own set: a changed set is re-delivered with its unchanged bids
+    included, so the period entries of a poll are not necessarily contiguous. A period entry may
+    span more than one set, and a set that changes again mid-drain is deferred to the next poll,
+    so a filtered response is not guaranteed to carry a period's complete bid set — re-fetch
+    without `updated-since` to reconcile withdrawals.
 
     Args:
         area (Area): Area code
@@ -268,8 +276,12 @@ async def asyncio_detailed(
     true the last period entry may continue on the next page, so merge entries on their group's
     dimensions plus the period when accumulating pages. Bids within a period entry are returned in no
     guaranteed order — sort by price client-side if you need the merit order. When polling with
-    `updated-since`, a page holds only the bids that changed, so the period entries of a poll are not
-    necessarily contiguous.
+    `updated-since`, change is tracked per stored bid set rather than per bid — each procurement
+    round of a period is its own set: a changed set is re-delivered with its unchanged bids
+    included, so the period entries of a poll are not necessarily contiguous. A period entry may
+    span more than one set, and a set that changes again mid-drain is deferred to the next poll,
+    so a filtered response is not guaranteed to carry a period's complete bid set — re-fetch
+    without `updated-since` to reconcile withdrawals.
 
     Args:
         area (Area): Area code
@@ -330,8 +342,12 @@ async def asyncio(
     true the last period entry may continue on the next page, so merge entries on their group's
     dimensions plus the period when accumulating pages. Bids within a period entry are returned in no
     guaranteed order — sort by price client-side if you need the merit order. When polling with
-    `updated-since`, a page holds only the bids that changed, so the period entries of a poll are not
-    necessarily contiguous.
+    `updated-since`, change is tracked per stored bid set rather than per bid — each procurement
+    round of a period is its own set: a changed set is re-delivered with its unchanged bids
+    included, so the period entries of a poll are not necessarily contiguous. A period entry may
+    span more than one set, and a set that changes again mid-drain is deferred to the next poll,
+    so a filtered response is not guaranteed to carry a period's complete bid set — re-fetch
+    without `updated-since` to reconcile withdrawals.
 
     Args:
         area (Area): Area code

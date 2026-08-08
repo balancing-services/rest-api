@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Experimental imbalance price forecast endpoint (`/imbalance/prices/forecast`), serving forecasts of the imbalance price — see the endpoint description for the semantics
 - Claude Code skill (`skills/balancing-services-api/`) covering both integrating with the API and migrating an existing client from v1 to v2. It describes the endpoint catalogue and request semantics, the cursor-pagination and `updated-since` polling contracts, and RFC 7807 error handling, and carries a change-by-change v1 → v2 migration guide with before/after payloads and a checklist to walk against a client codebase
 - The repository doubles as a Claude Code plugin marketplace containing itself as its single plugin (`.claude-plugin/marketplace.json` and `.claude-plugin/plugin.json`), so the skill installs with `/plugin marketplace add balancing-services/rest-api` followed by `/plugin install balancing-services-rest-api@balancing-services`; see the README for preconfiguring it for a team. The plugin version tracks `openapi.yaml`'s `info.version` and is stamped by `scripts/bump-version.sh`
 

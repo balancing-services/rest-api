@@ -57,6 +57,55 @@ paths:
         '501':
           $ref: '#/components/responses/NotImplemented'
 
+  /imbalance/prices/forecast:
+    get:
+      summary: Get imbalance price forecasts for an area
+      description: |
+        **Experimental** - This endpoint is under active development and may change without notice.
+
+        Returns imbalance price forecasts for the specified area within the given time period. Each
+        forecast is a predictive distribution: level/price pairs in `quantiles`, ascending by level.
+        An area without forecast coverage returns an empty result rather than an error. Supports
+        cursor-based pagination for large result sets.
+      operationId: getImbalancePriceForecasts
+      parameters:
+        - $ref: '#/components/parameters/area'
+        - $ref: '#/components/parameters/period-start-at'
+        - $ref: '#/components/parameters/period-end-at'
+        - $ref: '#/components/parameters/cursor'
+        - name: limit
+          in: query
+          description: Maximum number of results to return (default 100, max 1000)
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+            default: 100
+            example: 100
+        - $ref: '#/components/parameters/updated-since'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImbalancePriceForecastsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '501':
+          $ref: '#/components/responses/NotImplemented'
+
   /imbalance/total-volumes:
     get:
       summary: Get total imbalance volumes for an area
@@ -1237,6 +1286,105 @@ components:
         pricePerMwh:
           type: number
           description: Price per MWh in the specified currency
+          example: 45.50
+
+    ImbalancePriceForecastsResponse:
+      type: object
+      required:
+        - queriedPeriod
+        - data
+        - hasMore
+        - nextUpdatedSince
+      properties:
+        queriedPeriod:
+          $ref: '#/components/schemas/Period'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImbalancePriceForecasts'
+        nextCursor:
+          type: string
+          description: Cursor to fetch the next page of results. Null if no more results.
+          example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
+          nullable: true
+        hasMore:
+          type: boolean
+          description: Indicates whether there are more results available
+          example: false
+        nextUpdatedSince:
+          $ref: '#/components/schemas/NextUpdatedSince'
+
+    ImbalancePriceForecasts:
+      type: object
+      required:
+        - area
+        - eicCode
+        - currency
+        - direction
+        - forecasts
+      properties:
+        area:
+          $ref: '#/components/schemas/Area'
+        eicCode:
+          $ref: '#/components/schemas/EicCode'
+        currency:
+          $ref: '#/components/schemas/Currency'
+        direction:
+          $ref: '#/components/schemas/ImbalanceDirection'
+        forecasts:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImbalancePriceForecast'
+
+    ImbalancePriceForecast:
+      type: object
+      required:
+        - period
+        - quantiles
+        - madeAt
+        - degraded
+      properties:
+        period:
+          $ref: '#/components/schemas/Period'
+        quantiles:
+          type: array
+          description: >-
+            The predictive distribution of the price, as one level/price pair per quantile level,
+            ascending by level. Each forecast states the grid it was made on — read the levels off
+            it rather than indexing by a position you hardcoded.
+          items:
+            $ref: '#/components/schemas/ImbalancePriceForecastQuantile'
+        madeAt:
+          type: string
+          format: date-time
+          description: When this forecast was made (UTC).
+          example: '2025-01-01T00:05:00Z'
+        degraded:
+          type: boolean
+          description: >-
+            True when the forecast was computed from incomplete or stale inputs. It is still
+            served, but is less trustworthy — use with care.
+          example: false
+
+    ImbalancePriceForecastQuantile:
+      type: object
+      required:
+        - level
+        - pricePerMwh
+      properties:
+        level:
+          type: number
+          description: >-
+            The quantile level, as a decimal strictly between 0 and 1 — 0.5 being the median, and
+            the pair 0.1/0.9 bounding the central 80% interval.
+          minimum: 0
+          exclusiveMinimum: true
+          maximum: 1
+          exclusiveMaximum: true
+          example: 0.5
+        pricePerMwh:
+          type: number
+          description: Forecast price per MWh at this level, in the group's currency
           example: 45.50
 
     ImbalanceTotalVolumesResponse:

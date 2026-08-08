@@ -7,9 +7,8 @@ import httpx
 from ... import errors
 from ...client import AuthenticatedClient, Client
 from ...models.area import Area
-from ...models.balancing_energy_bids_response import BalancingEnergyBidsResponse
+from ...models.imbalance_price_forecasts_response import ImbalancePriceForecastsResponse
 from ...models.problem import Problem
-from ...models.reserve_type import ReserveType
 from ...types import UNSET, Response, Unset
 
 
@@ -18,7 +17,6 @@ def _get_kwargs(
     area: Area,
     period_start_at: datetime.datetime,
     period_end_at: datetime.datetime,
-    reserve_type: ReserveType,
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
     updated_since: datetime.datetime | Unset = UNSET,
@@ -35,9 +33,6 @@ def _get_kwargs(
     json_period_end_at = period_end_at.isoformat()
     params["period-end-at"] = json_period_end_at
 
-    json_reserve_type: str = reserve_type
-    params["reserve-type"] = json_reserve_type
-
     params["cursor"] = cursor
 
     params["limit"] = limit
@@ -51,7 +46,7 @@ def _get_kwargs(
 
     _kwargs: dict[str, Any] = {
         "method": "get",
-        "url": "/balancing/energy/bids",
+        "url": "/imbalance/prices/forecast",
         "params": params,
     }
 
@@ -60,9 +55,9 @@ def _get_kwargs(
 
 def _parse_response(
     *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> BalancingEnergyBidsResponse | Problem | None:
+) -> ImbalancePriceForecastsResponse | Problem | None:
     if response.status_code == 200:
-        response_200 = BalancingEnergyBidsResponse.from_dict(response.json())
+        response_200 = ImbalancePriceForecastsResponse.from_dict(response.json())
 
         return response_200
 
@@ -109,7 +104,7 @@ def _parse_response(
 
 def _build_response(
     *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> Response[BalancingEnergyBidsResponse | Problem]:
+) -> Response[ImbalancePriceForecastsResponse | Problem]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -124,38 +119,23 @@ def sync_detailed(
     area: Area,
     period_start_at: datetime.datetime,
     period_end_at: datetime.datetime,
-    reserve_type: ReserveType,
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
     updated_since: datetime.datetime | Unset = UNSET,
-) -> Response[BalancingEnergyBidsResponse | Problem]:
-    """Get balancing energy bids
+) -> Response[ImbalancePriceForecastsResponse | Problem]:
+    """Get imbalance price forecasts for an area
 
-     Returns balancing energy bids for the specified area within the given time period. Prices are in
-    the specified currency per MWh.
+     **Experimental** - This endpoint is under active development and may change without notice.
 
-    Bids are grouped by their shared dimensions (area, reserve type, direction, currency,
-    standard-product flag), and inside each group by delivery period: each entry of `periods` states
-    the period once and carries that period's bids. Period entries ascend by period start within
-    their group.
-
-    Supports cursor-based pagination for large result sets; `limit` counts individual bids, not
-    groups or period entries. Groups and period entries are assembled per page: when `hasMore` is
-    true the last period entry may continue on the next page, so merge entries on their group's
-    dimensions plus the period when accumulating pages. Bids within a period entry are returned in no
-    guaranteed order — sort by price client-side if you need the merit order. When polling with
-    `updated-since`, change is tracked per stored bid set rather than per bid: a changed set is
-    re-delivered with its unchanged bids included, so the period entries of a poll are not
-    necessarily contiguous. A period entry may span more than one tracked set, and a set that
-    changes again mid-drain is deferred to the next poll, so a filtered response is not guaranteed
-    to carry a period's complete bid set — re-fetch without `updated-since` to reconcile
-    withdrawals.
+    Returns imbalance price forecasts for the specified area within the given time period. Each
+    forecast is a predictive distribution: level/price pairs in `quantiles`, ascending by level.
+    An area without forecast coverage returns an empty result rather than an error. Supports
+    cursor-based pagination for large result sets.
 
     Args:
         area (Area): Area code
         period_start_at (datetime.datetime):  Example: 2025-01-01T00:00:00Z.
         period_end_at (datetime.datetime):  Example: 2025-01-02T00:00:00Z.
-        reserve_type (ReserveType): Reserve type
         cursor (str | Unset):  Example: v1:AAAAAYwBAgMEBQYHCAkKCw==.
         limit (int | Unset):  Default: 100. Example: 100.
         updated_since (datetime.datetime | Unset):  Example: 2025-01-02T09:15:00Z.
@@ -165,14 +145,13 @@ def sync_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[BalancingEnergyBidsResponse | Problem]
+        Response[ImbalancePriceForecastsResponse | Problem]
     """
 
     kwargs = _get_kwargs(
         area=area,
         period_start_at=period_start_at,
         period_end_at=period_end_at,
-        reserve_type=reserve_type,
         cursor=cursor,
         limit=limit,
         updated_since=updated_since,
@@ -191,38 +170,23 @@ def sync(
     area: Area,
     period_start_at: datetime.datetime,
     period_end_at: datetime.datetime,
-    reserve_type: ReserveType,
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
     updated_since: datetime.datetime | Unset = UNSET,
-) -> BalancingEnergyBidsResponse | Problem | None:
-    """Get balancing energy bids
+) -> ImbalancePriceForecastsResponse | Problem | None:
+    """Get imbalance price forecasts for an area
 
-     Returns balancing energy bids for the specified area within the given time period. Prices are in
-    the specified currency per MWh.
+     **Experimental** - This endpoint is under active development and may change without notice.
 
-    Bids are grouped by their shared dimensions (area, reserve type, direction, currency,
-    standard-product flag), and inside each group by delivery period: each entry of `periods` states
-    the period once and carries that period's bids. Period entries ascend by period start within
-    their group.
-
-    Supports cursor-based pagination for large result sets; `limit` counts individual bids, not
-    groups or period entries. Groups and period entries are assembled per page: when `hasMore` is
-    true the last period entry may continue on the next page, so merge entries on their group's
-    dimensions plus the period when accumulating pages. Bids within a period entry are returned in no
-    guaranteed order — sort by price client-side if you need the merit order. When polling with
-    `updated-since`, change is tracked per stored bid set rather than per bid: a changed set is
-    re-delivered with its unchanged bids included, so the period entries of a poll are not
-    necessarily contiguous. A period entry may span more than one tracked set, and a set that
-    changes again mid-drain is deferred to the next poll, so a filtered response is not guaranteed
-    to carry a period's complete bid set — re-fetch without `updated-since` to reconcile
-    withdrawals.
+    Returns imbalance price forecasts for the specified area within the given time period. Each
+    forecast is a predictive distribution: level/price pairs in `quantiles`, ascending by level.
+    An area without forecast coverage returns an empty result rather than an error. Supports
+    cursor-based pagination for large result sets.
 
     Args:
         area (Area): Area code
         period_start_at (datetime.datetime):  Example: 2025-01-01T00:00:00Z.
         period_end_at (datetime.datetime):  Example: 2025-01-02T00:00:00Z.
-        reserve_type (ReserveType): Reserve type
         cursor (str | Unset):  Example: v1:AAAAAYwBAgMEBQYHCAkKCw==.
         limit (int | Unset):  Default: 100. Example: 100.
         updated_since (datetime.datetime | Unset):  Example: 2025-01-02T09:15:00Z.
@@ -232,7 +196,7 @@ def sync(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        BalancingEnergyBidsResponse | Problem
+        ImbalancePriceForecastsResponse | Problem
     """
 
     return sync_detailed(
@@ -240,7 +204,6 @@ def sync(
         area=area,
         period_start_at=period_start_at,
         period_end_at=period_end_at,
-        reserve_type=reserve_type,
         cursor=cursor,
         limit=limit,
         updated_since=updated_since,
@@ -253,38 +216,23 @@ async def asyncio_detailed(
     area: Area,
     period_start_at: datetime.datetime,
     period_end_at: datetime.datetime,
-    reserve_type: ReserveType,
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
     updated_since: datetime.datetime | Unset = UNSET,
-) -> Response[BalancingEnergyBidsResponse | Problem]:
-    """Get balancing energy bids
+) -> Response[ImbalancePriceForecastsResponse | Problem]:
+    """Get imbalance price forecasts for an area
 
-     Returns balancing energy bids for the specified area within the given time period. Prices are in
-    the specified currency per MWh.
+     **Experimental** - This endpoint is under active development and may change without notice.
 
-    Bids are grouped by their shared dimensions (area, reserve type, direction, currency,
-    standard-product flag), and inside each group by delivery period: each entry of `periods` states
-    the period once and carries that period's bids. Period entries ascend by period start within
-    their group.
-
-    Supports cursor-based pagination for large result sets; `limit` counts individual bids, not
-    groups or period entries. Groups and period entries are assembled per page: when `hasMore` is
-    true the last period entry may continue on the next page, so merge entries on their group's
-    dimensions plus the period when accumulating pages. Bids within a period entry are returned in no
-    guaranteed order — sort by price client-side if you need the merit order. When polling with
-    `updated-since`, change is tracked per stored bid set rather than per bid: a changed set is
-    re-delivered with its unchanged bids included, so the period entries of a poll are not
-    necessarily contiguous. A period entry may span more than one tracked set, and a set that
-    changes again mid-drain is deferred to the next poll, so a filtered response is not guaranteed
-    to carry a period's complete bid set — re-fetch without `updated-since` to reconcile
-    withdrawals.
+    Returns imbalance price forecasts for the specified area within the given time period. Each
+    forecast is a predictive distribution: level/price pairs in `quantiles`, ascending by level.
+    An area without forecast coverage returns an empty result rather than an error. Supports
+    cursor-based pagination for large result sets.
 
     Args:
         area (Area): Area code
         period_start_at (datetime.datetime):  Example: 2025-01-01T00:00:00Z.
         period_end_at (datetime.datetime):  Example: 2025-01-02T00:00:00Z.
-        reserve_type (ReserveType): Reserve type
         cursor (str | Unset):  Example: v1:AAAAAYwBAgMEBQYHCAkKCw==.
         limit (int | Unset):  Default: 100. Example: 100.
         updated_since (datetime.datetime | Unset):  Example: 2025-01-02T09:15:00Z.
@@ -294,14 +242,13 @@ async def asyncio_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[BalancingEnergyBidsResponse | Problem]
+        Response[ImbalancePriceForecastsResponse | Problem]
     """
 
     kwargs = _get_kwargs(
         area=area,
         period_start_at=period_start_at,
         period_end_at=period_end_at,
-        reserve_type=reserve_type,
         cursor=cursor,
         limit=limit,
         updated_since=updated_since,
@@ -318,38 +265,23 @@ async def asyncio(
     area: Area,
     period_start_at: datetime.datetime,
     period_end_at: datetime.datetime,
-    reserve_type: ReserveType,
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
     updated_since: datetime.datetime | Unset = UNSET,
-) -> BalancingEnergyBidsResponse | Problem | None:
-    """Get balancing energy bids
+) -> ImbalancePriceForecastsResponse | Problem | None:
+    """Get imbalance price forecasts for an area
 
-     Returns balancing energy bids for the specified area within the given time period. Prices are in
-    the specified currency per MWh.
+     **Experimental** - This endpoint is under active development and may change without notice.
 
-    Bids are grouped by their shared dimensions (area, reserve type, direction, currency,
-    standard-product flag), and inside each group by delivery period: each entry of `periods` states
-    the period once and carries that period's bids. Period entries ascend by period start within
-    their group.
-
-    Supports cursor-based pagination for large result sets; `limit` counts individual bids, not
-    groups or period entries. Groups and period entries are assembled per page: when `hasMore` is
-    true the last period entry may continue on the next page, so merge entries on their group's
-    dimensions plus the period when accumulating pages. Bids within a period entry are returned in no
-    guaranteed order — sort by price client-side if you need the merit order. When polling with
-    `updated-since`, change is tracked per stored bid set rather than per bid: a changed set is
-    re-delivered with its unchanged bids included, so the period entries of a poll are not
-    necessarily contiguous. A period entry may span more than one tracked set, and a set that
-    changes again mid-drain is deferred to the next poll, so a filtered response is not guaranteed
-    to carry a period's complete bid set — re-fetch without `updated-since` to reconcile
-    withdrawals.
+    Returns imbalance price forecasts for the specified area within the given time period. Each
+    forecast is a predictive distribution: level/price pairs in `quantiles`, ascending by level.
+    An area without forecast coverage returns an empty result rather than an error. Supports
+    cursor-based pagination for large result sets.
 
     Args:
         area (Area): Area code
         period_start_at (datetime.datetime):  Example: 2025-01-01T00:00:00Z.
         period_end_at (datetime.datetime):  Example: 2025-01-02T00:00:00Z.
-        reserve_type (ReserveType): Reserve type
         cursor (str | Unset):  Example: v1:AAAAAYwBAgMEBQYHCAkKCw==.
         limit (int | Unset):  Default: 100. Example: 100.
         updated_since (datetime.datetime | Unset):  Example: 2025-01-02T09:15:00Z.
@@ -359,7 +291,7 @@ async def asyncio(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        BalancingEnergyBidsResponse | Problem
+        ImbalancePriceForecastsResponse | Problem
     """
 
     return (
@@ -368,7 +300,6 @@ async def asyncio(
             area=area,
             period_start_at=period_start_at,
             period_end_at=period_end_at,
-            reserve_type=reserve_type,
             cursor=cursor,
             limit=limit,
             updated_since=updated_since,

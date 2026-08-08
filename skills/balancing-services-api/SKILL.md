@@ -50,6 +50,7 @@ All take `period-start-at` and `period-end-at`; the last column lists what else 
 | Endpoint | Returns | Also required |
 |---|---|---|
 | `GET /imbalance/prices` | Imbalance prices per MWh, grouped by direction (`positive`/`symmetric`/`negative`) | `area` |
+| `GET /imbalance/prices/forecast` | Experimental. Imbalance price forecasts as predictive distributions: `quantiles` gives one level/price pair per quantile level, ascending by level; `degraded` flags a less trustworthy forecast | `area` |
 | `GET /imbalance/total-volumes` | Settled total imbalance volume as average power, direction `surplus`/`deficit`/`balanced` per period | `area` |
 | `GET /imbalance/total-volumes/current` | Experimental. Provisional open area control error at 1-minute resolution, roughly 25 min behind real time, ~90 days retained | `area` |
 | `GET /balancing/energy/activated-volumes` | Activated balancing energy as average power in MW, by direction and activation type | `area`, `reserve-type` |
@@ -124,6 +125,9 @@ references/pagination-and-polling.md).
   `localDemandInMw`. There are no unit-less aliases on v2.
 - **Capacity demand can double-count.** Sum only `additive` demand across procurements of one
   period; `substitutive` restates demand already covered by another procurement.
+- **Forecast quantiles are self-describing.** Each forecast on `/imbalance/prices/forecast` states
+  the grid it was made on — read `level` off every quantile rather than indexing by a position you
+  hardcoded. Levels are decimals strictly between 0 and 1 (0.5 the median).
 - **Currency varies by area** (`EUR`, `BGN`, `CHF`, `HUF`, `PLN`, `RON`, `UAH`) and is stated per
   group — never assume euros.
 
