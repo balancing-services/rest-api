@@ -49,6 +49,10 @@ from .eic_code import EicCode
 from .energy_bid import EnergyBid
 from .imbalance_direction import ImbalanceDirection
 from .imbalance_price import ImbalancePrice
+from .imbalance_price_forecast import ImbalancePriceForecast
+from .imbalance_price_forecast_quantile import ImbalancePriceForecastQuantile
+from .imbalance_price_forecasts import ImbalancePriceForecasts
+from .imbalance_price_forecasts_response import ImbalancePriceForecastsResponse
 from .imbalance_prices import ImbalancePrices
 from .imbalance_prices_response import ImbalancePricesResponse
 from .imbalance_total_volumes import ImbalanceTotalVolumes
@@ -106,6 +110,10 @@ __all__ = (
     "EnergyBid",
     "ImbalanceDirection",
     "ImbalancePrice",
+    "ImbalancePriceForecast",
+    "ImbalancePriceForecastQuantile",
+    "ImbalancePriceForecasts",
+    "ImbalancePriceForecastsResponse",
     "ImbalancePrices",
     "ImbalancePricesResponse",
     "ImbalanceTotalVolumes",

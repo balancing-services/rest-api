@@ -22,8 +22,15 @@ from balancing_services.api.default import (
     get_cross_border_marginal_prices,
     get_current_imbalance_total_volumes,
     get_day_ahead_energy_prices,
+    get_imbalance_price_forecasts,
     get_imbalance_prices,
     get_imbalance_total_volumes,
+)
+from balancing_services.models import (
+    ImbalancePriceForecast,
+    ImbalancePriceForecastQuantile,
+    ImbalancePriceForecasts,
+    ImbalancePriceForecastsResponse,
 )
 from balancing_services.models.activation_type import ACTIVATION_TYPE_VALUES
 from balancing_services.models.area import AREA_VALUES
@@ -69,10 +76,32 @@ class TestAPIEndpointsExist:
         """Test that imbalance endpoints are available."""
         assert hasattr(get_imbalance_prices, "sync_detailed")
         assert hasattr(get_imbalance_prices, "asyncio_detailed")
+        assert hasattr(get_imbalance_price_forecasts, "sync_detailed")
+        assert hasattr(get_imbalance_price_forecasts, "asyncio_detailed")
         assert hasattr(get_imbalance_total_volumes, "sync_detailed")
         assert hasattr(get_imbalance_total_volumes, "asyncio_detailed")
         assert hasattr(get_current_imbalance_total_volumes, "sync_detailed")
         assert hasattr(get_current_imbalance_total_volumes, "asyncio_detailed")
+
+    def test_imbalance_price_forecast_models_exist(self):
+        """Test that the imbalance price forecast models are exported and shaped as expected."""
+        forecast = ImbalancePriceForecast.from_dict(
+            {
+                "period": {
+                    "startAt": "2025-01-01T00:00:00Z",
+                    "endAt": "2025-01-01T00:15:00Z",
+                },
+                "quantiles": [{"level": 0.5, "pricePerMwh": 45.5}],
+                "madeAt": "2025-01-01T00:05:00Z",
+                "degraded": False,
+            }
+        )
+        assert forecast.degraded is False
+        assert isinstance(forecast.quantiles[0], ImbalancePriceForecastQuantile)
+        assert forecast.quantiles[0].level == 0.5
+        assert forecast.quantiles[0].price_per_mwh == 45.5
+        assert hasattr(ImbalancePriceForecasts, "from_dict")
+        assert hasattr(ImbalancePriceForecastsResponse, "from_dict")
 
     def test_balancing_energy_endpoints_exist(self):
         """Test that balancing energy endpoints are available."""
