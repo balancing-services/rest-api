@@ -53,6 +53,9 @@ from .imbalance_price_forecast import ImbalancePriceForecast
 from .imbalance_price_forecast_quantile import ImbalancePriceForecastQuantile
 from .imbalance_price_forecasts import ImbalancePriceForecasts
 from .imbalance_price_forecasts_response import ImbalancePriceForecastsResponse
+from .imbalance_price_history import ImbalancePriceHistory
+from .imbalance_price_history_response import ImbalancePriceHistoryResponse
+from .imbalance_price_revision import ImbalancePriceRevision
 from .imbalance_prices import ImbalancePrices
 from .imbalance_prices_response import ImbalancePricesResponse
 from .imbalance_total_volumes import ImbalanceTotalVolumes
@@ -114,6 +117,9 @@ __all__ = (
     "ImbalancePriceForecastQuantile",
     "ImbalancePriceForecasts",
     "ImbalancePriceForecastsResponse",
+    "ImbalancePriceHistory",
+    "ImbalancePriceHistoryResponse",
+    "ImbalancePriceRevision",
     "ImbalancePrices",
     "ImbalancePricesResponse",
     "ImbalanceTotalVolumes",
