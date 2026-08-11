@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-08-11
+
 ### Added
 - Experimental imbalance price revision history endpoint (`/imbalance/prices/history`), serving how the prices on `/imbalance/prices` reached their current values — see the endpoint description for the semantics
 
@@ -221,7 +223,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - UTC timestamp-based period filtering
 - OpenAPI 3.0.3 specification
 
-[Unreleased]: https://github.com/balancing-services/rest-api/compare/v2.1.0...HEAD
+[Unreleased]: https://github.com/balancing-services/rest-api/compare/v2.2.0...HEAD
+[2.2.0]: https://github.com/balancing-services/rest-api/compare/v2.1.0...v2.2.0
 [2.1.0]: https://github.com/balancing-services/rest-api/compare/v2.0.2...v2.1.0
 [2.0.2]: https://github.com/balancing-services/rest-api/compare/v2.0.1...v2.0.2
 [2.0.1]: https://github.com/balancing-services/rest-api/compare/v2.0.0...v2.0.1
