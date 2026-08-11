@@ -106,6 +106,55 @@ paths:
         '501':
           $ref: '#/components/responses/NotImplemented'
 
+  /imbalance/prices/history:
+    get:
+      summary: Get the revision history of the imbalance prices for an area
+      description: |
+        **Experimental** - This endpoint is under active development and may change without notice.
+
+        Returns how the imbalance prices on `/imbalance/prices` reached their current values: the
+        sequence of values held for a period, each stamped with the `observedAt` it was recorded at.
+        The response is the `/imbalance/prices` shape with `observedAt` added to each entry of
+        `prices`, which carries the revision entries, ascending by `observedAt`.
+      operationId: getImbalancePriceHistory
+      parameters:
+        - $ref: '#/components/parameters/area'
+        - $ref: '#/components/parameters/period-start-at'
+        - $ref: '#/components/parameters/period-end-at'
+        - $ref: '#/components/parameters/cursor'
+        - name: limit
+          in: query
+          description: Maximum number of results to return (default 100, max 1000)
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+            default: 100
+            example: 100
+        - $ref: '#/components/parameters/updated-since'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImbalancePriceHistoryResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '501':
+          $ref: '#/components/responses/NotImplemented'
+
   /imbalance/total-volumes:
     get:
       summary: Get total imbalance volumes for an area
@@ -1386,6 +1435,73 @@ components:
           type: number
           description: Forecast price per MWh at this level, in the group's currency
           example: 45.50
+
+    ImbalancePriceHistoryResponse:
+      type: object
+      required:
+        - queriedPeriod
+        - data
+        - hasMore
+        - nextUpdatedSince
+      properties:
+        queriedPeriod:
+          $ref: '#/components/schemas/Period'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImbalancePriceHistory'
+        nextCursor:
+          type: string
+          description: Cursor to fetch the next page of results. Null if no more results.
+          example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
+          nullable: true
+        hasMore:
+          type: boolean
+          description: Indicates whether there are more results available
+          example: false
+        nextUpdatedSince:
+          $ref: '#/components/schemas/NextUpdatedSince'
+
+    ImbalancePriceHistory:
+      type: object
+      required:
+        - area
+        - eicCode
+        - currency
+        - direction
+        - prices
+      properties:
+        area:
+          $ref: '#/components/schemas/Area'
+        eicCode:
+          $ref: '#/components/schemas/EicCode'
+        currency:
+          $ref: '#/components/schemas/Currency'
+        direction:
+          $ref: '#/components/schemas/ImbalanceDirection'
+        prices:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImbalancePriceRevision'
+
+    ImbalancePriceRevision:
+      type: object
+      required:
+        - period
+        - pricePerMwh
+        - observedAt
+      properties:
+        period:
+          $ref: '#/components/schemas/Period'
+        pricePerMwh:
+          type: number
+          description: Price per MWh in the specified currency
+          example: 45.50
+        observedAt:
+          type: string
+          format: date-time
+          description: When this revision was recorded (UTC)
+          example: '2026-08-04T10:07:31Z'
 
     ImbalanceTotalVolumesResponse:
       type: object

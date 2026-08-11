@@ -23,6 +23,7 @@ from balancing_services.api.default import (
     get_current_imbalance_total_volumes,
     get_day_ahead_energy_prices,
     get_imbalance_price_forecasts,
+    get_imbalance_price_history,
     get_imbalance_prices,
     get_imbalance_total_volumes,
 )
@@ -31,6 +32,9 @@ from balancing_services.models import (
     ImbalancePriceForecastQuantile,
     ImbalancePriceForecasts,
     ImbalancePriceForecastsResponse,
+    ImbalancePriceHistory,
+    ImbalancePriceHistoryResponse,
+    ImbalancePriceRevision,
 )
 from balancing_services.models.activation_type import ACTIVATION_TYPE_VALUES
 from balancing_services.models.area import AREA_VALUES
@@ -78,6 +82,8 @@ class TestAPIEndpointsExist:
         assert hasattr(get_imbalance_prices, "asyncio_detailed")
         assert hasattr(get_imbalance_price_forecasts, "sync_detailed")
         assert hasattr(get_imbalance_price_forecasts, "asyncio_detailed")
+        assert hasattr(get_imbalance_price_history, "sync_detailed")
+        assert hasattr(get_imbalance_price_history, "asyncio_detailed")
         assert hasattr(get_imbalance_total_volumes, "sync_detailed")
         assert hasattr(get_imbalance_total_volumes, "asyncio_detailed")
         assert hasattr(get_current_imbalance_total_volumes, "sync_detailed")
@@ -102,6 +108,23 @@ class TestAPIEndpointsExist:
         assert forecast.quantiles[0].price_per_mwh == 45.5
         assert hasattr(ImbalancePriceForecasts, "from_dict")
         assert hasattr(ImbalancePriceForecastsResponse, "from_dict")
+
+    def test_imbalance_price_history_models_exist(self):
+        """Test that the imbalance price history models are exported and shaped as expected."""
+        revision = ImbalancePriceRevision.from_dict(
+            {
+                "period": {
+                    "startAt": "2025-01-01T00:00:00Z",
+                    "endAt": "2025-01-01T00:15:00Z",
+                },
+                "pricePerMwh": 41.2,
+                "observedAt": "2025-01-01T00:16:04Z",
+            }
+        )
+        assert revision.price_per_mwh == 41.2
+        assert revision.observed_at.isoformat() == "2025-01-01T00:16:04+00:00"
+        assert hasattr(ImbalancePriceHistory, "from_dict")
+        assert hasattr(ImbalancePriceHistoryResponse, "from_dict")
 
     def test_balancing_energy_endpoints_exist(self):
         """Test that balancing energy endpoints are available."""

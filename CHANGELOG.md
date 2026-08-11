@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Experimental imbalance price revision history endpoint (`/imbalance/prices/history`), serving how the prices on `/imbalance/prices` reached their current values — see the endpoint description for the semantics
+
 ## [2.1.0] - 2026-08-08
 
 ### Added

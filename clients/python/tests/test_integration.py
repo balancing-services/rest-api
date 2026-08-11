@@ -22,6 +22,7 @@ from balancing_services.api.default import (
     get_current_imbalance_total_volumes,
     get_day_ahead_energy_prices,
     get_imbalance_price_forecasts,
+    get_imbalance_price_history,
     get_imbalance_prices,
 )
 
@@ -1794,3 +1795,166 @@ async def test_async_get_imbalance_price_forecasts(authenticated_client, mock_im
     assert len(response.parsed.data) == 1
     assert len(response.parsed.data[0].forecasts) == 2
     assert response.parsed.data[0].forecasts[0].quantiles[1].price_per_mwh == 45.5
+
+
+@pytest.fixture
+def mock_imbalance_price_history_response():
+    """Mock response data for the imbalance price revision history."""
+    return {
+        "queriedPeriod": {
+            "startAt": "2025-01-01T00:00:00Z",
+            "endAt": "2025-01-01T01:00:00Z"
+        },
+        "hasMore": False,
+        "nextUpdatedSince": "2025-01-01T00:20:00Z",
+        "data": [
+            {
+                "area": "BE",
+                "eicCode": "10YBE----------2",
+                "currency": "EUR",
+                "direction": "symmetric",
+                "prices": [
+                    {
+                        "period": {
+                            "startAt": "2025-01-01T00:00:00Z",
+                            "endAt": "2025-01-01T00:15:00Z"
+                        },
+                        "pricePerMwh": 41.2,
+                        "observedAt": "2025-01-01T00:16:04Z"
+                    },
+                    {
+                        "period": {
+                            "startAt": "2025-01-01T00:00:00Z",
+                            "endAt": "2025-01-01T00:15:00Z"
+                        },
+                        "pricePerMwh": 38.9,
+                        "observedAt": "2025-01-01T01:02:11Z"
+                    }
+                ]
+            }
+        ]
+    }
+
+
+@respx.mock
+def test_get_imbalance_price_history_success(authenticated_client, mock_imbalance_price_history_response):
+    """Test successful imbalance price history request."""
+    respx.get(
+        "https://api.balancing.services/v2/imbalance/prices/history"
+    ).mock(return_value=Response(200, json=mock_imbalance_price_history_response))
+
+    response = get_imbalance_price_history.sync_detailed(
+        client=authenticated_client,
+        area="BE",
+        period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
+        period_end_at=datetime(2025, 1, 1, 1, 0, 0, tzinfo=timezone.utc)
+    )
+
+    assert response.status_code == 200
+    assert response.parsed is not None
+    assert response.parsed.has_more is False
+    assert len(response.parsed.data) == 1
+    assert response.parsed.data[0].area == "BE"
+    assert response.parsed.data[0].currency == "EUR"
+    assert response.parsed.data[0].direction == "symmetric"
+
+    # One period, two entries: the same quarter revised once. They are distinguished
+    # only by observedAt, which ascends, and the last one is the value served now.
+    revisions = response.parsed.data[0].prices
+    assert len(revisions) == 2
+    assert all(
+        revision.period.start_at == datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
+        for revision in revisions
+    )
+    observed_at = [revision.observed_at for revision in revisions]
+    assert observed_at == sorted(observed_at)
+    assert observed_at[0] == datetime(2025, 1, 1, 0, 16, 4, tzinfo=timezone.utc)
+    assert revisions[0].price_per_mwh == 41.2
+    assert revisions[-1].price_per_mwh == 38.9
+
+
+@respx.mock
+def test_get_imbalance_price_history_before_log_start_is_empty(authenticated_client):
+    """Test that a window predating the revision log returns an empty result, not an error."""
+    empty_response = {
+        "queriedPeriod": {
+            "startAt": "2025-01-01T00:00:00Z",
+            "endAt": "2025-01-01T01:00:00Z"
+        },
+        "hasMore": False,
+        "nextUpdatedSince": "2025-01-01T00:20:00Z",
+        "data": []
+    }
+
+    respx.get(
+        "https://api.balancing.services/v2/imbalance/prices/history"
+    ).mock(return_value=Response(200, json=empty_response))
+
+    response = get_imbalance_price_history.sync_detailed(
+        client=authenticated_client,
+        area="BE",
+        period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
+        period_end_at=datetime(2025, 1, 1, 1, 0, 0, tzinfo=timezone.utc)
+    )
+
+    assert response.status_code == 200
+    assert response.parsed is not None
+    assert response.parsed.data == []
+    assert response.parsed.has_more is False
+
+
+@respx.mock
+def test_get_imbalance_price_history_pagination(authenticated_client, mock_imbalance_price_history_response):
+    """Test imbalance price history pagination - cursor/limit/updated-since sent, nextCursor parsed."""
+    paginated_response = {
+        **mock_imbalance_price_history_response,
+        "hasMore": True,
+        "nextCursor": "v1:AAAAAYwBAgMEBQYHCAkKCw==",
+    }
+
+    route = respx.get(
+        "https://api.balancing.services/v2/imbalance/prices/history"
+    ).mock(return_value=Response(200, json=paginated_response))
+
+    response = get_imbalance_price_history.sync_detailed(
+        client=authenticated_client,
+        area="BE",
+        period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
+        period_end_at=datetime(2025, 1, 1, 1, 0, 0, tzinfo=timezone.utc),
+        cursor="v1:AAAAAYwBAgMEBQYHCAkKCw==",
+        limit=100,
+        updated_since=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
+    )
+
+    assert response.status_code == 200
+    assert response.parsed is not None
+    assert response.parsed.has_more is True
+    assert response.parsed.next_cursor == "v1:AAAAAYwBAgMEBQYHCAkKCw=="
+    assert response.parsed.next_updated_since == datetime(2025, 1, 1, 0, 20, 0, tzinfo=timezone.utc)
+    sent_url = route.calls.last.request.url
+    assert sent_url.params["cursor"] == "v1:AAAAAYwBAgMEBQYHCAkKCw=="
+    assert sent_url.params["limit"] == "100"
+    assert sent_url.params["updated-since"] == "2025-01-01T00:00:00+00:00"
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_async_get_imbalance_price_history(authenticated_client, mock_imbalance_price_history_response):
+    """Test async request for the imbalance price history."""
+    respx.get(
+        "https://api.balancing.services/v2/imbalance/prices/history"
+    ).mock(return_value=Response(200, json=mock_imbalance_price_history_response))
+
+    response = await get_imbalance_price_history.asyncio_detailed(
+        client=authenticated_client,
+        area="BE",
+        period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
+        period_end_at=datetime(2025, 1, 1, 1, 0, 0, tzinfo=timezone.utc)
+    )
+
+    assert response.status_code == 200
+    assert response.parsed is not None
+    assert len(response.parsed.data[0].prices) == 2
+    assert response.parsed.data[0].prices[-1].observed_at == datetime(
+        2025, 1, 1, 1, 2, 11, tzinfo=timezone.utc
+    )

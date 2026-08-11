@@ -51,6 +51,7 @@ All take `period-start-at` and `period-end-at`; the last column lists what else 
 |---|---|---|
 | `GET /imbalance/prices` | Imbalance prices per MWh, grouped by direction (`positive`/`symmetric`/`negative`) | `area` |
 | `GET /imbalance/prices/forecast` | Experimental. Imbalance price forecasts as predictive distributions: `quantiles` gives one level/price pair per quantile level, ascending by level; `degraded` flags a less trustworthy forecast | `area` |
+| `GET /imbalance/prices/history` | Experimental. The revision history of `/imbalance/prices`: the sequence of values held for a period, each stamped with its `observedAt` — a lineage, normally ending at the value served now | `area` |
 | `GET /imbalance/total-volumes` | Settled total imbalance volume as average power, direction `surplus`/`deficit`/`balanced` per period | `area` |
 | `GET /imbalance/total-volumes/current` | Experimental. Provisional open area control error at 1-minute resolution, roughly 25 min behind real time, ~90 days retained | `area` |
 | `GET /balancing/energy/activated-volumes` | Activated balancing energy as average power in MW, by direction and activation type | `area`, `reserve-type` |
