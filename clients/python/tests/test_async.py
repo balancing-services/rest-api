@@ -2,7 +2,6 @@
 Async tests for the Balancing Services Python client.
 """
 
-
 import pytest
 
 from balancing_services import AuthenticatedClient
@@ -18,20 +17,14 @@ class TestAsyncClient:
     @pytest.mark.asyncio
     async def test_async_client_creation(self):
         """Test that async client can be created."""
-        client = AuthenticatedClient(
-            base_url="https://api.balancing.services/v2",
-            token="test_token"
-        )
+        client = AuthenticatedClient(base_url="https://api.balancing.services/v2", token="test_token")
         async_httpx_client = client.get_async_httpx_client()
         assert async_httpx_client is not None
 
     @pytest.mark.asyncio
     async def test_async_client_cleanup(self):
         """Test that async client can be properly closed."""
-        client = AuthenticatedClient(
-            base_url="https://api.balancing.services/v2",
-            token="test_token"
-        )
+        client = AuthenticatedClient(base_url="https://api.balancing.services/v2", token="test_token")
         async_client = client.get_async_httpx_client()
 
         await async_client.aclose()
@@ -41,10 +34,7 @@ class TestAsyncClient:
     @pytest.mark.asyncio
     async def test_async_context_manager(self):
         """Test async context manager usage."""
-        client = AuthenticatedClient(
-            base_url="https://api.balancing.services/v2",
-            token="test_token"
-        )
+        client = AuthenticatedClient(base_url="https://api.balancing.services/v2", token="test_token")
 
         async with client.get_async_httpx_client() as async_client:
             assert not async_client.is_closed

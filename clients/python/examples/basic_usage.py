@@ -28,9 +28,7 @@ def main():
     args = parser.parse_args()
 
     # Create an authenticated client
-    client = AuthenticatedClient(
-        base_url="https://api.balancing.services/v2", token=args.api_token
-    )
+    client = AuthenticatedClient(base_url="https://api.balancing.services/v2", token=args.api_token)
 
     # Fetch imbalance prices for Estonia for yesterday (full day)
     today = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)

@@ -26,7 +26,7 @@ def extract_python_code_blocks(readme_path: Path) -> dict[str, str]:
     content = readme_path.read_text()
 
     # Find all Python code blocks with their preceding context
-    pattern = r'###?\s+([^\n]+)\n+```python\n(.*?)\n```'
+    pattern = r"###?\s+([^\n]+)\n+```python\n(.*?)\n```"
     matches = re.finditer(pattern, content, re.DOTALL)
 
     blocks = {}
@@ -34,7 +34,7 @@ def extract_python_code_blocks(readme_path: Path) -> dict[str, str]:
         title = match.group(1).strip()
         code = match.group(2)
         # Skip blocks that are just comments or configuration
-        if code.strip() and 'get_' in code:
+        if code.strip() and "get_" in code:
             blocks[title] = code
 
     return blocks
@@ -44,10 +44,7 @@ def extract_python_code_blocks(readme_path: Path) -> dict[str, str]:
 def mock_success_response():
     """Mock successful API response."""
     return {
-        "queriedPeriod": {
-            "startAt": "2025-01-01T00:00:00Z",
-            "endAt": "2025-01-02T00:00:00Z"
-        },
+        "queriedPeriod": {"startAt": "2025-01-01T00:00:00Z", "endAt": "2025-01-02T00:00:00Z"},
         "hasMore": False,
         "nextUpdatedSince": "2025-01-02T09:15:00Z",
         "data": [
@@ -58,15 +55,12 @@ def mock_success_response():
                 "currency": "EUR",
                 "prices": [
                     {
-                        "period": {
-                            "startAt": "2025-01-01T00:00:00Z",
-                            "endAt": "2025-01-01T01:00:00Z"
-                        },
-                        "pricePerMwh": 45.5
+                        "period": {"startAt": "2025-01-01T00:00:00Z", "endAt": "2025-01-01T01:00:00Z"},
+                        "pricePerMwh": 45.5,
                     }
-                ]
+                ],
             }
-        ]
+        ],
     }
 
 
@@ -74,10 +68,7 @@ def mock_success_response():
 def mock_bids_response():
     """Mock balancing energy bids response with pagination."""
     return {
-        "queriedPeriod": {
-            "startAt": "2025-01-01T00:00:00Z",
-            "endAt": "2025-01-02T00:00:00Z"
-        },
+        "queriedPeriod": {"startAt": "2025-01-01T00:00:00Z", "endAt": "2025-01-02T00:00:00Z"},
         "hasMore": True,
         "nextUpdatedSince": "2025-01-02T09:15:00Z",
         "nextCursor": "v1:test_cursor",
@@ -91,32 +82,19 @@ def mock_bids_response():
                 "currency": "EUR",
                 "periods": [
                     {
-                        "period": {
-                            "startAt": "2025-01-01T00:00:00Z",
-                            "endAt": "2025-01-01T00:15:00Z"
-                        },
-                        "bids": [
-                            {
-                                "volumeInMw": 10.5,
-                                "pricePerMwh": 25.0
-                            }
-                        ]
+                        "period": {"startAt": "2025-01-01T00:00:00Z", "endAt": "2025-01-01T00:15:00Z"},
+                        "bids": [{"volumeInMw": 10.5, "pricePerMwh": 25.0}],
                     }
-                ]
+                ],
             }
-        ]
+        ],
     }
 
 
 @pytest.fixture
 def mock_error_401():
     """Mock 401 unauthorized error response."""
-    return {
-        "type": "unauthorized",
-        "title": "Unauthorized",
-        "status": 401,
-        "detail": "Invalid API key"
-    }
+    return {"type": "unauthorized", "title": "Unauthorized", "status": 401, "detail": "Invalid API key"}
 
 
 @respx.mock
@@ -186,11 +164,11 @@ async def test_async_example_executes(mock_success_response):
     exec_globals = {}
     try:
         # Remove the asyncio.run() line since we're already in async context
-        code_without_run = async_example.rsplit('# Run async function', 1)[0]
+        code_without_run = async_example.rsplit("# Run async function", 1)[0]
         exec(code_without_run, exec_globals)
 
         # Now call the async function directly
-        fetch_prices = exec_globals.get('fetch_prices')
+        fetch_prices = exec_globals.get("fetch_prices")
         if fetch_prices:
             await fetch_prices()
     except Exception as e:

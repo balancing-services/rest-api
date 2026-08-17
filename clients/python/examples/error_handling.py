@@ -71,7 +71,7 @@ def fetch_with_retry(client, area, reserve_type, period_start, period_end, max_r
         # Forbidden
         elif response.status_code == 403:
             error = response.parsed
-            detail = error.detail if hasattr(error, 'detail') else 'Insufficient permissions'
+            detail = error.detail if hasattr(error, "detail") else "Insufficient permissions"
             print(f"Error: Access forbidden - {detail}")
             return None
 
@@ -127,9 +127,7 @@ def main():
     args = parser.parse_args()
 
     # Create an authenticated client
-    client = AuthenticatedClient(
-        base_url="https://api.balancing.services/v2", token=args.api_token
-    )
+    client = AuthenticatedClient(base_url="https://api.balancing.services/v2", token=args.api_token)
 
     # Fetch data with retry logic
     data = fetch_with_retry(
@@ -138,7 +136,7 @@ def main():
         reserve_type="aFRR",
         period_start=isoparse("2025-01-01T00:00:00Z"),
         period_end=isoparse("2025-01-02T00:00:00Z"),
-        max_retries=3
+        max_retries=3,
     )
 
     if data:

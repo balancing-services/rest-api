@@ -17,6 +17,7 @@ technically redundant. Run from generate.sh after generation; `cast` is appended
 `from typing import ...` line, which is already the ruff/isort canonical order (types before
 lowercase names), so the output is stable regardless of the later ruff --fix pass.
 """
+
 import pathlib
 import re
 

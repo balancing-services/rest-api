@@ -23,9 +23,7 @@ def test_period_parses_z_suffixed_timestamps():
     On Python 3.10 this fails without the shim, since ``fromisoformat`` rejects
     the trailing 'Z'.
     """
-    period = Period.from_dict(
-        {"startAt": "2025-01-01T00:00:00Z", "endAt": "2025-01-01T01:00:00Z"}
-    )
+    period = Period.from_dict({"startAt": "2025-01-01T00:00:00Z", "endAt": "2025-01-01T01:00:00Z"})
     assert period.start_at.utcoffset() == timedelta(0)
     assert period.end_at.utcoffset() == timedelta(0)
 

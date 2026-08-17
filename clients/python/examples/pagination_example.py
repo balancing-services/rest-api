@@ -28,9 +28,7 @@ def main():
     args = parser.parse_args()
 
     # Create an authenticated client
-    client = AuthenticatedClient(
-        base_url="https://api.balancing.services/v2", token=args.api_token
-    )
+    client = AuthenticatedClient(base_url="https://api.balancing.services/v2", token=args.api_token)
 
     # Fetch balancing energy bids with pagination for yesterday
     today = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
@@ -89,10 +87,7 @@ def main():
                 for bid in period.bids:
                     if shown >= 3:
                         break
-                    print(
-                        f"    Bid {shown + 1}: {bid.volume_in_mw} MW @ "
-                        f"{bid.price_per_mwh} {bid_group.currency}/MWh"
-                    )
+                    print(f"    Bid {shown + 1}: {bid.volume_in_mw} MW @ {bid.price_per_mwh} {bid_group.currency}/MWh")
                     print(f"           Period: {period.period.start_at} to {period.period.end_at}")
                     shown += 1
 

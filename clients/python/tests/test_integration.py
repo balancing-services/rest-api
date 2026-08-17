@@ -31,20 +31,14 @@ from balancing_services.api.default import (
 @pytest.fixture
 def authenticated_client():
     """Create an authenticated client for testing."""
-    return AuthenticatedClient(
-        base_url="https://api.balancing.services/v2",
-        token="test_token_12345"
-    )
+    return AuthenticatedClient(base_url="https://api.balancing.services/v2", token="test_token_12345")
 
 
 @pytest.fixture
 def mock_imbalance_prices_response():
     """Mock response data for imbalance prices."""
     return {
-        "queriedPeriod": {
-            "startAt": "2025-01-01T00:00:00Z",
-            "endAt": "2025-01-02T00:00:00Z"
-        },
+        "queriedPeriod": {"startAt": "2025-01-01T00:00:00Z", "endAt": "2025-01-02T00:00:00Z"},
         "hasMore": False,
         "nextUpdatedSince": "2025-01-02T09:15:00Z",
         "data": [
@@ -55,15 +49,12 @@ def mock_imbalance_prices_response():
                 "currency": "EUR",
                 "prices": [
                     {
-                        "period": {
-                            "startAt": "2025-01-01T00:00:00Z",
-                            "endAt": "2025-01-01T01:00:00Z"
-                        },
-                        "pricePerMwh": 45.5
+                        "period": {"startAt": "2025-01-01T00:00:00Z", "endAt": "2025-01-01T01:00:00Z"},
+                        "pricePerMwh": 45.5,
                     }
-                ]
+                ],
             }
-        ]
+        ],
     }
 
 
@@ -71,10 +62,7 @@ def mock_imbalance_prices_response():
 def mock_balancing_energy_bids_response():
     """Mock response data for balancing energy bids."""
     return {
-        "queriedPeriod": {
-            "startAt": "2025-01-01T00:00:00Z",
-            "endAt": "2025-01-02T00:00:00Z"
-        },
+        "queriedPeriod": {"startAt": "2025-01-01T00:00:00Z", "endAt": "2025-01-02T00:00:00Z"},
         "hasMore": True,
         "nextUpdatedSince": "2025-01-02T09:15:00Z",
         "nextCursor": "v1:AAAAAYwBAgMEBQYHCAkKCw==",
@@ -88,35 +76,27 @@ def mock_balancing_energy_bids_response():
                 "currency": "EUR",
                 "periods": [
                     {
-                        "period": {
-                            "startAt": "2025-01-01T00:00:00Z",
-                            "endAt": "2025-01-01T00:15:00Z"
-                        },
-                        "bids": [
-                            {
-                                "volumeInMw": 10.5,
-                                "pricePerMwh": 25.0
-                            }
-                        ]
+                        "period": {"startAt": "2025-01-01T00:00:00Z", "endAt": "2025-01-01T00:15:00Z"},
+                        "bids": [{"volumeInMw": 10.5, "pricePerMwh": 25.0}],
                     }
-                ]
+                ],
             }
-        ]
+        ],
     }
 
 
 @respx.mock
 def test_get_imbalance_prices_success(authenticated_client, mock_imbalance_prices_response):
     """Test successful imbalance prices request."""
-    respx.get(
-        "https://api.balancing.services/v2/imbalance/prices"
-    ).mock(return_value=Response(200, json=mock_imbalance_prices_response))
+    respx.get("https://api.balancing.services/v2/imbalance/prices").mock(
+        return_value=Response(200, json=mock_imbalance_prices_response)
+    )
 
     response = get_imbalance_prices.sync_detailed(
         client=authenticated_client,
         area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
-        period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc)
+        period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
     )
 
     assert response.status_code == 200
@@ -134,18 +114,18 @@ def test_get_imbalance_prices_unauthorized(authenticated_client):
         "type": "unauthorized",
         "title": "Unauthorized",
         "status": 401,
-        "detail": "Invalid or missing authentication token"
+        "detail": "Invalid or missing authentication token",
     }
 
-    respx.get(
-        "https://api.balancing.services/v2/imbalance/prices"
-    ).mock(return_value=Response(401, json=error_response))
+    respx.get("https://api.balancing.services/v2/imbalance/prices").mock(
+        return_value=Response(401, json=error_response)
+    )
 
     response = get_imbalance_prices.sync_detailed(
         client=authenticated_client,
         area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
-        period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc)
+        period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
     )
 
     assert response.status_code == 401
@@ -160,18 +140,18 @@ def test_get_imbalance_prices_bad_request(authenticated_client):
         "type": "invalid-parameter",
         "title": "Bad Request",
         "status": 400,
-        "detail": "Invalid period range"
+        "detail": "Invalid period range",
     }
 
-    respx.get(
-        "https://api.balancing.services/v2/imbalance/prices"
-    ).mock(return_value=Response(400, json=error_response))
+    respx.get("https://api.balancing.services/v2/imbalance/prices").mock(
+        return_value=Response(400, json=error_response)
+    )
 
     response = get_imbalance_prices.sync_detailed(
         client=authenticated_client,
         area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
-        period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc)
+        period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
     )
 
     assert response.status_code == 400
@@ -182,9 +162,9 @@ def test_get_imbalance_prices_bad_request(authenticated_client):
 @respx.mock
 def test_get_balancing_energy_bids_pagination(authenticated_client, mock_balancing_energy_bids_response):
     """Test pagination with balancing energy bids."""
-    respx.get(
-        "https://api.balancing.services/v2/balancing/energy/bids"
-    ).mock(return_value=Response(200, json=mock_balancing_energy_bids_response))
+    respx.get("https://api.balancing.services/v2/balancing/energy/bids").mock(
+        return_value=Response(200, json=mock_balancing_energy_bids_response)
+    )
 
     response = get_balancing_energy_bids.sync_detailed(
         client=authenticated_client,
@@ -192,7 +172,7 @@ def test_get_balancing_energy_bids_pagination(authenticated_client, mock_balanci
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
         reserve_type="aFRR",
-        limit=100
+        limit=100,
     )
 
     assert response.status_code == 200
@@ -208,15 +188,14 @@ def test_get_balancing_energy_bids_pagination(authenticated_client, mock_balanci
 def test_authentication_header_included(authenticated_client, mock_imbalance_prices_response):
     """Test that authentication header is included in requests."""
     route = respx.get(
-        "https://api.balancing.services/v2/imbalance/prices",
-        headers={"Authorization": "Bearer test_token_12345"}
+        "https://api.balancing.services/v2/imbalance/prices", headers={"Authorization": "Bearer test_token_12345"}
     ).mock(return_value=Response(200, json=mock_imbalance_prices_response))
 
     response = get_imbalance_prices.sync_detailed(
         client=authenticated_client,
         area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
-        period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc)
+        period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
     )
 
     assert response.status_code == 200
@@ -227,15 +206,15 @@ def test_authentication_header_included(authenticated_client, mock_imbalance_pri
 @respx.mock
 async def test_async_get_imbalance_prices(authenticated_client, mock_imbalance_prices_response):
     """Test async request for imbalance prices."""
-    respx.get(
-        "https://api.balancing.services/v2/imbalance/prices"
-    ).mock(return_value=Response(200, json=mock_imbalance_prices_response))
+    respx.get("https://api.balancing.services/v2/imbalance/prices").mock(
+        return_value=Response(200, json=mock_imbalance_prices_response)
+    )
 
     response = await get_imbalance_prices.asyncio_detailed(
         client=authenticated_client,
         area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
-        period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc)
+        period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
     )
 
     assert response.status_code == 200
@@ -248,10 +227,7 @@ async def test_async_get_imbalance_prices(authenticated_client, mock_imbalance_p
 def mock_offered_volumes_response():
     """Mock response data for offered balancing energy volumes."""
     return {
-        "queriedPeriod": {
-            "startAt": "2025-01-01T00:00:00Z",
-            "endAt": "2025-01-02T00:00:00Z"
-        },
+        "queriedPeriod": {"startAt": "2025-01-01T00:00:00Z", "endAt": "2025-01-02T00:00:00Z"},
         "hasMore": False,
         "nextUpdatedSince": "2025-01-02T09:15:00Z",
         "data": [
@@ -263,16 +239,10 @@ def mock_offered_volumes_response():
                 "activationType": "direct",
                 "standardProduct": True,
                 "volumes": [
-                    {
-                        "period": {
-                            "startAt": "2025-01-01T00:00:00Z",
-                            "endAt": "2025-01-01T01:00:00Z"
-                        },
-                        "volumeInMw": 50.0
-                    }
-                ]
+                    {"period": {"startAt": "2025-01-01T00:00:00Z", "endAt": "2025-01-01T01:00:00Z"}, "volumeInMw": 50.0}
+                ],
             }
-        ]
+        ],
     }
 
 
@@ -280,10 +250,7 @@ def mock_offered_volumes_response():
 def mock_cross_zonal_allocation_response():
     """Mock response data for cross-zonal capacity allocation."""
     return {
-        "queriedPeriod": {
-            "startAt": "2025-01-01T00:00:00Z",
-            "endAt": "2025-01-02T00:00:00Z"
-        },
+        "queriedPeriod": {"startAt": "2025-01-01T00:00:00Z", "endAt": "2025-01-02T00:00:00Z"},
         "hasMore": False,
         "nextUpdatedSince": "2025-01-02T09:15:00Z",
         "data": [
@@ -294,32 +261,26 @@ def mock_cross_zonal_allocation_response():
                 "toEicCode": "10YLV-1001A00074",
                 "reserveType": "aFRR",
                 "volumes": [
-                    {
-                        "period": {
-                            "startAt": "2025-01-01T00:00:00Z",
-                            "endAt": "2025-01-01T01:00:00Z"
-                        },
-                        "volumeInMw": 25.0
-                    }
-                ]
+                    {"period": {"startAt": "2025-01-01T00:00:00Z", "endAt": "2025-01-01T01:00:00Z"}, "volumeInMw": 25.0}
+                ],
             }
-        ]
+        ],
     }
 
 
 @respx.mock
 def test_get_balancing_energy_offered_volumes_success(authenticated_client, mock_offered_volumes_response):
     """Test successful offered balancing energy volumes request."""
-    respx.get(
-        "https://api.balancing.services/v2/balancing/energy/offered-volumes"
-    ).mock(return_value=Response(200, json=mock_offered_volumes_response))
+    respx.get("https://api.balancing.services/v2/balancing/energy/offered-volumes").mock(
+        return_value=Response(200, json=mock_offered_volumes_response)
+    )
 
     response = get_balancing_energy_offered_volumes.sync_detailed(
         client=authenticated_client,
         area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
-        reserve_type="aFRR"
+        reserve_type="aFRR",
     )
 
     assert response.status_code == 200
@@ -337,19 +298,19 @@ def test_get_balancing_energy_offered_volumes_unauthorized(authenticated_client)
         "type": "unauthorized",
         "title": "Unauthorized",
         "status": 401,
-        "detail": "Invalid or missing authentication token"
+        "detail": "Invalid or missing authentication token",
     }
 
-    respx.get(
-        "https://api.balancing.services/v2/balancing/energy/offered-volumes"
-    ).mock(return_value=Response(401, json=error_response))
+    respx.get("https://api.balancing.services/v2/balancing/energy/offered-volumes").mock(
+        return_value=Response(401, json=error_response)
+    )
 
     response = get_balancing_energy_offered_volumes.sync_detailed(
         client=authenticated_client,
         area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
-        reserve_type="aFRR"
+        reserve_type="aFRR",
     )
 
     assert response.status_code == 401
@@ -361,16 +322,16 @@ def test_get_balancing_energy_offered_volumes_unauthorized(authenticated_client)
 @respx.mock
 async def test_async_get_balancing_energy_offered_volumes(authenticated_client, mock_offered_volumes_response):
     """Test async request for offered balancing energy volumes."""
-    respx.get(
-        "https://api.balancing.services/v2/balancing/energy/offered-volumes"
-    ).mock(return_value=Response(200, json=mock_offered_volumes_response))
+    respx.get("https://api.balancing.services/v2/balancing/energy/offered-volumes").mock(
+        return_value=Response(200, json=mock_offered_volumes_response)
+    )
 
     response = await get_balancing_energy_offered_volumes.asyncio_detailed(
         client=authenticated_client,
         area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
-        reserve_type="aFRR"
+        reserve_type="aFRR",
     )
 
     assert response.status_code == 200
@@ -382,9 +343,9 @@ async def test_async_get_balancing_energy_offered_volumes(authenticated_client, 
 @respx.mock
 def test_get_cross_zonal_capacity_allocation_success(authenticated_client, mock_cross_zonal_allocation_response):
     """Test successful cross-zonal capacity allocation request."""
-    respx.get(
-        "https://api.balancing.services/v2/balancing/capacity/cross-zonal-allocation"
-    ).mock(return_value=Response(200, json=mock_cross_zonal_allocation_response))
+    respx.get("https://api.balancing.services/v2/balancing/capacity/cross-zonal-allocation").mock(
+        return_value=Response(200, json=mock_cross_zonal_allocation_response)
+    )
 
     response = get_cross_zonal_capacity_allocation.sync_detailed(
         client=authenticated_client,
@@ -392,7 +353,7 @@ def test_get_cross_zonal_capacity_allocation_success(authenticated_client, mock_
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
         reserve_type="aFRR",
-        other_area="LV"
+        other_area="LV",
     )
 
     assert response.status_code == 200
@@ -411,12 +372,12 @@ def test_get_cross_zonal_capacity_allocation_unauthorized(authenticated_client):
         "type": "unauthorized",
         "title": "Unauthorized",
         "status": 401,
-        "detail": "Invalid or missing authentication token"
+        "detail": "Invalid or missing authentication token",
     }
 
-    respx.get(
-        "https://api.balancing.services/v2/balancing/capacity/cross-zonal-allocation"
-    ).mock(return_value=Response(401, json=error_response))
+    respx.get("https://api.balancing.services/v2/balancing/capacity/cross-zonal-allocation").mock(
+        return_value=Response(401, json=error_response)
+    )
 
     response = get_cross_zonal_capacity_allocation.sync_detailed(
         client=authenticated_client,
@@ -424,7 +385,7 @@ def test_get_cross_zonal_capacity_allocation_unauthorized(authenticated_client):
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
         reserve_type="aFRR",
-        other_area="LV"
+        other_area="LV",
     )
 
     assert response.status_code == 401
@@ -436,9 +397,9 @@ def test_get_cross_zonal_capacity_allocation_unauthorized(authenticated_client):
 @respx.mock
 async def test_async_get_cross_zonal_capacity_allocation(authenticated_client, mock_cross_zonal_allocation_response):
     """Test async request for cross-zonal capacity allocation."""
-    respx.get(
-        "https://api.balancing.services/v2/balancing/capacity/cross-zonal-allocation"
-    ).mock(return_value=Response(200, json=mock_cross_zonal_allocation_response))
+    respx.get("https://api.balancing.services/v2/balancing/capacity/cross-zonal-allocation").mock(
+        return_value=Response(200, json=mock_cross_zonal_allocation_response)
+    )
 
     response = await get_cross_zonal_capacity_allocation.asyncio_detailed(
         client=authenticated_client,
@@ -446,7 +407,7 @@ async def test_async_get_cross_zonal_capacity_allocation(authenticated_client, m
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
         reserve_type="aFRR",
-        other_area="LV"
+        other_area="LV",
     )
 
     assert response.status_code == 200
@@ -459,10 +420,7 @@ async def test_async_get_cross_zonal_capacity_allocation(authenticated_client, m
 def mock_balancing_energy_demand_response():
     """Mock response data for balancing energy demand (also used for satisfied demand)."""
     return {
-        "queriedPeriod": {
-            "startAt": "2025-01-01T00:00:00Z",
-            "endAt": "2025-01-02T00:00:00Z"
-        },
+        "queriedPeriod": {"startAt": "2025-01-01T00:00:00Z", "endAt": "2025-01-02T00:00:00Z"},
         "hasMore": False,
         "nextUpdatedSince": "2025-01-02T09:15:00Z",
         "data": [
@@ -474,32 +432,26 @@ def mock_balancing_energy_demand_response():
                 "activationType": "notApplicable",
                 "standardProduct": True,
                 "volumes": [
-                    {
-                        "period": {
-                            "startAt": "2025-01-01T00:00:00Z",
-                            "endAt": "2025-01-01T01:00:00Z"
-                        },
-                        "volumeInMw": 80.0
-                    }
-                ]
+                    {"period": {"startAt": "2025-01-01T00:00:00Z", "endAt": "2025-01-01T01:00:00Z"}, "volumeInMw": 80.0}
+                ],
             }
-        ]
+        ],
     }
 
 
 @respx.mock
 def test_get_balancing_energy_demand_success(authenticated_client, mock_balancing_energy_demand_response):
     """Test successful balancing energy demand request."""
-    respx.get(
-        "https://api.balancing.services/v2/balancing/energy/demand"
-    ).mock(return_value=Response(200, json=mock_balancing_energy_demand_response))
+    respx.get("https://api.balancing.services/v2/balancing/energy/demand").mock(
+        return_value=Response(200, json=mock_balancing_energy_demand_response)
+    )
 
     response = get_balancing_energy_demand.sync_detailed(
         client=authenticated_client,
         area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
-        reserve_type="aFRR"
+        reserve_type="aFRR",
     )
 
     assert response.status_code == 200
@@ -522,9 +474,9 @@ def test_get_balancing_energy_demand_pagination(authenticated_client, mock_balan
         "nextCursor": "v1:AAAAAYwBAgMEBQYHCAkKCw==",
     }
 
-    route = respx.get(
-        "https://api.balancing.services/v2/balancing/energy/demand"
-    ).mock(return_value=Response(200, json=paginated_response))
+    route = respx.get("https://api.balancing.services/v2/balancing/energy/demand").mock(
+        return_value=Response(200, json=paginated_response)
+    )
 
     response = get_balancing_energy_demand.sync_detailed(
         client=authenticated_client,
@@ -552,19 +504,19 @@ def test_get_balancing_energy_demand_unauthorized(authenticated_client):
         "type": "unauthorized",
         "title": "Unauthorized",
         "status": 401,
-        "detail": "Invalid or missing authentication token"
+        "detail": "Invalid or missing authentication token",
     }
 
-    respx.get(
-        "https://api.balancing.services/v2/balancing/energy/demand"
-    ).mock(return_value=Response(401, json=error_response))
+    respx.get("https://api.balancing.services/v2/balancing/energy/demand").mock(
+        return_value=Response(401, json=error_response)
+    )
 
     response = get_balancing_energy_demand.sync_detailed(
         client=authenticated_client,
         area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
-        reserve_type="aFRR"
+        reserve_type="aFRR",
     )
 
     assert response.status_code == 401
@@ -576,16 +528,16 @@ def test_get_balancing_energy_demand_unauthorized(authenticated_client):
 @respx.mock
 async def test_async_get_balancing_energy_demand(authenticated_client, mock_balancing_energy_demand_response):
     """Test async request for balancing energy demand."""
-    respx.get(
-        "https://api.balancing.services/v2/balancing/energy/demand"
-    ).mock(return_value=Response(200, json=mock_balancing_energy_demand_response))
+    respx.get("https://api.balancing.services/v2/balancing/energy/demand").mock(
+        return_value=Response(200, json=mock_balancing_energy_demand_response)
+    )
 
     response = await get_balancing_energy_demand.asyncio_detailed(
         client=authenticated_client,
         area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
-        reserve_type="aFRR"
+        reserve_type="aFRR",
     )
 
     assert response.status_code == 200
@@ -597,16 +549,16 @@ async def test_async_get_balancing_energy_demand(authenticated_client, mock_bala
 @respx.mock
 def test_get_balancing_energy_satisfied_demand_success(authenticated_client, mock_balancing_energy_demand_response):
     """Test successful satisfied balancing energy demand request."""
-    respx.get(
-        "https://api.balancing.services/v2/balancing/energy/satisfied-demand"
-    ).mock(return_value=Response(200, json=mock_balancing_energy_demand_response))
+    respx.get("https://api.balancing.services/v2/balancing/energy/satisfied-demand").mock(
+        return_value=Response(200, json=mock_balancing_energy_demand_response)
+    )
 
     response = get_balancing_energy_satisfied_demand.sync_detailed(
         client=authenticated_client,
         area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
-        reserve_type="aFRR"
+        reserve_type="aFRR",
     )
 
     assert response.status_code == 200
@@ -628,9 +580,9 @@ def test_get_balancing_energy_satisfied_demand_pagination(authenticated_client, 
         "nextCursor": "v1:AAAAAYwBAgMEBQYHCAkKCw==",
     }
 
-    route = respx.get(
-        "https://api.balancing.services/v2/balancing/energy/satisfied-demand"
-    ).mock(return_value=Response(200, json=paginated_response))
+    route = respx.get("https://api.balancing.services/v2/balancing/energy/satisfied-demand").mock(
+        return_value=Response(200, json=paginated_response)
+    )
 
     response = get_balancing_energy_satisfied_demand.sync_detailed(
         client=authenticated_client,
@@ -658,19 +610,19 @@ def test_get_balancing_energy_satisfied_demand_unauthorized(authenticated_client
         "type": "unauthorized",
         "title": "Unauthorized",
         "status": 401,
-        "detail": "Invalid or missing authentication token"
+        "detail": "Invalid or missing authentication token",
     }
 
-    respx.get(
-        "https://api.balancing.services/v2/balancing/energy/satisfied-demand"
-    ).mock(return_value=Response(401, json=error_response))
+    respx.get("https://api.balancing.services/v2/balancing/energy/satisfied-demand").mock(
+        return_value=Response(401, json=error_response)
+    )
 
     response = get_balancing_energy_satisfied_demand.sync_detailed(
         client=authenticated_client,
         area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
-        reserve_type="aFRR"
+        reserve_type="aFRR",
     )
 
     assert response.status_code == 401
@@ -682,16 +634,16 @@ def test_get_balancing_energy_satisfied_demand_unauthorized(authenticated_client
 @respx.mock
 async def test_async_get_balancing_energy_satisfied_demand(authenticated_client, mock_balancing_energy_demand_response):
     """Test async request for satisfied balancing energy demand."""
-    respx.get(
-        "https://api.balancing.services/v2/balancing/energy/satisfied-demand"
-    ).mock(return_value=Response(200, json=mock_balancing_energy_demand_response))
+    respx.get("https://api.balancing.services/v2/balancing/energy/satisfied-demand").mock(
+        return_value=Response(200, json=mock_balancing_energy_demand_response)
+    )
 
     response = await get_balancing_energy_satisfied_demand.asyncio_detailed(
         client=authenticated_client,
         area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
-        reserve_type="aFRR"
+        reserve_type="aFRR",
     )
 
     assert response.status_code == 200
@@ -704,10 +656,7 @@ async def test_async_get_balancing_energy_satisfied_demand(authenticated_client,
 def mock_balancing_capacity_demand_response():
     """Mock response data for balancing capacity demand."""
     return {
-        "queriedPeriod": {
-            "startAt": "2025-01-01T00:00:00Z",
-            "endAt": "2025-01-02T00:00:00Z"
-        },
+        "queriedPeriod": {"startAt": "2025-01-01T00:00:00Z", "endAt": "2025-01-02T00:00:00Z"},
         "hasMore": False,
         "nextUpdatedSince": "2025-01-02T09:15:00Z",
         "data": [
@@ -720,32 +669,29 @@ def mock_balancing_capacity_demand_response():
                 "demandBasis": "additive",
                 "demands": [
                     {
-                        "period": {
-                            "startAt": "2025-01-01T00:00:00Z",
-                            "endAt": "2025-01-01T01:00:00Z"
-                        },
+                        "period": {"startAt": "2025-01-01T00:00:00Z", "endAt": "2025-01-01T01:00:00Z"},
                         "totalDemandInMw": 80.0,
-                        "localDemandInMw": 30.0
+                        "localDemandInMw": 30.0,
                     }
-                ]
+                ],
             }
-        ]
+        ],
     }
 
 
 @respx.mock
 def test_get_balancing_capacity_demand_success(authenticated_client, mock_balancing_capacity_demand_response):
     """Test successful balancing capacity demand request."""
-    respx.get(
-        "https://api.balancing.services/v2/balancing/capacity/demand"
-    ).mock(return_value=Response(200, json=mock_balancing_capacity_demand_response))
+    respx.get("https://api.balancing.services/v2/balancing/capacity/demand").mock(
+        return_value=Response(200, json=mock_balancing_capacity_demand_response)
+    )
 
     response = get_balancing_capacity_demand.sync_detailed(
         client=authenticated_client,
         area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
-        reserve_type="aFRR"
+        reserve_type="aFRR",
     )
 
     assert response.status_code == 200
@@ -770,9 +716,9 @@ def test_get_balancing_capacity_demand_pagination(authenticated_client, mock_bal
         "nextCursor": "v1:AAAAAYwBAgMEBQYHCAkKCw==",
     }
 
-    route = respx.get(
-        "https://api.balancing.services/v2/balancing/capacity/demand"
-    ).mock(return_value=Response(200, json=paginated_response))
+    route = respx.get("https://api.balancing.services/v2/balancing/capacity/demand").mock(
+        return_value=Response(200, json=paginated_response)
+    )
 
     response = get_balancing_capacity_demand.sync_detailed(
         client=authenticated_client,
@@ -800,19 +746,19 @@ def test_get_balancing_capacity_demand_unauthorized(authenticated_client):
         "type": "unauthorized",
         "title": "Unauthorized",
         "status": 401,
-        "detail": "Invalid or missing authentication token"
+        "detail": "Invalid or missing authentication token",
     }
 
-    respx.get(
-        "https://api.balancing.services/v2/balancing/capacity/demand"
-    ).mock(return_value=Response(401, json=error_response))
+    respx.get("https://api.balancing.services/v2/balancing/capacity/demand").mock(
+        return_value=Response(401, json=error_response)
+    )
 
     response = get_balancing_capacity_demand.sync_detailed(
         client=authenticated_client,
         area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
-        reserve_type="aFRR"
+        reserve_type="aFRR",
     )
 
     assert response.status_code == 401
@@ -824,16 +770,16 @@ def test_get_balancing_capacity_demand_unauthorized(authenticated_client):
 @respx.mock
 async def test_async_get_balancing_capacity_demand(authenticated_client, mock_balancing_capacity_demand_response):
     """Test async request for balancing capacity demand."""
-    respx.get(
-        "https://api.balancing.services/v2/balancing/capacity/demand"
-    ).mock(return_value=Response(200, json=mock_balancing_capacity_demand_response))
+    respx.get("https://api.balancing.services/v2/balancing/capacity/demand").mock(
+        return_value=Response(200, json=mock_balancing_capacity_demand_response)
+    )
 
     response = await get_balancing_capacity_demand.asyncio_detailed(
         client=authenticated_client,
         area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
         period_end_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
-        reserve_type="aFRR"
+        reserve_type="aFRR",
     )
 
     assert response.status_code == 200
@@ -846,10 +792,7 @@ async def test_async_get_balancing_capacity_demand(authenticated_client, mock_ba
 def mock_cross_border_marginal_prices_response():
     """Mock response data for cross-border marginal prices."""
     return {
-        "queriedPeriod": {
-            "startAt": "2026-03-01T00:00:00Z",
-            "endAt": "2026-03-01T01:00:00Z"
-        },
+        "queriedPeriod": {"startAt": "2026-03-01T00:00:00Z", "endAt": "2026-03-01T01:00:00Z"},
         "hasMore": True,
         "nextUpdatedSince": "2025-01-02T09:15:00Z",
         "nextCursor": "v1:AAAAAYwBAgMEBQYHCAkKCw==",
@@ -862,24 +805,21 @@ def mock_cross_border_marginal_prices_response():
                 "currency": "EUR",
                 "prices": [
                     {
-                        "period": {
-                            "startAt": "2026-03-01T00:00:00Z",
-                            "endAt": "2026-03-01T00:15:00Z"
-                        },
-                        "pricePerMwh": 45.50
+                        "period": {"startAt": "2026-03-01T00:00:00Z", "endAt": "2026-03-01T00:15:00Z"},
+                        "pricePerMwh": 45.50,
                     }
-                ]
+                ],
             }
-        ]
+        ],
     }
 
 
 @respx.mock
 def test_get_cross_border_marginal_prices_success(authenticated_client, mock_cross_border_marginal_prices_response):
     """Test successful cross-border marginal prices request."""
-    respx.get(
-        "https://api.balancing.services/v2/balancing/energy/cross-border-marginal-prices"
-    ).mock(return_value=Response(200, json=mock_cross_border_marginal_prices_response))
+    respx.get("https://api.balancing.services/v2/balancing/energy/cross-border-marginal-prices").mock(
+        return_value=Response(200, json=mock_cross_border_marginal_prices_response)
+    )
 
     response = get_cross_border_marginal_prices.sync_detailed(
         client=authenticated_client,
@@ -906,12 +846,12 @@ def test_get_cross_border_marginal_prices_unauthorized(authenticated_client):
         "type": "unauthorized",
         "title": "Unauthorized",
         "status": 401,
-        "detail": "Invalid or missing authentication token"
+        "detail": "Invalid or missing authentication token",
     }
 
-    respx.get(
-        "https://api.balancing.services/v2/balancing/energy/cross-border-marginal-prices"
-    ).mock(return_value=Response(401, json=error_response))
+    respx.get("https://api.balancing.services/v2/balancing/energy/cross-border-marginal-prices").mock(
+        return_value=Response(401, json=error_response)
+    )
 
     response = get_cross_border_marginal_prices.sync_detailed(
         client=authenticated_client,
@@ -930,9 +870,9 @@ def test_get_cross_border_marginal_prices_unauthorized(authenticated_client):
 @respx.mock
 async def test_async_get_cross_border_marginal_prices(authenticated_client, mock_cross_border_marginal_prices_response):
     """Test async request for cross-border marginal prices."""
-    respx.get(
-        "https://api.balancing.services/v2/balancing/energy/cross-border-marginal-prices"
-    ).mock(return_value=Response(200, json=mock_cross_border_marginal_prices_response))
+    respx.get("https://api.balancing.services/v2/balancing/energy/cross-border-marginal-prices").mock(
+        return_value=Response(200, json=mock_cross_border_marginal_prices_response)
+    )
 
     response = await get_cross_border_marginal_prices.asyncio_detailed(
         client=authenticated_client,
@@ -952,10 +892,7 @@ async def test_async_get_cross_border_marginal_prices(authenticated_client, mock
 def mock_cross_border_energy_volumes_response():
     """Mock response data for cross-border balancing energy volumes."""
     return {
-        "queriedPeriod": {
-            "startAt": "2026-03-01T00:00:00Z",
-            "endAt": "2026-03-01T01:00:00Z"
-        },
+        "queriedPeriod": {"startAt": "2026-03-01T00:00:00Z", "endAt": "2026-03-01T01:00:00Z"},
         "hasMore": False,
         "nextUpdatedSince": "2025-01-02T09:15:00Z",
         "data": [
@@ -968,24 +905,21 @@ def mock_cross_border_energy_volumes_response():
                 "activationType": "notApplicable",
                 "volumes": [
                     {
-                        "period": {
-                            "startAt": "2026-03-01T00:00:00Z",
-                            "endAt": "2026-03-01T00:15:00Z"
-                        },
-                        "volumeInMw": 250.5
+                        "period": {"startAt": "2026-03-01T00:00:00Z", "endAt": "2026-03-01T00:15:00Z"},
+                        "volumeInMw": 250.5,
                     }
-                ]
+                ],
             }
-        ]
+        ],
     }
 
 
 @respx.mock
 def test_get_cross_border_energy_volumes_success(authenticated_client, mock_cross_border_energy_volumes_response):
     """Test successful cross-border balancing energy volumes request."""
-    respx.get(
-        "https://api.balancing.services/v2/balancing/energy/cross-border-volumes"
-    ).mock(return_value=Response(200, json=mock_cross_border_energy_volumes_response))
+    respx.get("https://api.balancing.services/v2/balancing/energy/cross-border-volumes").mock(
+        return_value=Response(200, json=mock_cross_border_energy_volumes_response)
+    )
 
     response = get_cross_border_energy_volumes.sync_detailed(
         client=authenticated_client,
@@ -1014,12 +948,12 @@ def test_get_cross_border_energy_volumes_unauthorized(authenticated_client):
         "type": "unauthorized",
         "title": "Unauthorized",
         "status": 401,
-        "detail": "Invalid or missing authentication token"
+        "detail": "Invalid or missing authentication token",
     }
 
-    respx.get(
-        "https://api.balancing.services/v2/balancing/energy/cross-border-volumes"
-    ).mock(return_value=Response(401, json=error_response))
+    respx.get("https://api.balancing.services/v2/balancing/energy/cross-border-volumes").mock(
+        return_value=Response(401, json=error_response)
+    )
 
     response = get_cross_border_energy_volumes.sync_detailed(
         client=authenticated_client,
@@ -1039,9 +973,9 @@ def test_get_cross_border_energy_volumes_unauthorized(authenticated_client):
 @respx.mock
 async def test_async_get_cross_border_energy_volumes(authenticated_client, mock_cross_border_energy_volumes_response):
     """Test async request for cross-border balancing energy volumes."""
-    respx.get(
-        "https://api.balancing.services/v2/balancing/energy/cross-border-volumes"
-    ).mock(return_value=Response(200, json=mock_cross_border_energy_volumes_response))
+    respx.get("https://api.balancing.services/v2/balancing/energy/cross-border-volumes").mock(
+        return_value=Response(200, json=mock_cross_border_energy_volumes_response)
+    )
 
     response = await get_cross_border_energy_volumes.asyncio_detailed(
         client=authenticated_client,
@@ -1068,9 +1002,9 @@ def test_get_cross_border_energy_volumes_pagination(authenticated_client, mock_c
         "nextCursor": "v1:AAAAAYwBAgMEBQYHCAkKCw==",
     }
 
-    route = respx.get(
-        "https://api.balancing.services/v2/balancing/energy/cross-border-volumes"
-    ).mock(return_value=Response(200, json=paginated_response))
+    route = respx.get("https://api.balancing.services/v2/balancing/energy/cross-border-volumes").mock(
+        return_value=Response(200, json=paginated_response)
+    )
 
     response = get_cross_border_energy_volumes.sync_detailed(
         client=authenticated_client,
@@ -1099,10 +1033,7 @@ def test_get_cross_border_energy_volumes_pagination(authenticated_client, mock_c
 def mock_cross_border_available_capacity_response():
     """Mock response data for cross-border available capacity (both border directions)."""
     return {
-        "queriedPeriod": {
-            "startAt": "2025-01-01T00:00:00Z",
-            "endAt": "2025-01-02T00:00:00Z"
-        },
+        "queriedPeriod": {"startAt": "2025-01-01T00:00:00Z", "endAt": "2025-01-02T00:00:00Z"},
         "hasMore": False,
         "nextUpdatedSince": "2025-01-02T09:15:00Z",
         "data": [
@@ -1114,13 +1045,10 @@ def mock_cross_border_available_capacity_response():
                 "reserveType": "aFRR",
                 "availableCapacities": [
                     {
-                        "period": {
-                            "startAt": "2025-01-01T00:00:00Z",
-                            "endAt": "2025-01-01T00:15:00Z"
-                        },
-                        "availableCapacityInMw": 150.0
+                        "period": {"startAt": "2025-01-01T00:00:00Z", "endAt": "2025-01-01T00:15:00Z"},
+                        "availableCapacityInMw": 150.0,
                     }
-                ]
+                ],
             },
             {
                 "fromArea": "SE3",
@@ -1130,15 +1058,12 @@ def mock_cross_border_available_capacity_response():
                 "reserveType": "aFRR",
                 "availableCapacities": [
                     {
-                        "period": {
-                            "startAt": "2025-01-01T00:00:00Z",
-                            "endAt": "2025-01-01T00:15:00Z"
-                        },
-                        "availableCapacityInMw": 80.5
+                        "period": {"startAt": "2025-01-01T00:00:00Z", "endAt": "2025-01-01T00:15:00Z"},
+                        "availableCapacityInMw": 80.5,
                     }
-                ]
-            }
-        ]
+                ],
+            },
+        ],
     }
 
 
@@ -1147,9 +1072,9 @@ def test_get_cross_border_available_capacity_success(
     authenticated_client, mock_cross_border_available_capacity_response
 ):
     """Test successful cross-border available capacity request."""
-    respx.get(
-        "https://api.balancing.services/v2/balancing/cross-border/available-capacity"
-    ).mock(return_value=Response(200, json=mock_cross_border_available_capacity_response))
+    respx.get("https://api.balancing.services/v2/balancing/cross-border/available-capacity").mock(
+        return_value=Response(200, json=mock_cross_border_available_capacity_response)
+    )
 
     response = get_cross_border_available_capacity.sync_detailed(
         client=authenticated_client,
@@ -1181,12 +1106,12 @@ def test_get_cross_border_available_capacity_unauthorized(authenticated_client):
         "type": "unauthorized",
         "title": "Unauthorized",
         "status": 401,
-        "detail": "Invalid or missing authentication token"
+        "detail": "Invalid or missing authentication token",
     }
 
-    respx.get(
-        "https://api.balancing.services/v2/balancing/cross-border/available-capacity"
-    ).mock(return_value=Response(401, json=error_response))
+    respx.get("https://api.balancing.services/v2/balancing/cross-border/available-capacity").mock(
+        return_value=Response(401, json=error_response)
+    )
 
     response = get_cross_border_available_capacity.sync_detailed(
         client=authenticated_client,
@@ -1208,9 +1133,9 @@ async def test_async_get_cross_border_available_capacity(
     authenticated_client, mock_cross_border_available_capacity_response
 ):
     """Test async request for cross-border available capacity."""
-    respx.get(
-        "https://api.balancing.services/v2/balancing/cross-border/available-capacity"
-    ).mock(return_value=Response(200, json=mock_cross_border_available_capacity_response))
+    respx.get("https://api.balancing.services/v2/balancing/cross-border/available-capacity").mock(
+        return_value=Response(200, json=mock_cross_border_available_capacity_response)
+    )
 
     response = await get_cross_border_available_capacity.asyncio_detailed(
         client=authenticated_client,
@@ -1239,9 +1164,9 @@ def test_get_cross_border_available_capacity_pagination(
         "nextCursor": "v1:AAAAAYwBAgMEBQYHCAkKCw==",
     }
 
-    route = respx.get(
-        "https://api.balancing.services/v2/balancing/cross-border/available-capacity"
-    ).mock(return_value=Response(200, json=paginated_response))
+    route = respx.get("https://api.balancing.services/v2/balancing/cross-border/available-capacity").mock(
+        return_value=Response(200, json=paginated_response)
+    )
 
     response = get_cross_border_available_capacity.sync_detailed(
         client=authenticated_client,
@@ -1270,10 +1195,7 @@ def test_get_cross_border_available_capacity_pagination(
 def mock_current_imbalance_total_volumes_response():
     """Mock response data for current (provisional) total imbalance volumes."""
     return {
-        "queriedPeriod": {
-            "startAt": "2025-01-01T00:00:00Z",
-            "endAt": "2025-01-01T02:00:00Z"
-        },
+        "queriedPeriod": {"startAt": "2025-01-01T00:00:00Z", "endAt": "2025-01-01T02:00:00Z"},
         "hasMore": False,
         "nextUpdatedSince": "2025-01-02T09:15:00Z",
         "data": [
@@ -1282,26 +1204,20 @@ def mock_current_imbalance_total_volumes_response():
                 "eicCode": "10Y1001A1001A39I",
                 "volumes": [
                     {
-                        "period": {
-                            "startAt": "2025-01-01T00:00:00Z",
-                            "endAt": "2025-01-01T00:01:00Z"
-                        },
+                        "period": {"startAt": "2025-01-01T00:00:00Z", "endAt": "2025-01-01T00:01:00Z"},
                         "averagePowerMW": 4.2,
                         "averagePowerInMw": 4.2,
-                        "direction": "surplus"
+                        "direction": "surplus",
                     },
                     {
-                        "period": {
-                            "startAt": "2025-01-01T00:01:00Z",
-                            "endAt": "2025-01-01T00:02:00Z"
-                        },
+                        "period": {"startAt": "2025-01-01T00:01:00Z", "endAt": "2025-01-01T00:02:00Z"},
                         "averagePowerMW": 7.5,
                         "averagePowerInMw": 7.5,
-                        "direction": "deficit"
-                    }
-                ]
+                        "direction": "deficit",
+                    },
+                ],
             }
-        ]
+        ],
     }
 
 
@@ -1310,9 +1226,9 @@ def test_get_current_imbalance_total_volumes_success(
     authenticated_client, mock_current_imbalance_total_volumes_response
 ):
     """Test successful current imbalance total volumes request."""
-    respx.get(
-        "https://api.balancing.services/v2/imbalance/total-volumes/current"
-    ).mock(return_value=Response(200, json=mock_current_imbalance_total_volumes_response))
+    respx.get("https://api.balancing.services/v2/imbalance/total-volumes/current").mock(
+        return_value=Response(200, json=mock_current_imbalance_total_volumes_response)
+    )
 
     response = get_current_imbalance_total_volumes.sync_detailed(
         client=authenticated_client,
@@ -1340,12 +1256,12 @@ def test_get_current_imbalance_total_volumes_unauthorized(authenticated_client):
         "type": "unauthorized",
         "title": "Unauthorized",
         "status": 401,
-        "detail": "Invalid or missing authentication token"
+        "detail": "Invalid or missing authentication token",
     }
 
-    respx.get(
-        "https://api.balancing.services/v2/imbalance/total-volumes/current"
-    ).mock(return_value=Response(401, json=error_response))
+    respx.get("https://api.balancing.services/v2/imbalance/total-volumes/current").mock(
+        return_value=Response(401, json=error_response)
+    )
 
     response = get_current_imbalance_total_volumes.sync_detailed(
         client=authenticated_client,
@@ -1365,9 +1281,9 @@ async def test_async_get_current_imbalance_total_volumes(
     authenticated_client, mock_current_imbalance_total_volumes_response
 ):
     """Test async request for current imbalance total volumes."""
-    respx.get(
-        "https://api.balancing.services/v2/imbalance/total-volumes/current"
-    ).mock(return_value=Response(200, json=mock_current_imbalance_total_volumes_response))
+    respx.get("https://api.balancing.services/v2/imbalance/total-volumes/current").mock(
+        return_value=Response(200, json=mock_current_imbalance_total_volumes_response)
+    )
 
     response = await get_current_imbalance_total_volumes.asyncio_detailed(
         client=authenticated_client,
@@ -1394,9 +1310,9 @@ def test_get_current_imbalance_total_volumes_pagination(
         "nextCursor": "v1:AAAAAYwBAgMEBQYHCAkKCw==",
     }
 
-    route = respx.get(
-        "https://api.balancing.services/v2/imbalance/total-volumes/current"
-    ).mock(return_value=Response(200, json=paginated_response))
+    route = respx.get("https://api.balancing.services/v2/imbalance/total-volumes/current").mock(
+        return_value=Response(200, json=paginated_response)
+    )
 
     response = get_current_imbalance_total_volumes.sync_detailed(
         client=authenticated_client,
@@ -1420,10 +1336,7 @@ def test_get_current_imbalance_total_volumes_pagination(
 def mock_day_ahead_energy_prices_response():
     """Mock response data for day-ahead energy prices."""
     return {
-        "queriedPeriod": {
-            "startAt": "2025-01-01T00:00:00Z",
-            "endAt": "2025-01-02T00:00:00Z"
-        },
+        "queriedPeriod": {"startAt": "2025-01-01T00:00:00Z", "endAt": "2025-01-02T00:00:00Z"},
         "hasMore": False,
         "nextUpdatedSince": "2025-01-02T09:15:00Z",
         "data": [
@@ -1433,31 +1346,25 @@ def mock_day_ahead_energy_prices_response():
                 "currency": "EUR",
                 "prices": [
                     {
-                        "period": {
-                            "startAt": "2025-01-01T00:00:00Z",
-                            "endAt": "2025-01-01T01:00:00Z"
-                        },
-                        "pricePerMwh": 45.67
+                        "period": {"startAt": "2025-01-01T00:00:00Z", "endAt": "2025-01-01T01:00:00Z"},
+                        "pricePerMwh": 45.67,
                     },
                     {
-                        "period": {
-                            "startAt": "2025-01-01T01:00:00Z",
-                            "endAt": "2025-01-01T02:00:00Z"
-                        },
-                        "pricePerMwh": 38.21
-                    }
-                ]
+                        "period": {"startAt": "2025-01-01T01:00:00Z", "endAt": "2025-01-01T02:00:00Z"},
+                        "pricePerMwh": 38.21,
+                    },
+                ],
             }
-        ]
+        ],
     }
 
 
 @respx.mock
 def test_get_day_ahead_energy_prices_success(authenticated_client, mock_day_ahead_energy_prices_response):
     """Test successful day-ahead energy prices request."""
-    respx.get(
-        "https://api.balancing.services/v2/energy/day-ahead/prices"
-    ).mock(return_value=Response(200, json=mock_day_ahead_energy_prices_response))
+    respx.get("https://api.balancing.services/v2/energy/day-ahead/prices").mock(
+        return_value=Response(200, json=mock_day_ahead_energy_prices_response)
+    )
 
     response = get_day_ahead_energy_prices.sync_detailed(
         client=authenticated_client,
@@ -1481,10 +1388,7 @@ def test_get_day_ahead_energy_prices_success(authenticated_client, mock_day_ahea
 def test_get_day_ahead_energy_prices_pagination(authenticated_client):
     """Test day-ahead energy prices pagination - response with nextCursor."""
     paginated_response = {
-        "queriedPeriod": {
-            "startAt": "2025-01-01T00:00:00Z",
-            "endAt": "2025-01-08T00:00:00Z"
-        },
+        "queriedPeriod": {"startAt": "2025-01-01T00:00:00Z", "endAt": "2025-01-08T00:00:00Z"},
         "hasMore": True,
         "nextUpdatedSince": "2025-01-02T09:15:00Z",
         "nextCursor": "v1:AAAAAYwBAgMEBQYHCAkKCw==",
@@ -1495,20 +1399,17 @@ def test_get_day_ahead_energy_prices_pagination(authenticated_client):
                 "currency": "EUR",
                 "prices": [
                     {
-                        "period": {
-                            "startAt": "2025-01-01T00:00:00Z",
-                            "endAt": "2025-01-01T01:00:00Z"
-                        },
-                        "pricePerMwh": 45.67
+                        "period": {"startAt": "2025-01-01T00:00:00Z", "endAt": "2025-01-01T01:00:00Z"},
+                        "pricePerMwh": 45.67,
                     }
-                ]
+                ],
             }
-        ]
+        ],
     }
 
-    respx.get(
-        "https://api.balancing.services/v2/energy/day-ahead/prices"
-    ).mock(return_value=Response(200, json=paginated_response))
+    respx.get("https://api.balancing.services/v2/energy/day-ahead/prices").mock(
+        return_value=Response(200, json=paginated_response)
+    )
 
     response = get_day_ahead_energy_prices.sync_detailed(
         client=authenticated_client,
@@ -1532,12 +1433,12 @@ def test_get_day_ahead_energy_prices_unauthorized(authenticated_client):
         "type": "unauthorized",
         "title": "Unauthorized",
         "status": 401,
-        "detail": "Invalid or missing authentication token"
+        "detail": "Invalid or missing authentication token",
     }
 
-    respx.get(
-        "https://api.balancing.services/v2/energy/day-ahead/prices"
-    ).mock(return_value=Response(401, json=error_response))
+    respx.get("https://api.balancing.services/v2/energy/day-ahead/prices").mock(
+        return_value=Response(401, json=error_response)
+    )
 
     response = get_day_ahead_energy_prices.sync_detailed(
         client=authenticated_client,
@@ -1558,12 +1459,12 @@ def test_get_day_ahead_energy_prices_not_implemented(authenticated_client):
         "type": "not-implemented",
         "title": "Not Implemented",
         "status": 501,
-        "detail": "Day-ahead prices are not available for this bidding zone"
+        "detail": "Day-ahead prices are not available for this bidding zone",
     }
 
-    respx.get(
-        "https://api.balancing.services/v2/energy/day-ahead/prices"
-    ).mock(return_value=Response(501, json=error_response))
+    respx.get("https://api.balancing.services/v2/energy/day-ahead/prices").mock(
+        return_value=Response(501, json=error_response)
+    )
 
     response = get_day_ahead_energy_prices.sync_detailed(
         client=authenticated_client,
@@ -1581,9 +1482,9 @@ def test_get_day_ahead_energy_prices_not_implemented(authenticated_client):
 @respx.mock
 async def test_async_get_day_ahead_energy_prices(authenticated_client, mock_day_ahead_energy_prices_response):
     """Test async request for day-ahead energy prices."""
-    respx.get(
-        "https://api.balancing.services/v2/energy/day-ahead/prices"
-    ).mock(return_value=Response(200, json=mock_day_ahead_energy_prices_response))
+    respx.get("https://api.balancing.services/v2/energy/day-ahead/prices").mock(
+        return_value=Response(200, json=mock_day_ahead_energy_prices_response)
+    )
 
     response = await get_day_ahead_energy_prices.asyncio_detailed(
         client=authenticated_client,
@@ -1603,10 +1504,7 @@ async def test_async_get_day_ahead_energy_prices(authenticated_client, mock_day_
 def mock_imbalance_price_forecasts_response():
     """Mock response data for imbalance price forecasts (nowcasts)."""
     return {
-        "queriedPeriod": {
-            "startAt": "2025-01-01T00:00:00Z",
-            "endAt": "2025-01-01T01:00:00Z"
-        },
+        "queriedPeriod": {"startAt": "2025-01-01T00:00:00Z", "endAt": "2025-01-01T01:00:00Z"},
         "hasMore": False,
         "nextUpdatedSince": "2025-01-01T00:20:00Z",
         "data": [
@@ -1617,49 +1515,43 @@ def mock_imbalance_price_forecasts_response():
                 "direction": "symmetric",
                 "forecasts": [
                     {
-                        "period": {
-                            "startAt": "2025-01-01T00:00:00Z",
-                            "endAt": "2025-01-01T00:15:00Z"
-                        },
+                        "period": {"startAt": "2025-01-01T00:00:00Z", "endAt": "2025-01-01T00:15:00Z"},
                         "quantiles": [
                             {"level": 0.1, "pricePerMwh": 12.5},
                             {"level": 0.5, "pricePerMwh": 45.5},
-                            {"level": 0.9, "pricePerMwh": 98.0}
+                            {"level": 0.9, "pricePerMwh": 98.0},
                         ],
                         "madeAt": "2025-01-01T00:05:00Z",
-                        "degraded": False
+                        "degraded": False,
                     },
                     {
-                        "period": {
-                            "startAt": "2025-01-01T00:15:00Z",
-                            "endAt": "2025-01-01T00:30:00Z"
-                        },
+                        "period": {"startAt": "2025-01-01T00:15:00Z", "endAt": "2025-01-01T00:30:00Z"},
                         "quantiles": [
                             {"level": 0.1, "pricePerMwh": 10.0},
                             {"level": 0.5, "pricePerMwh": 40.0},
-                            {"level": 0.9, "pricePerMwh": 91.0}
+                            {"level": 0.9, "pricePerMwh": 91.0},
                         ],
                         "madeAt": "2025-01-01T00:05:00Z",
-                        "degraded": True
-                    }
-                ]
+                        "degraded": True,
+                    },
+                ],
             }
-        ]
+        ],
     }
 
 
 @respx.mock
 def test_get_imbalance_price_forecasts_success(authenticated_client, mock_imbalance_price_forecasts_response):
     """Test successful imbalance price forecasts request."""
-    respx.get(
-        "https://api.balancing.services/v2/imbalance/prices/forecast"
-    ).mock(return_value=Response(200, json=mock_imbalance_price_forecasts_response))
+    respx.get("https://api.balancing.services/v2/imbalance/prices/forecast").mock(
+        return_value=Response(200, json=mock_imbalance_price_forecasts_response)
+    )
 
     response = get_imbalance_price_forecasts.sync_detailed(
         client=authenticated_client,
         area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
-        period_end_at=datetime(2025, 1, 1, 1, 0, 0, tzinfo=timezone.utc)
+        period_end_at=datetime(2025, 1, 1, 1, 0, 0, tzinfo=timezone.utc),
     )
 
     assert response.status_code == 200
@@ -1690,24 +1582,21 @@ def test_get_imbalance_price_forecasts_success(authenticated_client, mock_imbala
 def test_get_imbalance_price_forecasts_unserved_area_is_empty(authenticated_client):
     """Test that an area without forecast coverage returns an empty result, not an error."""
     empty_response = {
-        "queriedPeriod": {
-            "startAt": "2025-01-01T00:00:00Z",
-            "endAt": "2025-01-01T01:00:00Z"
-        },
+        "queriedPeriod": {"startAt": "2025-01-01T00:00:00Z", "endAt": "2025-01-01T01:00:00Z"},
         "hasMore": False,
         "nextUpdatedSince": "2025-01-01T00:20:00Z",
-        "data": []
+        "data": [],
     }
 
-    respx.get(
-        "https://api.balancing.services/v2/imbalance/prices/forecast"
-    ).mock(return_value=Response(200, json=empty_response))
+    respx.get("https://api.balancing.services/v2/imbalance/prices/forecast").mock(
+        return_value=Response(200, json=empty_response)
+    )
 
     response = get_imbalance_price_forecasts.sync_detailed(
         client=authenticated_client,
         area="FI",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
-        period_end_at=datetime(2025, 1, 1, 1, 0, 0, tzinfo=timezone.utc)
+        period_end_at=datetime(2025, 1, 1, 1, 0, 0, tzinfo=timezone.utc),
     )
 
     assert response.status_code == 200
@@ -1725,9 +1614,9 @@ def test_get_imbalance_price_forecasts_pagination(authenticated_client, mock_imb
         "nextCursor": "v1:AAAAAYwBAgMEBQYHCAkKCw==",
     }
 
-    route = respx.get(
-        "https://api.balancing.services/v2/imbalance/prices/forecast"
-    ).mock(return_value=Response(200, json=paginated_response))
+    route = respx.get("https://api.balancing.services/v2/imbalance/prices/forecast").mock(
+        return_value=Response(200, json=paginated_response)
+    )
 
     response = get_imbalance_price_forecasts.sync_detailed(
         client=authenticated_client,
@@ -1757,18 +1646,18 @@ def test_get_imbalance_price_forecasts_unauthorized(authenticated_client):
         "type": "unauthorized",
         "title": "Unauthorized",
         "status": 401,
-        "detail": "Invalid or missing authentication token"
+        "detail": "Invalid or missing authentication token",
     }
 
-    respx.get(
-        "https://api.balancing.services/v2/imbalance/prices/forecast"
-    ).mock(return_value=Response(401, json=error_response))
+    respx.get("https://api.balancing.services/v2/imbalance/prices/forecast").mock(
+        return_value=Response(401, json=error_response)
+    )
 
     response = get_imbalance_price_forecasts.sync_detailed(
         client=authenticated_client,
         area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
-        period_end_at=datetime(2025, 1, 1, 1, 0, 0, tzinfo=timezone.utc)
+        period_end_at=datetime(2025, 1, 1, 1, 0, 0, tzinfo=timezone.utc),
     )
 
     assert response.status_code == 401
@@ -1780,15 +1669,15 @@ def test_get_imbalance_price_forecasts_unauthorized(authenticated_client):
 @respx.mock
 async def test_async_get_imbalance_price_forecasts(authenticated_client, mock_imbalance_price_forecasts_response):
     """Test async request for imbalance price forecasts."""
-    respx.get(
-        "https://api.balancing.services/v2/imbalance/prices/forecast"
-    ).mock(return_value=Response(200, json=mock_imbalance_price_forecasts_response))
+    respx.get("https://api.balancing.services/v2/imbalance/prices/forecast").mock(
+        return_value=Response(200, json=mock_imbalance_price_forecasts_response)
+    )
 
     response = await get_imbalance_price_forecasts.asyncio_detailed(
         client=authenticated_client,
         area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
-        period_end_at=datetime(2025, 1, 1, 1, 0, 0, tzinfo=timezone.utc)
+        period_end_at=datetime(2025, 1, 1, 1, 0, 0, tzinfo=timezone.utc),
     )
 
     assert response.status_code == 200
@@ -1802,10 +1691,7 @@ async def test_async_get_imbalance_price_forecasts(authenticated_client, mock_im
 def mock_imbalance_price_history_response():
     """Mock response data for the imbalance price revision history."""
     return {
-        "queriedPeriod": {
-            "startAt": "2025-01-01T00:00:00Z",
-            "endAt": "2025-01-01T01:00:00Z"
-        },
+        "queriedPeriod": {"startAt": "2025-01-01T00:00:00Z", "endAt": "2025-01-01T01:00:00Z"},
         "hasMore": False,
         "nextUpdatedSince": "2025-01-01T00:20:00Z",
         "data": [
@@ -1816,39 +1702,33 @@ def mock_imbalance_price_history_response():
                 "direction": "symmetric",
                 "prices": [
                     {
-                        "period": {
-                            "startAt": "2025-01-01T00:00:00Z",
-                            "endAt": "2025-01-01T00:15:00Z"
-                        },
+                        "period": {"startAt": "2025-01-01T00:00:00Z", "endAt": "2025-01-01T00:15:00Z"},
                         "pricePerMwh": 41.2,
-                        "observedAt": "2025-01-01T00:16:04Z"
+                        "observedAt": "2025-01-01T00:16:04Z",
                     },
                     {
-                        "period": {
-                            "startAt": "2025-01-01T00:00:00Z",
-                            "endAt": "2025-01-01T00:15:00Z"
-                        },
+                        "period": {"startAt": "2025-01-01T00:00:00Z", "endAt": "2025-01-01T00:15:00Z"},
                         "pricePerMwh": 38.9,
-                        "observedAt": "2025-01-01T01:02:11Z"
-                    }
-                ]
+                        "observedAt": "2025-01-01T01:02:11Z",
+                    },
+                ],
             }
-        ]
+        ],
     }
 
 
 @respx.mock
 def test_get_imbalance_price_history_success(authenticated_client, mock_imbalance_price_history_response):
     """Test successful imbalance price history request."""
-    respx.get(
-        "https://api.balancing.services/v2/imbalance/prices/history"
-    ).mock(return_value=Response(200, json=mock_imbalance_price_history_response))
+    respx.get("https://api.balancing.services/v2/imbalance/prices/history").mock(
+        return_value=Response(200, json=mock_imbalance_price_history_response)
+    )
 
     response = get_imbalance_price_history.sync_detailed(
         client=authenticated_client,
         area="BE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
-        period_end_at=datetime(2025, 1, 1, 1, 0, 0, tzinfo=timezone.utc)
+        period_end_at=datetime(2025, 1, 1, 1, 0, 0, tzinfo=timezone.utc),
     )
 
     assert response.status_code == 200
@@ -1863,10 +1743,7 @@ def test_get_imbalance_price_history_success(authenticated_client, mock_imbalanc
     # only by observedAt, which ascends, and the last one is the value served now.
     revisions = response.parsed.data[0].prices
     assert len(revisions) == 2
-    assert all(
-        revision.period.start_at == datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
-        for revision in revisions
-    )
+    assert all(revision.period.start_at == datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc) for revision in revisions)
     observed_at = [revision.observed_at for revision in revisions]
     assert observed_at == sorted(observed_at)
     assert observed_at[0] == datetime(2025, 1, 1, 0, 16, 4, tzinfo=timezone.utc)
@@ -1878,24 +1755,21 @@ def test_get_imbalance_price_history_success(authenticated_client, mock_imbalanc
 def test_get_imbalance_price_history_before_log_start_is_empty(authenticated_client):
     """Test that a window predating the revision log returns an empty result, not an error."""
     empty_response = {
-        "queriedPeriod": {
-            "startAt": "2025-01-01T00:00:00Z",
-            "endAt": "2025-01-01T01:00:00Z"
-        },
+        "queriedPeriod": {"startAt": "2025-01-01T00:00:00Z", "endAt": "2025-01-01T01:00:00Z"},
         "hasMore": False,
         "nextUpdatedSince": "2025-01-01T00:20:00Z",
-        "data": []
+        "data": [],
     }
 
-    respx.get(
-        "https://api.balancing.services/v2/imbalance/prices/history"
-    ).mock(return_value=Response(200, json=empty_response))
+    respx.get("https://api.balancing.services/v2/imbalance/prices/history").mock(
+        return_value=Response(200, json=empty_response)
+    )
 
     response = get_imbalance_price_history.sync_detailed(
         client=authenticated_client,
         area="BE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
-        period_end_at=datetime(2025, 1, 1, 1, 0, 0, tzinfo=timezone.utc)
+        period_end_at=datetime(2025, 1, 1, 1, 0, 0, tzinfo=timezone.utc),
     )
 
     assert response.status_code == 200
@@ -1913,9 +1787,9 @@ def test_get_imbalance_price_history_pagination(authenticated_client, mock_imbal
         "nextCursor": "v1:AAAAAYwBAgMEBQYHCAkKCw==",
     }
 
-    route = respx.get(
-        "https://api.balancing.services/v2/imbalance/prices/history"
-    ).mock(return_value=Response(200, json=paginated_response))
+    route = respx.get("https://api.balancing.services/v2/imbalance/prices/history").mock(
+        return_value=Response(200, json=paginated_response)
+    )
 
     response = get_imbalance_price_history.sync_detailed(
         client=authenticated_client,
@@ -1942,33 +1816,28 @@ def test_get_imbalance_price_history_pagination(authenticated_client, mock_imbal
 @respx.mock
 async def test_async_get_imbalance_price_history(authenticated_client, mock_imbalance_price_history_response):
     """Test async request for the imbalance price history."""
-    respx.get(
-        "https://api.balancing.services/v2/imbalance/prices/history"
-    ).mock(return_value=Response(200, json=mock_imbalance_price_history_response))
+    respx.get("https://api.balancing.services/v2/imbalance/prices/history").mock(
+        return_value=Response(200, json=mock_imbalance_price_history_response)
+    )
 
     response = await get_imbalance_price_history.asyncio_detailed(
         client=authenticated_client,
         area="BE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
-        period_end_at=datetime(2025, 1, 1, 1, 0, 0, tzinfo=timezone.utc)
+        period_end_at=datetime(2025, 1, 1, 1, 0, 0, tzinfo=timezone.utc),
     )
 
     assert response.status_code == 200
     assert response.parsed is not None
     assert len(response.parsed.data[0].prices) == 2
-    assert response.parsed.data[0].prices[-1].observed_at == datetime(
-        2025, 1, 1, 1, 2, 11, tzinfo=timezone.utc
-    )
+    assert response.parsed.data[0].prices[-1].observed_at == datetime(2025, 1, 1, 1, 2, 11, tzinfo=timezone.utc)
 
 
 @pytest.fixture
 def mock_imbalance_total_volume_history_response():
     """Mock response data for the total imbalance volume revision history."""
     return {
-        "queriedPeriod": {
-            "startAt": "2025-01-01T00:00:00Z",
-            "endAt": "2025-01-01T01:00:00Z"
-        },
+        "queriedPeriod": {"startAt": "2025-01-01T00:00:00Z", "endAt": "2025-01-01T01:00:00Z"},
         "hasMore": False,
         "nextUpdatedSince": "2025-01-01T00:20:00Z",
         "data": [
@@ -1977,43 +1846,35 @@ def mock_imbalance_total_volume_history_response():
                 "eicCode": "10Y1001A1001A39I",
                 "volumes": [
                     {
-                        "period": {
-                            "startAt": "2025-01-01T00:00:00Z",
-                            "endAt": "2025-01-01T00:15:00Z"
-                        },
+                        "period": {"startAt": "2025-01-01T00:00:00Z", "endAt": "2025-01-01T00:15:00Z"},
                         "averagePowerInMw": 60.5,
                         "direction": "surplus",
-                        "observedAt": "2025-01-01T00:16:04Z"
+                        "observedAt": "2025-01-01T00:16:04Z",
                     },
                     {
-                        "period": {
-                            "startAt": "2025-01-01T00:00:00Z",
-                            "endAt": "2025-01-01T00:15:00Z"
-                        },
+                        "period": {"startAt": "2025-01-01T00:00:00Z", "endAt": "2025-01-01T00:15:00Z"},
                         "averagePowerInMw": 12.8,
                         "direction": "deficit",
-                        "observedAt": "2025-01-01T01:02:11Z"
-                    }
-                ]
+                        "observedAt": "2025-01-01T01:02:11Z",
+                    },
+                ],
             }
-        ]
+        ],
     }
 
 
 @respx.mock
-def test_get_imbalance_total_volume_history_success(
-    authenticated_client, mock_imbalance_total_volume_history_response
-):
+def test_get_imbalance_total_volume_history_success(authenticated_client, mock_imbalance_total_volume_history_response):
     """Test successful total imbalance volume history request."""
-    respx.get(
-        "https://api.balancing.services/v2/imbalance/total-volumes/history"
-    ).mock(return_value=Response(200, json=mock_imbalance_total_volume_history_response))
+    respx.get("https://api.balancing.services/v2/imbalance/total-volumes/history").mock(
+        return_value=Response(200, json=mock_imbalance_total_volume_history_response)
+    )
 
     response = get_imbalance_total_volume_history.sync_detailed(
         client=authenticated_client,
         area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
-        period_end_at=datetime(2025, 1, 1, 1, 0, 0, tzinfo=timezone.utc)
+        period_end_at=datetime(2025, 1, 1, 1, 0, 0, tzinfo=timezone.utc),
     )
 
     assert response.status_code == 200
@@ -2027,10 +1888,7 @@ def test_get_imbalance_total_volume_history_success(
     # A revision can flip the direction as well as the magnitude.
     revisions = response.parsed.data[0].volumes
     assert len(revisions) == 2
-    assert all(
-        revision.period.start_at == datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
-        for revision in revisions
-    )
+    assert all(revision.period.start_at == datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc) for revision in revisions)
     observed_at = [revision.observed_at for revision in revisions]
     assert observed_at == sorted(observed_at)
     assert observed_at[0] == datetime(2025, 1, 1, 0, 16, 4, tzinfo=timezone.utc)
@@ -2044,24 +1902,21 @@ def test_get_imbalance_total_volume_history_success(
 def test_get_imbalance_total_volume_history_before_log_start_is_empty(authenticated_client):
     """Test that a window predating the revision log returns an empty result, not an error."""
     empty_response = {
-        "queriedPeriod": {
-            "startAt": "2025-01-01T00:00:00Z",
-            "endAt": "2025-01-01T01:00:00Z"
-        },
+        "queriedPeriod": {"startAt": "2025-01-01T00:00:00Z", "endAt": "2025-01-01T01:00:00Z"},
         "hasMore": False,
         "nextUpdatedSince": "2025-01-01T00:20:00Z",
-        "data": []
+        "data": [],
     }
 
-    respx.get(
-        "https://api.balancing.services/v2/imbalance/total-volumes/history"
-    ).mock(return_value=Response(200, json=empty_response))
+    respx.get("https://api.balancing.services/v2/imbalance/total-volumes/history").mock(
+        return_value=Response(200, json=empty_response)
+    )
 
     response = get_imbalance_total_volume_history.sync_detailed(
         client=authenticated_client,
         area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
-        period_end_at=datetime(2025, 1, 1, 1, 0, 0, tzinfo=timezone.utc)
+        period_end_at=datetime(2025, 1, 1, 1, 0, 0, tzinfo=timezone.utc),
     )
 
     assert response.status_code == 200
@@ -2081,9 +1936,9 @@ def test_get_imbalance_total_volume_history_pagination(
         "nextCursor": "v1:AAAAAYwBAgMEBQYHCAkKCw==",
     }
 
-    route = respx.get(
-        "https://api.balancing.services/v2/imbalance/total-volumes/history"
-    ).mock(return_value=Response(200, json=paginated_response))
+    route = respx.get("https://api.balancing.services/v2/imbalance/total-volumes/history").mock(
+        return_value=Response(200, json=paginated_response)
+    )
 
     response = get_imbalance_total_volume_history.sync_detailed(
         client=authenticated_client,
@@ -2112,20 +1967,18 @@ async def test_async_get_imbalance_total_volume_history(
     authenticated_client, mock_imbalance_total_volume_history_response
 ):
     """Test async request for the total imbalance volume history."""
-    respx.get(
-        "https://api.balancing.services/v2/imbalance/total-volumes/history"
-    ).mock(return_value=Response(200, json=mock_imbalance_total_volume_history_response))
+    respx.get("https://api.balancing.services/v2/imbalance/total-volumes/history").mock(
+        return_value=Response(200, json=mock_imbalance_total_volume_history_response)
+    )
 
     response = await get_imbalance_total_volume_history.asyncio_detailed(
         client=authenticated_client,
         area="EE",
         period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
-        period_end_at=datetime(2025, 1, 1, 1, 0, 0, tzinfo=timezone.utc)
+        period_end_at=datetime(2025, 1, 1, 1, 0, 0, tzinfo=timezone.utc),
     )
 
     assert response.status_code == 200
     assert response.parsed is not None
     assert len(response.parsed.data[0].volumes) == 2
-    assert response.parsed.data[0].volumes[-1].observed_at == datetime(
-        2025, 1, 1, 1, 2, 11, tzinfo=timezone.utc
-    )
+    assert response.parsed.data[0].volumes[-1].observed_at == datetime(2025, 1, 1, 1, 2, 11, tzinfo=timezone.utc)

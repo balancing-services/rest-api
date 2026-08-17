@@ -38,10 +38,7 @@ from balancing_services import AuthenticatedClient
 from balancing_services.api.default import get_imbalance_prices
 
 # Create an authenticated client
-client = AuthenticatedClient(
-    base_url="https://api.balancing.services/v2",
-    token="YOUR_API_TOKEN"
-)
+client = AuthenticatedClient(base_url="https://api.balancing.services/v2", token="YOUR_API_TOKEN")
 
 # Get imbalance prices for Estonia. Enum-typed parameters take plain string
 # values (e.g. area="EE") — see "Data Models" below.
@@ -49,7 +46,7 @@ response = get_imbalance_prices.sync_detailed(
     client=client,
     area="EE",
     period_start_at=datetime.fromisoformat("2025-01-01T00:00:00Z"),
-    period_end_at=datetime.fromisoformat("2025-01-02T00:00:00Z")
+    period_end_at=datetime.fromisoformat("2025-01-02T00:00:00Z"),
 )
 
 if response.status_code == 200:
@@ -72,10 +69,7 @@ Include your token when creating the client:
 ```python
 from balancing_services import AuthenticatedClient
 
-client = AuthenticatedClient(
-    base_url="https://api.balancing.services/v2",
-    token="YOUR_API_TOKEN"
-)
+client = AuthenticatedClient(base_url="https://api.balancing.services/v2", token="YOUR_API_TOKEN")
 ```
 
 ## Usage Examples
@@ -97,7 +91,7 @@ response = get_balancing_energy_bids.sync_detailed(
     period_start_at=datetime.fromisoformat("2025-01-01T00:00:00Z"),
     period_end_at=datetime.fromisoformat("2025-01-02T00:00:00Z"),
     reserve_type="aFRR",
-    limit=100
+    limit=100,
 )
 
 if response.status_code == 200:
@@ -119,7 +113,7 @@ if response.status_code == 200:
             period_end_at=datetime.fromisoformat("2025-01-02T00:00:00Z"),
             reserve_type="aFRR",
             cursor=data.next_cursor,
-            limit=100
+            limit=100,
         )
 ```
 
@@ -132,22 +126,21 @@ from datetime import datetime
 from balancing_services import AuthenticatedClient
 from balancing_services.api.default import get_imbalance_prices
 
+
 async def fetch_prices():
-    client = AuthenticatedClient(
-        base_url="https://api.balancing.services/v2",
-        token="YOUR_TOKEN"
-    )
+    client = AuthenticatedClient(base_url="https://api.balancing.services/v2", token="YOUR_TOKEN")
 
     response = await get_imbalance_prices.asyncio_detailed(
         client=client,
         area="EE",
         period_start_at=datetime.fromisoformat("2025-01-01T00:00:00Z"),
-        period_end_at=datetime.fromisoformat("2025-01-02T00:00:00Z")
+        period_end_at=datetime.fromisoformat("2025-01-02T00:00:00Z"),
     )
 
     if response.status_code == 200:
         return response.parsed
     return None
+
 
 # Run async function
 prices = asyncio.run(fetch_prices())
@@ -167,7 +160,7 @@ response = get_imbalance_prices.sync_detailed(
     client=client,
     area="EE",
     period_start_at=datetime.fromisoformat("2025-01-01T00:00:00Z"),
-    period_end_at=datetime.fromisoformat("2025-01-02T00:00:00Z")
+    period_end_at=datetime.fromisoformat("2025-01-02T00:00:00Z"),
 )
 
 if response.status_code == 200:
@@ -364,7 +357,7 @@ if response.status_code == 400:
 client = AuthenticatedClient(
     base_url="https://api.balancing.services/v2",
     token="YOUR_TOKEN",
-    timeout=30.0  # Increase from default
+    timeout=30.0,  # Increase from default
 )
 ```
 - Reduce the date range in your request
@@ -379,8 +372,8 @@ client = AuthenticatedClient(
 no enum member to import:
 ```python
 # Correct
-area="EE"
-reserve_type="aFRR"
+area = "EE"
+reserve_type = "aFRR"
 ```
 
 The accepted values for each enum are available as a `*_VALUES` set if you need
