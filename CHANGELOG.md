@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Experimental total imbalance volume revision history endpoint (`/imbalance/total-volumes/history`), serving how the volumes on `/imbalance/total-volumes` reached their current values — see the endpoint description for the semantics
+
 ## [2.2.0] - 2026-08-11
 
 ### Added

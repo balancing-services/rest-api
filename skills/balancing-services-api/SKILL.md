@@ -54,6 +54,7 @@ All take `period-start-at` and `period-end-at`; the last column lists what else 
 | `GET /imbalance/prices/history` | Experimental. The revision history of `/imbalance/prices`: the sequence of values held for a period, each stamped with its `observedAt` — a lineage, normally ending at the value served now | `area` |
 | `GET /imbalance/total-volumes` | Settled total imbalance volume as average power, direction `surplus`/`deficit`/`balanced` per period | `area` |
 | `GET /imbalance/total-volumes/current` | Experimental. Provisional open area control error at 1-minute resolution, roughly 25 min behind real time, ~90 days retained | `area` |
+| `GET /imbalance/total-volumes/history` | Experimental. The revision history of `/imbalance/total-volumes`: the sequence of values held for a period, each stamped with its `observedAt` — a lineage, normally ending at the value served now | `area` |
 | `GET /balancing/energy/activated-volumes` | Activated balancing energy as average power in MW, by direction and activation type | `area`, `reserve-type` |
 | `GET /balancing/energy/offered-volumes` | Offered balancing energy volumes | `area`, `reserve-type` |
 | `GET /balancing/energy/prices` | Balancing energy prices per MWh | `area`, `reserve-type` |

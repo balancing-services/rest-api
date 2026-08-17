@@ -248,6 +248,58 @@ paths:
         '501':
           $ref: '#/components/responses/NotImplemented'
 
+  /imbalance/total-volumes/history:
+    get:
+      summary: Get the revision history of the total imbalance volumes for an area
+      description: |
+        **Experimental** - This endpoint is under active development and may change without notice.
+
+        Returns how the total imbalance volumes on `/imbalance/total-volumes` reached their current
+        values: the sequence of values held for a period, each stamped with the `observedAt` it was
+        recorded at. The response is the `/imbalance/total-volumes` shape with `observedAt` added to
+        each entry of `volumes`, which carries the revision entries, each period's ascending by
+        `observedAt` and the periods themselves in page order. A period appears once per change of
+        the value served for it — its direction or its magnitude — except for entries sharing an
+        `observedAt`, which are all returned because no order is recorded within an instant.
+      operationId: getImbalanceTotalVolumeHistory
+      parameters:
+        - $ref: '#/components/parameters/area'
+        - $ref: '#/components/parameters/period-start-at'
+        - $ref: '#/components/parameters/period-end-at'
+        - $ref: '#/components/parameters/cursor'
+        - name: limit
+          in: query
+          description: Maximum number of results to return (default 100, max 1000)
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+            default: 100
+            example: 100
+        - $ref: '#/components/parameters/updated-since'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImbalanceTotalVolumeHistoryResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '501':
+          $ref: '#/components/responses/NotImplemented'
+
   /balancing/energy/activated-volumes:
     get:
       summary: Get activated balancing energy volumes
@@ -1561,6 +1613,71 @@ components:
           example: 60.5
         direction:
           $ref: '#/components/schemas/TotalImbalanceDirection'
+
+    ImbalanceTotalVolumeHistoryResponse:
+      type: object
+      required:
+        - queriedPeriod
+        - data
+        - hasMore
+        - nextUpdatedSince
+      properties:
+        queriedPeriod:
+          $ref: '#/components/schemas/Period'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImbalanceTotalVolumeHistory'
+        nextCursor:
+          type: string
+          description: Cursor to fetch the next page of results. Null if no more results.
+          example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
+          nullable: true
+        hasMore:
+          type: boolean
+          description: Indicates whether there are more results available
+          example: false
+        nextUpdatedSince:
+          $ref: '#/components/schemas/NextUpdatedSince'
+
+    ImbalanceTotalVolumeHistory:
+      type: object
+      required:
+        - area
+        - eicCode
+        - volumes
+      properties:
+        area:
+          $ref: '#/components/schemas/Area'
+        eicCode:
+          $ref: '#/components/schemas/EicCode'
+        volumes:
+          type: array
+          items:
+            $ref: '#/components/schemas/TotalImbalanceVolumeRevision'
+          description: Revision entries, each period's ascending by observedAt; direction can vary per entry
+
+    TotalImbalanceVolumeRevision:
+      type: object
+      required:
+        - period
+        - averagePowerInMw
+        - direction
+        - observedAt
+      properties:
+        period:
+          $ref: '#/components/schemas/Period'
+        averagePowerInMw:
+          type: number
+          description: Average power in MW during the period
+          example: 60.5
+        direction:
+          $ref: '#/components/schemas/TotalImbalanceDirection'
+        observedAt:
+          type: string
+          format: date-time
+          description: When this revision was recorded (UTC)
+          example: '2026-08-04T10:07:31Z'
 
     BalancingEnergyVolumesResponse:
       type: object

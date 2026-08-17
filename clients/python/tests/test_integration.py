@@ -24,6 +24,7 @@ from balancing_services.api.default import (
     get_imbalance_price_forecasts,
     get_imbalance_price_history,
     get_imbalance_prices,
+    get_imbalance_total_volume_history,
 )
 
 
@@ -1956,5 +1957,175 @@ async def test_async_get_imbalance_price_history(authenticated_client, mock_imba
     assert response.parsed is not None
     assert len(response.parsed.data[0].prices) == 2
     assert response.parsed.data[0].prices[-1].observed_at == datetime(
+        2025, 1, 1, 1, 2, 11, tzinfo=timezone.utc
+    )
+
+
+@pytest.fixture
+def mock_imbalance_total_volume_history_response():
+    """Mock response data for the total imbalance volume revision history."""
+    return {
+        "queriedPeriod": {
+            "startAt": "2025-01-01T00:00:00Z",
+            "endAt": "2025-01-01T01:00:00Z"
+        },
+        "hasMore": False,
+        "nextUpdatedSince": "2025-01-01T00:20:00Z",
+        "data": [
+            {
+                "area": "EE",
+                "eicCode": "10Y1001A1001A39I",
+                "volumes": [
+                    {
+                        "period": {
+                            "startAt": "2025-01-01T00:00:00Z",
+                            "endAt": "2025-01-01T00:15:00Z"
+                        },
+                        "averagePowerInMw": 60.5,
+                        "direction": "surplus",
+                        "observedAt": "2025-01-01T00:16:04Z"
+                    },
+                    {
+                        "period": {
+                            "startAt": "2025-01-01T00:00:00Z",
+                            "endAt": "2025-01-01T00:15:00Z"
+                        },
+                        "averagePowerInMw": 12.8,
+                        "direction": "deficit",
+                        "observedAt": "2025-01-01T01:02:11Z"
+                    }
+                ]
+            }
+        ]
+    }
+
+
+@respx.mock
+def test_get_imbalance_total_volume_history_success(
+    authenticated_client, mock_imbalance_total_volume_history_response
+):
+    """Test successful total imbalance volume history request."""
+    respx.get(
+        "https://api.balancing.services/v2/imbalance/total-volumes/history"
+    ).mock(return_value=Response(200, json=mock_imbalance_total_volume_history_response))
+
+    response = get_imbalance_total_volume_history.sync_detailed(
+        client=authenticated_client,
+        area="EE",
+        period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
+        period_end_at=datetime(2025, 1, 1, 1, 0, 0, tzinfo=timezone.utc)
+    )
+
+    assert response.status_code == 200
+    assert response.parsed is not None
+    assert response.parsed.has_more is False
+    assert len(response.parsed.data) == 1
+    assert response.parsed.data[0].area == "EE"
+
+    # One period, two entries: the same quarter revised once. They are distinguished
+    # only by observedAt, which ascends, and the last one is the value served now.
+    # A revision can flip the direction as well as the magnitude.
+    revisions = response.parsed.data[0].volumes
+    assert len(revisions) == 2
+    assert all(
+        revision.period.start_at == datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
+        for revision in revisions
+    )
+    observed_at = [revision.observed_at for revision in revisions]
+    assert observed_at == sorted(observed_at)
+    assert observed_at[0] == datetime(2025, 1, 1, 0, 16, 4, tzinfo=timezone.utc)
+    assert revisions[0].average_power_in_mw == 60.5
+    assert revisions[0].direction == "surplus"
+    assert revisions[-1].average_power_in_mw == 12.8
+    assert revisions[-1].direction == "deficit"
+
+
+@respx.mock
+def test_get_imbalance_total_volume_history_before_log_start_is_empty(authenticated_client):
+    """Test that a window predating the revision log returns an empty result, not an error."""
+    empty_response = {
+        "queriedPeriod": {
+            "startAt": "2025-01-01T00:00:00Z",
+            "endAt": "2025-01-01T01:00:00Z"
+        },
+        "hasMore": False,
+        "nextUpdatedSince": "2025-01-01T00:20:00Z",
+        "data": []
+    }
+
+    respx.get(
+        "https://api.balancing.services/v2/imbalance/total-volumes/history"
+    ).mock(return_value=Response(200, json=empty_response))
+
+    response = get_imbalance_total_volume_history.sync_detailed(
+        client=authenticated_client,
+        area="EE",
+        period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
+        period_end_at=datetime(2025, 1, 1, 1, 0, 0, tzinfo=timezone.utc)
+    )
+
+    assert response.status_code == 200
+    assert response.parsed is not None
+    assert response.parsed.data == []
+    assert response.parsed.has_more is False
+
+
+@respx.mock
+def test_get_imbalance_total_volume_history_pagination(
+    authenticated_client, mock_imbalance_total_volume_history_response
+):
+    """Test total imbalance volume history pagination - cursor/limit/updated-since sent, nextCursor parsed."""
+    paginated_response = {
+        **mock_imbalance_total_volume_history_response,
+        "hasMore": True,
+        "nextCursor": "v1:AAAAAYwBAgMEBQYHCAkKCw==",
+    }
+
+    route = respx.get(
+        "https://api.balancing.services/v2/imbalance/total-volumes/history"
+    ).mock(return_value=Response(200, json=paginated_response))
+
+    response = get_imbalance_total_volume_history.sync_detailed(
+        client=authenticated_client,
+        area="EE",
+        period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
+        period_end_at=datetime(2025, 1, 1, 1, 0, 0, tzinfo=timezone.utc),
+        cursor="v1:AAAAAYwBAgMEBQYHCAkKCw==",
+        limit=100,
+        updated_since=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
+    )
+
+    assert response.status_code == 200
+    assert response.parsed is not None
+    assert response.parsed.has_more is True
+    assert response.parsed.next_cursor == "v1:AAAAAYwBAgMEBQYHCAkKCw=="
+    assert response.parsed.next_updated_since == datetime(2025, 1, 1, 0, 20, 0, tzinfo=timezone.utc)
+    sent_url = route.calls.last.request.url
+    assert sent_url.params["cursor"] == "v1:AAAAAYwBAgMEBQYHCAkKCw=="
+    assert sent_url.params["limit"] == "100"
+    assert sent_url.params["updated-since"] == "2025-01-01T00:00:00+00:00"
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_async_get_imbalance_total_volume_history(
+    authenticated_client, mock_imbalance_total_volume_history_response
+):
+    """Test async request for the total imbalance volume history."""
+    respx.get(
+        "https://api.balancing.services/v2/imbalance/total-volumes/history"
+    ).mock(return_value=Response(200, json=mock_imbalance_total_volume_history_response))
+
+    response = await get_imbalance_total_volume_history.asyncio_detailed(
+        client=authenticated_client,
+        area="EE",
+        period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
+        period_end_at=datetime(2025, 1, 1, 1, 0, 0, tzinfo=timezone.utc)
+    )
+
+    assert response.status_code == 200
+    assert response.parsed is not None
+    assert len(response.parsed.data[0].volumes) == 2
+    assert response.parsed.data[0].volumes[-1].observed_at == datetime(
         2025, 1, 1, 1, 2, 11, tzinfo=timezone.utc
     )
