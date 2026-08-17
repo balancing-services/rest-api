@@ -10,9 +10,7 @@ from balancing_services import AuthenticatedClient
 @pytest.fixture
 def test_client():
     """Fixture providing a test client instance."""
-    return AuthenticatedClient(
-        base_url="https://api.balancing.services/v2", token="test_token_12345"
-    )
+    return AuthenticatedClient(base_url="https://api.balancing.services/v2", token="test_token_12345")
 
 
 @pytest.fixture

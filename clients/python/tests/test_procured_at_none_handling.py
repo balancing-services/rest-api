@@ -4,6 +4,7 @@ In the 2.0 API the capacity price/volume groupings carry a required
 ``procurement`` object that nests the ``procuredAt`` timestamp. These tests
 verify that the nested structure round-trips through ``from_dict``.
 """
+
 import datetime
 from typing import Any
 
@@ -34,6 +35,7 @@ class TestBalancingCapacityVolumesProcurement:
 
 
 # Helper functions
+
 
 def make_prices(overrides: dict[str, Any] | None = None) -> BalancingCapacityPrices:
     """Create BalancingCapacityPrices with happy-path defaults."""
