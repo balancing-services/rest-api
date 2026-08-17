@@ -25,6 +25,7 @@ from balancing_services.api.default import (
     get_imbalance_price_forecasts,
     get_imbalance_price_history,
     get_imbalance_prices,
+    get_imbalance_total_volume_history,
     get_imbalance_total_volumes,
 )
 from balancing_services.models import (
@@ -35,6 +36,9 @@ from balancing_services.models import (
     ImbalancePriceHistory,
     ImbalancePriceHistoryResponse,
     ImbalancePriceRevision,
+    ImbalanceTotalVolumeHistory,
+    ImbalanceTotalVolumeHistoryResponse,
+    TotalImbalanceVolumeRevision,
 )
 from balancing_services.models.activation_type import ACTIVATION_TYPE_VALUES
 from balancing_services.models.area import AREA_VALUES
@@ -88,6 +92,8 @@ class TestAPIEndpointsExist:
         assert hasattr(get_imbalance_total_volumes, "asyncio_detailed")
         assert hasattr(get_current_imbalance_total_volumes, "sync_detailed")
         assert hasattr(get_current_imbalance_total_volumes, "asyncio_detailed")
+        assert hasattr(get_imbalance_total_volume_history, "sync_detailed")
+        assert hasattr(get_imbalance_total_volume_history, "asyncio_detailed")
 
     def test_imbalance_price_forecast_models_exist(self):
         """Test that the imbalance price forecast models are exported and shaped as expected."""
@@ -125,6 +131,25 @@ class TestAPIEndpointsExist:
         assert revision.observed_at.isoformat() == "2025-01-01T00:16:04+00:00"
         assert hasattr(ImbalancePriceHistory, "from_dict")
         assert hasattr(ImbalancePriceHistoryResponse, "from_dict")
+
+    def test_imbalance_total_volume_history_models_exist(self):
+        """Test that the total imbalance volume history models are exported and shaped as expected."""
+        revision = TotalImbalanceVolumeRevision.from_dict(
+            {
+                "period": {
+                    "startAt": "2025-01-01T00:00:00Z",
+                    "endAt": "2025-01-01T00:15:00Z",
+                },
+                "averagePowerInMw": 60.5,
+                "direction": "surplus",
+                "observedAt": "2025-01-01T00:16:04Z",
+            }
+        )
+        assert revision.average_power_in_mw == 60.5
+        assert revision.direction == "surplus"
+        assert revision.observed_at.isoformat() == "2025-01-01T00:16:04+00:00"
+        assert hasattr(ImbalanceTotalVolumeHistory, "from_dict")
+        assert hasattr(ImbalanceTotalVolumeHistoryResponse, "from_dict")
 
     def test_balancing_energy_endpoints_exist(self):
         """Test that balancing energy endpoints are available."""

@@ -58,6 +58,8 @@ from .imbalance_price_history_response import ImbalancePriceHistoryResponse
 from .imbalance_price_revision import ImbalancePriceRevision
 from .imbalance_prices import ImbalancePrices
 from .imbalance_prices_response import ImbalancePricesResponse
+from .imbalance_total_volume_history import ImbalanceTotalVolumeHistory
+from .imbalance_total_volume_history_response import ImbalanceTotalVolumeHistoryResponse
 from .imbalance_total_volumes import ImbalanceTotalVolumes
 from .imbalance_total_volumes_response import ImbalanceTotalVolumesResponse
 from .period import Period
@@ -66,6 +68,7 @@ from .procurement import Procurement
 from .reserve_type import ReserveType
 from .total_imbalance_direction import TotalImbalanceDirection
 from .total_imbalance_volume import TotalImbalanceVolume
+from .total_imbalance_volume_revision import TotalImbalanceVolumeRevision
 
 __all__ = (
     "ActivationType",
@@ -122,6 +125,8 @@ __all__ = (
     "ImbalancePriceRevision",
     "ImbalancePrices",
     "ImbalancePricesResponse",
+    "ImbalanceTotalVolumeHistory",
+    "ImbalanceTotalVolumeHistoryResponse",
     "ImbalanceTotalVolumes",
     "ImbalanceTotalVolumesResponse",
     "Period",
@@ -130,4 +135,5 @@ __all__ = (
     "ReserveType",
     "TotalImbalanceDirection",
     "TotalImbalanceVolume",
+    "TotalImbalanceVolumeRevision",
 )
