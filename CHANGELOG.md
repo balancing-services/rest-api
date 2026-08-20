@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Experimental activated balancing energy volume revision history endpoint (`/balancing/energy/activated-volumes/history`), serving how the volumes on `/balancing/energy/activated-volumes` reached their current values — see the endpoint description for the semantics
+- Experimental offered balancing energy volume revision history endpoint (`/balancing/energy/offered-volumes/history`), serving how the volumes on `/balancing/energy/offered-volumes` reached their current values — see the endpoint description for the semantics
+- Experimental balancing energy price revision history endpoint (`/balancing/energy/prices/history`), serving how the prices on `/balancing/energy/prices` reached their current values — see the endpoint description for the semantics
+
 ## [2.3.0] - 2026-08-17
 
 ### Added

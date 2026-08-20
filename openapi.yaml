@@ -344,6 +344,57 @@ paths:
         '501':
           $ref: '#/components/responses/NotImplemented'
 
+  /balancing/energy/activated-volumes/history:
+    get:
+      summary: Get the revision history of the activated balancing energy volumes for an area
+      description: |
+        **Experimental** - This endpoint is under active development and may change without notice.
+
+        Returns how the activated balancing energy volumes on `/balancing/energy/activated-volumes`
+        reached their current values: the sequence of values held for a period, each stamped with the
+        `observedAt` it was recorded at. The response is the `/balancing/energy/activated-volumes`
+        shape with `observedAt` added to each entry of `volumes`, which carries the revision entries,
+        ascending by `observedAt`.
+      operationId: getBalancingEnergyActivatedVolumeHistory
+      parameters:
+        - $ref: '#/components/parameters/area'
+        - $ref: '#/components/parameters/period-start-at'
+        - $ref: '#/components/parameters/period-end-at'
+        - $ref: '#/components/parameters/reserve-type'
+        - $ref: '#/components/parameters/cursor'
+        - name: limit
+          in: query
+          description: Maximum number of results to return (default 100, max 1000)
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+            default: 100
+            example: 100
+        - $ref: '#/components/parameters/updated-since'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BalancingEnergyActivatedVolumeHistoryResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '501':
+          $ref: '#/components/responses/NotImplemented'
+
   /balancing/energy/offered-volumes:
     get:
       summary: Get offered balancing energy volumes
@@ -388,6 +439,57 @@ paths:
         '501':
           $ref: '#/components/responses/NotImplemented'
 
+  /balancing/energy/offered-volumes/history:
+    get:
+      summary: Get the revision history of the offered balancing energy volumes for an area
+      description: |
+        **Experimental** - This endpoint is under active development and may change without notice.
+
+        Returns how the offered balancing energy volumes on `/balancing/energy/offered-volumes`
+        reached their current values: the sequence of values held for a period, each stamped with the
+        `observedAt` it was recorded at. The response is the `/balancing/energy/offered-volumes`
+        shape with `observedAt` added to each entry of `volumes`, which carries the revision entries,
+        ascending by `observedAt`.
+      operationId: getBalancingEnergyOfferedVolumeHistory
+      parameters:
+        - $ref: '#/components/parameters/area'
+        - $ref: '#/components/parameters/period-start-at'
+        - $ref: '#/components/parameters/period-end-at'
+        - $ref: '#/components/parameters/reserve-type'
+        - $ref: '#/components/parameters/cursor'
+        - name: limit
+          in: query
+          description: Maximum number of results to return (default 100, max 1000)
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+            default: 100
+            example: 100
+        - $ref: '#/components/parameters/updated-since'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BalancingEnergyOfferedVolumeHistoryResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '501':
+          $ref: '#/components/responses/NotImplemented'
+
   /balancing/energy/prices:
     get:
       summary: Get balancing energy prices
@@ -417,6 +519,56 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BalancingEnergyPricesResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '501':
+          $ref: '#/components/responses/NotImplemented'
+
+  /balancing/energy/prices/history:
+    get:
+      summary: Get the revision history of the balancing energy prices for an area
+      description: |
+        **Experimental** - This endpoint is under active development and may change without notice.
+
+        Returns how the balancing energy prices on `/balancing/energy/prices` reached their current
+        values: the sequence of values held for a period, each stamped with the `observedAt` it was
+        recorded at. The response is the `/balancing/energy/prices` shape with `observedAt` added to
+        each entry of `prices`, which carries the revision entries, ascending by `observedAt`.
+      operationId: getBalancingEnergyPriceHistory
+      parameters:
+        - $ref: '#/components/parameters/area'
+        - $ref: '#/components/parameters/period-start-at'
+        - $ref: '#/components/parameters/period-end-at'
+        - $ref: '#/components/parameters/reserve-type'
+        - $ref: '#/components/parameters/cursor'
+        - name: limit
+          in: query
+          description: Maximum number of results to return (default 100, max 1000)
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+            default: 100
+            example: 100
+        - $ref: '#/components/parameters/updated-since'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BalancingEnergyPriceHistoryResponse'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1748,6 +1900,156 @@ components:
           description: Average power in MW over the period
           example: 250.5
 
+    BalancingEnergyActivatedVolumeHistoryResponse:
+      type: object
+      required:
+        - queriedPeriod
+        - data
+        - hasMore
+        - nextUpdatedSince
+      properties:
+        queriedPeriod:
+          $ref: '#/components/schemas/Period'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/BalancingEnergyActivatedVolumeHistory'
+        nextCursor:
+          type: string
+          description: Cursor to fetch the next page of results. Null if no more results.
+          example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
+          nullable: true
+        hasMore:
+          type: boolean
+          description: Indicates whether there are more results available
+          example: false
+        nextUpdatedSince:
+          $ref: '#/components/schemas/NextUpdatedSince'
+
+    BalancingEnergyActivatedVolumeHistory:
+      type: object
+      required:
+        - area
+        - eicCode
+        - reserveType
+        - direction
+        - activationType
+        - standardProduct
+        - volumes
+      properties:
+        area:
+          $ref: '#/components/schemas/Area'
+        eicCode:
+          $ref: '#/components/schemas/EicCode'
+        reserveType:
+          $ref: '#/components/schemas/ReserveType'
+        direction:
+          $ref: '#/components/schemas/Direction'
+        activationType:
+          $ref: '#/components/schemas/ActivationType'
+        standardProduct:
+          type: boolean
+          description: Indicates if this is a European standard balancing product
+          example: true
+        volumes:
+          type: array
+          items:
+            $ref: '#/components/schemas/BalancingEnergyActivatedVolumeRevision'
+
+    BalancingEnergyActivatedVolumeRevision:
+      type: object
+      required:
+        - period
+        - volumeInMw
+        - observedAt
+      properties:
+        period:
+          $ref: '#/components/schemas/Period'
+        volumeInMw:
+          type: number
+          description: Average power in MW over the period
+          example: 250.5
+        observedAt:
+          type: string
+          format: date-time
+          description: When this revision was recorded (UTC)
+          example: '2026-08-19T10:07:31Z'
+
+    BalancingEnergyOfferedVolumeHistoryResponse:
+      type: object
+      required:
+        - queriedPeriod
+        - data
+        - hasMore
+        - nextUpdatedSince
+      properties:
+        queriedPeriod:
+          $ref: '#/components/schemas/Period'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/BalancingEnergyOfferedVolumeHistory'
+        nextCursor:
+          type: string
+          description: Cursor to fetch the next page of results. Null if no more results.
+          example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
+          nullable: true
+        hasMore:
+          type: boolean
+          description: Indicates whether there are more results available
+          example: false
+        nextUpdatedSince:
+          $ref: '#/components/schemas/NextUpdatedSince'
+
+    BalancingEnergyOfferedVolumeHistory:
+      type: object
+      required:
+        - area
+        - eicCode
+        - reserveType
+        - direction
+        - activationType
+        - standardProduct
+        - volumes
+      properties:
+        area:
+          $ref: '#/components/schemas/Area'
+        eicCode:
+          $ref: '#/components/schemas/EicCode'
+        reserveType:
+          $ref: '#/components/schemas/ReserveType'
+        direction:
+          $ref: '#/components/schemas/Direction'
+        activationType:
+          $ref: '#/components/schemas/ActivationType'
+        standardProduct:
+          type: boolean
+          description: Indicates if this is a European standard balancing product
+          example: true
+        volumes:
+          type: array
+          items:
+            $ref: '#/components/schemas/BalancingEnergyOfferedVolumeRevision'
+
+    BalancingEnergyOfferedVolumeRevision:
+      type: object
+      required:
+        - period
+        - volumeInMw
+        - observedAt
+      properties:
+        period:
+          $ref: '#/components/schemas/Period'
+        volumeInMw:
+          type: number
+          description: Average power in MW over the period
+          example: 250.5
+        observedAt:
+          type: string
+          format: date-time
+          description: When this revision was recorded (UTC)
+          example: '2026-08-19T10:07:31Z'
+
     BalancingEnergyPricesResponse:
       type: object
       required:
@@ -1819,6 +2121,84 @@ components:
           type: number
           description: Price per MWh in the specified currency
           example: 45.50
+
+    BalancingEnergyPriceHistoryResponse:
+      type: object
+      required:
+        - queriedPeriod
+        - data
+        - hasMore
+        - nextUpdatedSince
+      properties:
+        queriedPeriod:
+          $ref: '#/components/schemas/Period'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/BalancingEnergyPriceHistory'
+        nextCursor:
+          type: string
+          description: Cursor to fetch the next page of results. Null if no more results.
+          example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
+          nullable: true
+        hasMore:
+          type: boolean
+          description: Indicates whether there are more results available
+          example: false
+        nextUpdatedSince:
+          $ref: '#/components/schemas/NextUpdatedSince'
+
+    BalancingEnergyPriceHistory:
+      type: object
+      required:
+        - area
+        - eicCode
+        - reserveType
+        - direction
+        - activationType
+        - currency
+        - standardProduct
+        - prices
+      properties:
+        area:
+          $ref: '#/components/schemas/Area'
+        eicCode:
+          $ref: '#/components/schemas/EicCode'
+        reserveType:
+          $ref: '#/components/schemas/ReserveType'
+        direction:
+          $ref: '#/components/schemas/Direction'
+        activationType:
+          $ref: '#/components/schemas/ActivationType'
+        currency:
+          $ref: '#/components/schemas/Currency'
+        standardProduct:
+          type: boolean
+          description: Indicates if this is a European standard balancing product
+          example: true
+        prices:
+          type: array
+          items:
+            $ref: '#/components/schemas/BalancingEnergyPriceRevision'
+
+    BalancingEnergyPriceRevision:
+      type: object
+      required:
+        - period
+        - pricePerMwh
+        - observedAt
+      properties:
+        period:
+          $ref: '#/components/schemas/Period'
+        pricePerMwh:
+          type: number
+          description: Price per MWh in the specified currency
+          example: 45.50
+        observedAt:
+          type: string
+          format: date-time
+          description: When this revision was recorded (UTC)
+          example: '2026-08-19T10:07:31Z'
 
     DayAheadEnergyPricesResponse:
       type: object
