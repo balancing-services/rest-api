@@ -11,10 +11,13 @@ from balancing_services.api.default import (
     get_balancing_capacity_demand,
     get_balancing_capacity_prices,
     get_balancing_capacity_procured_volumes,
+    get_balancing_energy_activated_volume_history,
     get_balancing_energy_activated_volumes,
     get_balancing_energy_bids,
     get_balancing_energy_demand,
+    get_balancing_energy_offered_volume_history,
     get_balancing_energy_offered_volumes,
+    get_balancing_energy_price_history,
     get_balancing_energy_prices,
     get_balancing_energy_satisfied_demand,
     get_cross_border_available_capacity,
@@ -29,6 +32,15 @@ from balancing_services.api.default import (
     get_imbalance_total_volumes,
 )
 from balancing_services.models import (
+    BalancingEnergyActivatedVolumeHistory,
+    BalancingEnergyActivatedVolumeHistoryResponse,
+    BalancingEnergyActivatedVolumeRevision,
+    BalancingEnergyOfferedVolumeHistory,
+    BalancingEnergyOfferedVolumeHistoryResponse,
+    BalancingEnergyOfferedVolumeRevision,
+    BalancingEnergyPriceHistory,
+    BalancingEnergyPriceHistoryResponse,
+    BalancingEnergyPriceRevision,
     ImbalancePriceForecast,
     ImbalancePriceForecastQuantile,
     ImbalancePriceForecasts,
@@ -151,12 +163,18 @@ class TestAPIEndpointsExist:
         """Test that balancing energy endpoints are available."""
         assert hasattr(get_balancing_energy_activated_volumes, "sync_detailed")
         assert hasattr(get_balancing_energy_activated_volumes, "asyncio_detailed")
+        assert hasattr(get_balancing_energy_activated_volume_history, "sync_detailed")
+        assert hasattr(get_balancing_energy_activated_volume_history, "asyncio_detailed")
         assert hasattr(get_balancing_energy_prices, "sync_detailed")
         assert hasattr(get_balancing_energy_prices, "asyncio_detailed")
+        assert hasattr(get_balancing_energy_price_history, "sync_detailed")
+        assert hasattr(get_balancing_energy_price_history, "asyncio_detailed")
         assert hasattr(get_balancing_energy_bids, "sync_detailed")
         assert hasattr(get_balancing_energy_bids, "asyncio_detailed")
         assert hasattr(get_balancing_energy_offered_volumes, "sync_detailed")
         assert hasattr(get_balancing_energy_offered_volumes, "asyncio_detailed")
+        assert hasattr(get_balancing_energy_offered_volume_history, "sync_detailed")
+        assert hasattr(get_balancing_energy_offered_volume_history, "asyncio_detailed")
         assert hasattr(get_balancing_energy_demand, "sync_detailed")
         assert hasattr(get_balancing_energy_demand, "asyncio_detailed")
         assert hasattr(get_balancing_energy_satisfied_demand, "sync_detailed")
@@ -167,6 +185,57 @@ class TestAPIEndpointsExist:
         assert hasattr(get_cross_border_energy_volumes, "asyncio_detailed")
         assert hasattr(get_cross_border_available_capacity, "sync_detailed")
         assert hasattr(get_cross_border_available_capacity, "asyncio_detailed")
+
+    def test_balancing_energy_activated_volume_history_models_exist(self):
+        """Test that the activated balancing energy volume history models are exported and shaped as expected."""
+        revision = BalancingEnergyActivatedVolumeRevision.from_dict(
+            {
+                "period": {
+                    "startAt": "2025-01-01T00:00:00Z",
+                    "endAt": "2025-01-01T00:15:00Z",
+                },
+                "volumeInMw": 250.5,
+                "observedAt": "2025-01-01T00:16:04Z",
+            }
+        )
+        assert revision.volume_in_mw == 250.5
+        assert revision.observed_at.isoformat() == "2025-01-01T00:16:04+00:00"
+        assert hasattr(BalancingEnergyActivatedVolumeHistory, "from_dict")
+        assert hasattr(BalancingEnergyActivatedVolumeHistoryResponse, "from_dict")
+
+    def test_balancing_energy_offered_volume_history_models_exist(self):
+        """Test that the offered balancing energy volume history models are exported and shaped as expected."""
+        revision = BalancingEnergyOfferedVolumeRevision.from_dict(
+            {
+                "period": {
+                    "startAt": "2025-01-01T00:00:00Z",
+                    "endAt": "2025-01-01T00:15:00Z",
+                },
+                "volumeInMw": 480.0,
+                "observedAt": "2025-01-01T00:16:04Z",
+            }
+        )
+        assert revision.volume_in_mw == 480.0
+        assert revision.observed_at.isoformat() == "2025-01-01T00:16:04+00:00"
+        assert hasattr(BalancingEnergyOfferedVolumeHistory, "from_dict")
+        assert hasattr(BalancingEnergyOfferedVolumeHistoryResponse, "from_dict")
+
+    def test_balancing_energy_price_history_models_exist(self):
+        """Test that the balancing energy price history models are exported and shaped as expected."""
+        revision = BalancingEnergyPriceRevision.from_dict(
+            {
+                "period": {
+                    "startAt": "2025-01-01T00:00:00Z",
+                    "endAt": "2025-01-01T00:15:00Z",
+                },
+                "pricePerMwh": 45.5,
+                "observedAt": "2025-01-01T00:16:04Z",
+            }
+        )
+        assert revision.price_per_mwh == 45.5
+        assert revision.observed_at.isoformat() == "2025-01-01T00:16:04+00:00"
+        assert hasattr(BalancingEnergyPriceHistory, "from_dict")
+        assert hasattr(BalancingEnergyPriceHistoryResponse, "from_dict")
 
     def test_balancing_capacity_endpoints_exist(self):
         """Test that balancing capacity endpoints are available."""

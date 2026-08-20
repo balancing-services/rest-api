@@ -11,9 +11,12 @@ from httpx import Response
 from balancing_services import AuthenticatedClient
 from balancing_services.api.default import (
     get_balancing_capacity_demand,
+    get_balancing_energy_activated_volume_history,
     get_balancing_energy_bids,
     get_balancing_energy_demand,
+    get_balancing_energy_offered_volume_history,
     get_balancing_energy_offered_volumes,
+    get_balancing_energy_price_history,
     get_balancing_energy_satisfied_demand,
     get_cross_border_available_capacity,
     get_cross_border_energy_volumes,
@@ -1982,3 +1985,285 @@ async def test_async_get_imbalance_total_volume_history(
     assert response.parsed is not None
     assert len(response.parsed.data[0].volumes) == 2
     assert response.parsed.data[0].volumes[-1].observed_at == datetime(2025, 1, 1, 1, 2, 11, tzinfo=timezone.utc)
+
+
+@pytest.fixture
+def mock_balancing_energy_activated_volume_history_response():
+    """Mock response data for the activated balancing energy volume revision history."""
+    return {
+        "queriedPeriod": {"startAt": "2025-01-01T00:00:00Z", "endAt": "2025-01-01T01:00:00Z"},
+        "hasMore": False,
+        "nextUpdatedSince": "2025-01-01T01:05:00Z",
+        "data": [
+            {
+                "area": "EE",
+                "eicCode": "10Y1001A1001A39I",
+                "reserveType": "mFRR",
+                "direction": "up",
+                "activationType": "direct",
+                "standardProduct": True,
+                "volumes": [
+                    {
+                        "period": {"startAt": "2025-01-01T00:00:00Z", "endAt": "2025-01-01T00:15:00Z"},
+                        "volumeInMw": 250.5,
+                        "observedAt": "2025-01-01T00:16:04Z",
+                    },
+                    {
+                        "period": {"startAt": "2025-01-01T00:00:00Z", "endAt": "2025-01-01T00:15:00Z"},
+                        "volumeInMw": 245.0,
+                        "observedAt": "2025-01-01T01:02:11Z",
+                    },
+                ],
+            }
+        ],
+    }
+
+
+@respx.mock
+def test_get_balancing_energy_activated_volume_history_success(
+    authenticated_client, mock_balancing_energy_activated_volume_history_response
+):
+    """Test successful activated balancing energy volume history request."""
+    respx.get("https://api.balancing.services/v2/balancing/energy/activated-volumes/history").mock(
+        return_value=Response(200, json=mock_balancing_energy_activated_volume_history_response)
+    )
+
+    response = get_balancing_energy_activated_volume_history.sync_detailed(
+        client=authenticated_client,
+        area="EE",
+        period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
+        period_end_at=datetime(2025, 1, 1, 1, 0, 0, tzinfo=timezone.utc),
+        reserve_type="mFRR",
+    )
+
+    assert response.status_code == 200
+    assert response.parsed is not None
+    assert response.parsed.has_more is False
+    assert len(response.parsed.data) == 1
+    assert response.parsed.data[0].area == "EE"
+    assert response.parsed.data[0].reserve_type == "mFRR"
+    assert response.parsed.data[0].direction == "up"
+    assert response.parsed.data[0].activation_type == "direct"
+    assert response.parsed.data[0].standard_product is True
+
+    # One period, two entries: the same quarter revised once, distinguished only by an ascending observedAt.
+    revisions = response.parsed.data[0].volumes
+    assert len(revisions) == 2
+    assert all(revision.period.start_at == datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc) for revision in revisions)
+    observed_at = [revision.observed_at for revision in revisions]
+    assert observed_at == sorted(observed_at)
+    assert observed_at[0] == datetime(2025, 1, 1, 0, 16, 4, tzinfo=timezone.utc)
+    assert revisions[0].volume_in_mw == 250.5
+    assert revisions[-1].volume_in_mw == 245.0
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_async_get_balancing_energy_activated_volume_history(
+    authenticated_client, mock_balancing_energy_activated_volume_history_response
+):
+    """Test async request for the activated balancing energy volume history."""
+    respx.get("https://api.balancing.services/v2/balancing/energy/activated-volumes/history").mock(
+        return_value=Response(200, json=mock_balancing_energy_activated_volume_history_response)
+    )
+
+    response = await get_balancing_energy_activated_volume_history.asyncio_detailed(
+        client=authenticated_client,
+        area="EE",
+        period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
+        period_end_at=datetime(2025, 1, 1, 1, 0, 0, tzinfo=timezone.utc),
+        reserve_type="mFRR",
+    )
+
+    assert response.status_code == 200
+    assert response.parsed is not None
+    assert len(response.parsed.data[0].volumes) == 2
+    assert response.parsed.data[0].volumes[-1].observed_at == datetime(2025, 1, 1, 1, 2, 11, tzinfo=timezone.utc)
+
+
+@pytest.fixture
+def mock_balancing_energy_offered_volume_history_response():
+    """Mock response data for the offered balancing energy volume revision history."""
+    return {
+        "queriedPeriod": {"startAt": "2025-01-01T00:00:00Z", "endAt": "2025-01-01T01:00:00Z"},
+        "hasMore": False,
+        "nextUpdatedSince": "2025-01-01T01:05:00Z",
+        "data": [
+            {
+                "area": "EE",
+                "eicCode": "10Y1001A1001A39I",
+                "reserveType": "aFRR",
+                "direction": "down",
+                "activationType": "notApplicable",
+                "standardProduct": True,
+                "volumes": [
+                    {
+                        "period": {"startAt": "2025-01-01T00:00:00Z", "endAt": "2025-01-01T00:15:00Z"},
+                        "volumeInMw": 480.0,
+                        "observedAt": "2025-01-01T00:16:04Z",
+                    },
+                    {
+                        "period": {"startAt": "2025-01-01T00:00:00Z", "endAt": "2025-01-01T00:15:00Z"},
+                        "volumeInMw": 495.5,
+                        "observedAt": "2025-01-01T01:02:11Z",
+                    },
+                ],
+            }
+        ],
+    }
+
+
+@respx.mock
+def test_get_balancing_energy_offered_volume_history_success(
+    authenticated_client, mock_balancing_energy_offered_volume_history_response
+):
+    """Test successful offered balancing energy volume history request."""
+    respx.get("https://api.balancing.services/v2/balancing/energy/offered-volumes/history").mock(
+        return_value=Response(200, json=mock_balancing_energy_offered_volume_history_response)
+    )
+
+    response = get_balancing_energy_offered_volume_history.sync_detailed(
+        client=authenticated_client,
+        area="EE",
+        period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
+        period_end_at=datetime(2025, 1, 1, 1, 0, 0, tzinfo=timezone.utc),
+        reserve_type="aFRR",
+    )
+
+    assert response.status_code == 200
+    assert response.parsed is not None
+    assert response.parsed.has_more is False
+    assert len(response.parsed.data) == 1
+    assert response.parsed.data[0].area == "EE"
+    assert response.parsed.data[0].reserve_type == "aFRR"
+    assert response.parsed.data[0].direction == "down"
+    assert response.parsed.data[0].activation_type == "notApplicable"
+    assert response.parsed.data[0].standard_product is True
+
+    # One period, two entries: the same quarter revised once, distinguished only by an ascending observedAt.
+    revisions = response.parsed.data[0].volumes
+    assert len(revisions) == 2
+    assert all(revision.period.start_at == datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc) for revision in revisions)
+    observed_at = [revision.observed_at for revision in revisions]
+    assert observed_at == sorted(observed_at)
+    assert observed_at[0] == datetime(2025, 1, 1, 0, 16, 4, tzinfo=timezone.utc)
+    assert revisions[0].volume_in_mw == 480.0
+    assert revisions[-1].volume_in_mw == 495.5
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_async_get_balancing_energy_offered_volume_history(
+    authenticated_client, mock_balancing_energy_offered_volume_history_response
+):
+    """Test async request for the offered balancing energy volume history."""
+    respx.get("https://api.balancing.services/v2/balancing/energy/offered-volumes/history").mock(
+        return_value=Response(200, json=mock_balancing_energy_offered_volume_history_response)
+    )
+
+    response = await get_balancing_energy_offered_volume_history.asyncio_detailed(
+        client=authenticated_client,
+        area="EE",
+        period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
+        period_end_at=datetime(2025, 1, 1, 1, 0, 0, tzinfo=timezone.utc),
+        reserve_type="aFRR",
+    )
+
+    assert response.status_code == 200
+    assert response.parsed is not None
+    assert len(response.parsed.data[0].volumes) == 2
+    assert response.parsed.data[0].volumes[-1].observed_at == datetime(2025, 1, 1, 1, 2, 11, tzinfo=timezone.utc)
+
+
+@pytest.fixture
+def mock_balancing_energy_price_history_response():
+    """Mock response data for the balancing energy price revision history."""
+    return {
+        "queriedPeriod": {"startAt": "2025-01-01T00:00:00Z", "endAt": "2025-01-01T01:00:00Z"},
+        "hasMore": False,
+        "nextUpdatedSince": "2025-01-01T01:05:00Z",
+        "data": [
+            {
+                "area": "EE",
+                "eicCode": "10Y1001A1001A39I",
+                "reserveType": "aFRR",
+                "direction": "up",
+                "activationType": "notApplicable",
+                "currency": "EUR",
+                "standardProduct": True,
+                "prices": [
+                    {
+                        "period": {"startAt": "2025-01-01T00:00:00Z", "endAt": "2025-01-01T00:15:00Z"},
+                        "pricePerMwh": 45.5,
+                        "observedAt": "2025-01-01T00:16:04Z",
+                    },
+                    {
+                        "period": {"startAt": "2025-01-01T00:00:00Z", "endAt": "2025-01-01T00:15:00Z"},
+                        "pricePerMwh": 41.2,
+                        "observedAt": "2025-01-01T01:02:11Z",
+                    },
+                ],
+            }
+        ],
+    }
+
+
+@respx.mock
+def test_get_balancing_energy_price_history_success(authenticated_client, mock_balancing_energy_price_history_response):
+    """Test successful balancing energy price history request."""
+    respx.get("https://api.balancing.services/v2/balancing/energy/prices/history").mock(
+        return_value=Response(200, json=mock_balancing_energy_price_history_response)
+    )
+
+    response = get_balancing_energy_price_history.sync_detailed(
+        client=authenticated_client,
+        area="EE",
+        period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
+        period_end_at=datetime(2025, 1, 1, 1, 0, 0, tzinfo=timezone.utc),
+        reserve_type="aFRR",
+    )
+
+    assert response.status_code == 200
+    assert response.parsed is not None
+    assert response.parsed.has_more is False
+    assert len(response.parsed.data) == 1
+    assert response.parsed.data[0].area == "EE"
+    assert response.parsed.data[0].reserve_type == "aFRR"
+    assert response.parsed.data[0].direction == "up"
+    assert response.parsed.data[0].activation_type == "notApplicable"
+    assert response.parsed.data[0].currency == "EUR"
+    assert response.parsed.data[0].standard_product is True
+
+    # One period, two entries: the same quarter revised once, distinguished only by an ascending observedAt.
+    revisions = response.parsed.data[0].prices
+    assert len(revisions) == 2
+    assert all(revision.period.start_at == datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc) for revision in revisions)
+    observed_at = [revision.observed_at for revision in revisions]
+    assert observed_at == sorted(observed_at)
+    assert observed_at[0] == datetime(2025, 1, 1, 0, 16, 4, tzinfo=timezone.utc)
+    assert revisions[0].price_per_mwh == 45.5
+    assert revisions[-1].price_per_mwh == 41.2
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_async_get_balancing_energy_price_history(
+    authenticated_client, mock_balancing_energy_price_history_response
+):
+    """Test async request for the balancing energy price history."""
+    respx.get("https://api.balancing.services/v2/balancing/energy/prices/history").mock(
+        return_value=Response(200, json=mock_balancing_energy_price_history_response)
+    )
+
+    response = await get_balancing_energy_price_history.asyncio_detailed(
+        client=authenticated_client,
+        area="EE",
+        period_start_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
+        period_end_at=datetime(2025, 1, 1, 1, 0, 0, tzinfo=timezone.utc),
+        reserve_type="aFRR",
+    )
+
+    assert response.status_code == 200
+    assert response.parsed is not None
+    assert len(response.parsed.data[0].prices) == 2
+    assert response.parsed.data[0].prices[-1].observed_at == datetime(2025, 1, 1, 1, 2, 11, tzinfo=timezone.utc)
