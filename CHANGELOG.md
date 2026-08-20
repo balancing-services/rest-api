@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.4.0] - 2026-08-20
+
 ### Added
 - Experimental activated balancing energy volume revision history endpoint (`/balancing/energy/activated-volumes/history`), serving how the volumes on `/balancing/energy/activated-volumes` reached their current values — see the endpoint description for the semantics
 - Experimental offered balancing energy volume revision history endpoint (`/balancing/energy/offered-volumes/history`), serving how the volumes on `/balancing/energy/offered-volumes` reached their current values — see the endpoint description for the semantics
@@ -233,7 +235,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - UTC timestamp-based period filtering
 - OpenAPI 3.0.3 specification
 
-[Unreleased]: https://github.com/balancing-services/rest-api/compare/v2.3.0...HEAD
+[Unreleased]: https://github.com/balancing-services/rest-api/compare/v2.4.0...HEAD
+[2.4.0]: https://github.com/balancing-services/rest-api/compare/v2.3.0...v2.4.0
 [2.3.0]: https://github.com/balancing-services/rest-api/compare/v2.2.0...v2.3.0
 [2.2.0]: https://github.com/balancing-services/rest-api/compare/v2.1.0...v2.2.0
 [2.1.0]: https://github.com/balancing-services/rest-api/compare/v2.0.2...v2.1.0
