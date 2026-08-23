@@ -1122,7 +1122,7 @@ paths:
           required: false
           schema:
             type: integer
-            minimum: 1
+            minimum: 2
             maximum: 10000
             default: 1000
             example: 1000
