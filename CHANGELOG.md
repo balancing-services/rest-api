@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- The cross-border marginal prices endpoint (`/balancing/energy/cross-border-marginal-prices`) requires `limit` to be at least 2; `limit=1` is rejected with a 400
+
 ## [2.4.0] - 2026-08-20
 
 ### Added
