@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.5.0] - 2026-08-24
+
 ### Added
 - The balancing energy bids endpoint (`/balancing/energy/bids`) serves four experimental, nullable fields on each bid — `divisible`, `eligibleActivationTypes`, `minimumVolumeInMw`, `availability` — carrying the bid's fine structure: whether it may be partially activated, which activation modes it is eligible for, the smallest volume the TSO may activate from it, and the lifecycle state it was published in. Null or absent means the value is not available; absent and null are equivalent. Fields marked experimental may change or be removed in a minor release. `info.description` now states that experimental-marking policy explicitly
 
@@ -241,7 +243,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - UTC timestamp-based period filtering
 - OpenAPI 3.0.3 specification
 
-[Unreleased]: https://github.com/balancing-services/rest-api/compare/v2.4.0...HEAD
+[Unreleased]: https://github.com/balancing-services/rest-api/compare/v2.5.0...HEAD
+[2.5.0]: https://github.com/balancing-services/rest-api/compare/v2.4.0...v2.5.0
 [2.4.0]: https://github.com/balancing-services/rest-api/compare/v2.3.0...v2.4.0
 [2.3.0]: https://github.com/balancing-services/rest-api/compare/v2.2.0...v2.3.0
 [2.2.0]: https://github.com/balancing-services/rest-api/compare/v2.1.0...v2.2.0
