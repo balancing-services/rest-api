@@ -2,7 +2,13 @@ openapi: 3.0.3
 info:
   title: Balancing Services REST API
   version: 2.4.0
-  description: REST API for balancing services data
+  description: |
+    REST API for balancing services data.
+
+    Some parts of the API are experimental, marked with `x-experimental: true` and/or an
+    "**Experimental**" note in their description. An experimental endpoint or property may be
+    renamed, reshaped, or removed in a minor release, unlike the surrounding stable API surface,
+    which follows semantic versioning.
   contact:
     name: Balancing Services Team
 
@@ -2348,6 +2354,56 @@ components:
           type: number
           description: Bid price per MWh in the specified currency
           example: 55.25
+        divisible:
+          type: boolean
+          nullable: true
+          x-experimental: true
+          description: |
+            **Experimental** — may change or be removed without notice.
+
+            Whether the TSO may activate only part of the bid: true when partial activation is
+            allowed, false when the bid is all-or-nothing. Null (or absent) when the value is not
+            available; absent and null are equivalent.
+          example: true
+        eligibleActivationTypes:
+          type: array
+          nullable: true
+          uniqueItems: true
+          x-experimental: true
+          items:
+            $ref: '#/components/schemas/EligibleActivationType'
+          description: |
+            **Experimental** — may change or be removed without notice.
+
+            The activation modes the bid may be selected for. A set: no element order is promised
+            and elements are unique. Null (or absent) when the value is not available; absent and
+            null are equivalent.
+          example:
+            - direct
+            - scheduled
+        minimumVolumeInMw:
+          type: number
+          nullable: true
+          x-experimental: true
+          description: |
+            **Experimental** — may change or be removed without notice.
+
+            Smallest volume in MW the TSO may activate from this bid when activating it partially,
+            relayed as published by the source; no cross-field invariant with `divisible` is
+            promised. Null (or absent) when the value is not available; absent and null are
+            equivalent.
+          example: 1
+        availability:
+          nullable: true
+          x-experimental: true
+          allOf:
+            - $ref: '#/components/schemas/BidAvailability'
+          description: |
+            **Experimental** — may change or be removed without notice.
+
+            The lifecycle state the source published the bid in. Null (or absent) when the value
+            is not available; absent and null are equivalent.
+          example: available
 
     BalancingCapacityBidsResponse:
       type: object
@@ -2860,6 +2916,33 @@ components:
         - scheduled
         - unspecified
         - notApplicable
+
+    EligibleActivationType:
+      type: string
+      description: |
+        An activation mode a balancing energy bid is eligible for:
+        - direct: the bid may be selected for direct activation
+        - scheduled: the bid may be selected for scheduled activation
+
+        Deliberately narrower than ActivationType: an eligibility set never contains
+        unspecified or notApplicable.
+      enum:
+        - direct
+        - scheduled
+
+    BidAvailability:
+      type: string
+      description: |
+        Lifecycle state a balancing energy bid was published in:
+        - available: offered for activation
+        - unavailable: exists but cannot be activated
+        - cancelled: revoked by the TSO
+        - withdrawn: taken back by the market participant
+      enum:
+        - available
+        - unavailable
+        - cancelled
+        - withdrawn
 
     BidStatus:
       type: string

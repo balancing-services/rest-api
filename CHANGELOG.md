@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- The balancing energy bids endpoint (`/balancing/energy/bids`) serves four experimental, nullable fields on each bid — `divisible`, `eligibleActivationTypes`, `minimumVolumeInMw`, `availability` — carrying the bid's fine structure: whether it may be partially activated, which activation modes it is eligible for, the smallest volume the TSO may activate from it, and the lifecycle state it was published in. Null or absent means the value is not available; absent and null are equivalent. Fields marked experimental may change or be removed in a minor release. `info.description` now states that experimental-marking policy explicitly
+
 ### Changed
 - The cross-border marginal prices endpoint (`/balancing/energy/cross-border-marginal-prices`) requires `limit` to be at least 2; `limit=1` is rejected with a 400
 
