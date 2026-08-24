@@ -34,6 +34,12 @@ if command -v git &> /dev/null && git rev-parse --git-dir > /dev/null 2>&1; then
     fi
 fi
 
+# Regenerate pyproject.toml before anything runs ruff: ruff discovers its config
+# from this (gitignored, generated) file, and without it the pinned ruff falls
+# back to defaults and applies extra rewrites (e.g. `-> Self`, `*args: object`)
+# that churn the generated client independently of any spec change.
+./generate-pyproject.sh
+
 # Remove existing generated code (if any)
 if [ -d "balancing_services" ]; then
     echo "Removing existing generated code..."
