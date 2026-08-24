@@ -61,7 +61,7 @@ All take `period-start-at` and `period-end-at`; the last column lists what else 
 | `GET /balancing/energy/offered-volumes/history` | Experimental. The revision history of `/balancing/energy/offered-volumes`: the sequence of values held for a period, each stamped with its `observedAt` — a lineage, normally ending at the value served now | `area`, `reserve-type` |
 | `GET /balancing/energy/prices` | Balancing energy prices per MWh | `area`, `reserve-type` |
 | `GET /balancing/energy/prices/history` | Experimental. The revision history of `/balancing/energy/prices`: the sequence of values held for a period, each stamped with its `observedAt` — a lineage, normally ending at the value served now | `area`, `reserve-type` |
-| `GET /balancing/energy/bids` | Energy bid curves (`volumeInMw`, `pricePerMwh`), grouped by delivery period | `area`, `reserve-type` |
+| `GET /balancing/energy/bids` | Energy bid curves (`volumeInMw`, `pricePerMwh`, plus experimental fine-structure fields — `divisible`, `eligibleActivationTypes`, `minimumVolumeInMw`, `availability`, all nullable), grouped by delivery period | `area`, `reserve-type` |
 | `GET /balancing/energy/demand` | Experimental. Balancing energy the TSO requested | `area`, `reserve-type` |
 | `GET /balancing/energy/satisfied-demand` | Experimental. The part of that demand which was satisfied | `area`, `reserve-type` |
 | `GET /balancing/energy/cross-border-marginal-prices` | Experimental. Cross-border purchased marginal prices per MWh | `area`, `reserve-type` |

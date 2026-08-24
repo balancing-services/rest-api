@@ -42,6 +42,7 @@ from .balancing_energy_prices_response import BalancingEnergyPricesResponse
 from .balancing_energy_volume import BalancingEnergyVolume
 from .balancing_energy_volumes import BalancingEnergyVolumes
 from .balancing_energy_volumes_response import BalancingEnergyVolumesResponse
+from .bid_availability import BidAvailability
 from .bid_status import BidStatus
 from .capacity_bid import CapacityBid
 from .cross_border_available_capacity import CrossBorderAvailableCapacity
@@ -65,6 +66,7 @@ from .day_ahead_energy_prices_response import DayAheadEnergyPricesResponse
 from .demand_basis import DemandBasis
 from .direction import Direction
 from .eic_code import EicCode
+from .eligible_activation_type import EligibleActivationType
 from .energy_bid import EnergyBid
 from .imbalance_direction import ImbalanceDirection
 from .imbalance_price import ImbalancePrice
@@ -122,6 +124,7 @@ __all__ = (
     "BalancingEnergyVolume",
     "BalancingEnergyVolumes",
     "BalancingEnergyVolumesResponse",
+    "BidAvailability",
     "BidStatus",
     "CapacityBid",
     "CrossBorderAvailableCapacity",
@@ -141,6 +144,7 @@ __all__ = (
     "DemandBasis",
     "Direction",
     "EicCode",
+    "EligibleActivationType",
     "EnergyBid",
     "ImbalanceDirection",
     "ImbalancePrice",
