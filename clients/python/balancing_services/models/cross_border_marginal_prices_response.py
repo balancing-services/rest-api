@@ -28,8 +28,8 @@ class CrossBorderMarginalPricesResponse:
             one drain reports the same value. It deliberately lags real time to cover writes that were still committing, so
             consecutive polls overlap slightly and a record may be delivered more than once — upsert on consume. Example:
             2025-01-02T09:15:00Z.
-        next_cursor (None | str | Unset): Cursor to fetch the next page of results. Null if no more results. Example:
-            v1:AAAAAYwBAgMEBQYHCAkKCw==.
+        next_cursor (None | str | Unset): Opaque cursor for the next page; pass it unchanged as `cursor`. Null if no
+            more results. Example: v1:AAAAAYwBAgMEBQYHCAkKCw==.
     """
 
     queried_period: Period
