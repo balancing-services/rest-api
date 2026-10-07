@@ -1316,10 +1316,11 @@ components:
     cursor:
       name: cursor
       in: query
-      description: Pagination cursor from previous response. Omit to start from the beginning.
+      description: 'Opaque pagination cursor: pass the previous response''s `nextCursor` unchanged; do not parse or construct one. Omit to start from the beginning.'
       required: false
       schema:
         type: string
+        description: 'Opaque pagination cursor: pass the previous response''s `nextCursor` unchanged; do not parse or construct one. Omit to start from the beginning.'
         example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
     updated-since:
       name: updated-since
@@ -1502,7 +1503,7 @@ components:
             $ref: '#/components/schemas/ImbalancePrices'
         nextCursor:
           type: string
-          description: Cursor to fetch the next page of results. Null if no more results.
+          description: Opaque cursor for the next page; pass it unchanged as `cursor`. Null if no more results.
           example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
           nullable: true
         hasMore:
@@ -1563,7 +1564,7 @@ components:
             $ref: '#/components/schemas/ImbalancePriceForecasts'
         nextCursor:
           type: string
-          description: Cursor to fetch the next page of results. Null if no more results.
+          description: Opaque cursor for the next page; pass it unchanged as `cursor`. Null if no more results.
           example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
           nullable: true
         hasMore:
@@ -1662,7 +1663,7 @@ components:
             $ref: '#/components/schemas/ImbalancePriceHistory'
         nextCursor:
           type: string
-          description: Cursor to fetch the next page of results. Null if no more results.
+          description: Opaque cursor for the next page; pass it unchanged as `cursor`. Null if no more results.
           example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
           nullable: true
         hasMore:
@@ -1729,7 +1730,7 @@ components:
             $ref: '#/components/schemas/ImbalanceTotalVolumes'
         nextCursor:
           type: string
-          description: Cursor to fetch the next page of results. Null if no more results.
+          description: Opaque cursor for the next page; pass it unchanged as `cursor`. Null if no more results.
           example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
           nullable: true
         hasMore:
@@ -1788,7 +1789,7 @@ components:
             $ref: '#/components/schemas/ImbalanceTotalVolumeHistory'
         nextCursor:
           type: string
-          description: Cursor to fetch the next page of results. Null if no more results.
+          description: Opaque cursor for the next page; pass it unchanged as `cursor`. Null if no more results.
           example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
           nullable: true
         hasMore:
@@ -1853,7 +1854,7 @@ components:
             $ref: '#/components/schemas/BalancingEnergyVolumes'
         nextCursor:
           type: string
-          description: Cursor to fetch the next page of results. Null if no more results.
+          description: Opaque cursor for the next page; pass it unchanged as `cursor`. Null if no more results.
           example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
           nullable: true
         hasMore:
@@ -1922,7 +1923,7 @@ components:
             $ref: '#/components/schemas/BalancingEnergyActivatedVolumeHistory'
         nextCursor:
           type: string
-          description: Cursor to fetch the next page of results. Null if no more results.
+          description: Opaque cursor for the next page; pass it unchanged as `cursor`. Null if no more results.
           example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
           nullable: true
         hasMore:
@@ -1997,7 +1998,7 @@ components:
             $ref: '#/components/schemas/BalancingEnergyOfferedVolumeHistory'
         nextCursor:
           type: string
-          description: Cursor to fetch the next page of results. Null if no more results.
+          description: Opaque cursor for the next page; pass it unchanged as `cursor`. Null if no more results.
           example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
           nullable: true
         hasMore:
@@ -2072,7 +2073,7 @@ components:
             $ref: '#/components/schemas/BalancingEnergyPrices'
         nextCursor:
           type: string
-          description: Cursor to fetch the next page of results. Null if no more results.
+          description: Opaque cursor for the next page; pass it unchanged as `cursor`. Null if no more results.
           example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
           nullable: true
         hasMore:
@@ -2144,7 +2145,7 @@ components:
             $ref: '#/components/schemas/BalancingEnergyPriceHistory'
         nextCursor:
           type: string
-          description: Cursor to fetch the next page of results. Null if no more results.
+          description: Opaque cursor for the next page; pass it unchanged as `cursor`. Null if no more results.
           example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
           nullable: true
         hasMore:
@@ -2222,7 +2223,7 @@ components:
             $ref: '#/components/schemas/DayAheadEnergyPrices'
         nextCursor:
           type: string
-          description: Cursor to fetch the next page of results. Null if no more results.
+          description: Opaque cursor for the next page; pass it unchanged as `cursor`. Null if no more results.
           example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
           nullable: true
         hasMore:
@@ -2280,7 +2281,7 @@ components:
             $ref: '#/components/schemas/BalancingEnergyBids'
         nextCursor:
           type: string
-          description: Cursor to fetch the next page of results. Null if no more results.
+          description: Opaque cursor for the next page; pass it unchanged as `cursor`. Null if no more results.
           example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
           nullable: true
         hasMore:
@@ -2421,7 +2422,7 @@ components:
             $ref: '#/components/schemas/BalancingCapacityBids'
         nextCursor:
           type: string
-          description: Cursor to fetch the next page of results. Null if no more results.
+          description: Opaque cursor for the next page; pass it unchanged as `cursor`. Null if no more results.
           example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
           nullable: true
         hasMore:
@@ -2528,7 +2529,7 @@ components:
             $ref: '#/components/schemas/BalancingCapacityPrices'
         nextCursor:
           type: string
-          description: Cursor to fetch the next page of results. Null if no more results.
+          description: Opaque cursor for the next page; pass it unchanged as `cursor`. Null if no more results.
           example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
           nullable: true
         hasMore:
@@ -2597,7 +2598,7 @@ components:
             $ref: '#/components/schemas/BalancingCapacityVolumes'
         nextCursor:
           type: string
-          description: Cursor to fetch the next page of results. Null if no more results.
+          description: Opaque cursor for the next page; pass it unchanged as `cursor`. Null if no more results.
           example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
           nullable: true
         hasMore:
@@ -2663,7 +2664,7 @@ components:
             $ref: '#/components/schemas/BalancingCapacityDemands'
         nextCursor:
           type: string
-          description: Cursor to fetch the next page of results. Null if no more results.
+          description: Opaque cursor for the next page; pass it unchanged as `cursor`. Null if no more results.
           example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
           nullable: true
         hasMore:
@@ -2997,7 +2998,7 @@ components:
             $ref: '#/components/schemas/CrossBorderAvailableCapacity'
         nextCursor:
           type: string
-          description: Cursor to fetch the next page of results. Null if no more results.
+          description: Opaque cursor for the next page; pass it unchanged as `cursor`. Null if no more results.
           example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
           nullable: true
         hasMore:
@@ -3061,7 +3062,7 @@ components:
             $ref: '#/components/schemas/CrossZonalVolumes'
         nextCursor:
           type: string
-          description: Cursor to fetch the next page of results. Null if no more results.
+          description: Opaque cursor for the next page; pass it unchanged as `cursor`. Null if no more results.
           example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
           nullable: true
         hasMore:
@@ -3112,7 +3113,7 @@ components:
             $ref: '#/components/schemas/CrossBorderMarginalPrices'
         nextCursor:
           type: string
-          description: Cursor to fetch the next page of results. Null if no more results.
+          description: Opaque cursor for the next page; pass it unchanged as `cursor`. Null if no more results.
           example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
           nullable: true
         hasMore:
@@ -3176,7 +3177,7 @@ components:
             $ref: '#/components/schemas/CrossBorderEnergyVolumes'
         nextCursor:
           type: string
-          description: Cursor to fetch the next page of results. Null if no more results.
+          description: Opaque cursor for the next page; pass it unchanged as `cursor`. Null if no more results.
           example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
           nullable: true
         hasMore:

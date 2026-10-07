@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- The `cursor` parameter and `nextCursor` field descriptions state that cursors are opaque: pass `nextCursor` back unchanged as `cursor`, never parse or construct one. Documentation only; no wire or behaviour change
+
 ## [2.5.0] - 2026-08-24
 
 ### Added

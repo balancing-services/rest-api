@@ -144,7 +144,9 @@ def sync_detailed(
         period_start_at (datetime.datetime):  Example: 2026-03-01T00:00:00Z.
         period_end_at (datetime.datetime):  Example: 2026-03-01T01:00:00Z.
         reserve_type (ReserveType): Reserve type
-        cursor (str | Unset):  Example: v1:AAAAAYwBAgMEBQYHCAkKCw==.
+        cursor (str | Unset): Opaque pagination cursor: pass the previous response's `nextCursor`
+            unchanged; do not parse or construct one. Omit to start from the beginning. Example:
+            v1:AAAAAYwBAgMEBQYHCAkKCw==.
         limit (int | Unset):  Default: 1000. Example: 1000.
         updated_since (datetime.datetime | Unset):  Example: 2025-01-02T09:15:00Z.
 
@@ -197,7 +199,9 @@ def sync(
         period_start_at (datetime.datetime):  Example: 2026-03-01T00:00:00Z.
         period_end_at (datetime.datetime):  Example: 2026-03-01T01:00:00Z.
         reserve_type (ReserveType): Reserve type
-        cursor (str | Unset):  Example: v1:AAAAAYwBAgMEBQYHCAkKCw==.
+        cursor (str | Unset): Opaque pagination cursor: pass the previous response's `nextCursor`
+            unchanged; do not parse or construct one. Omit to start from the beginning. Example:
+            v1:AAAAAYwBAgMEBQYHCAkKCw==.
         limit (int | Unset):  Default: 1000. Example: 1000.
         updated_since (datetime.datetime | Unset):  Example: 2025-01-02T09:15:00Z.
 
@@ -245,7 +249,9 @@ async def asyncio_detailed(
         period_start_at (datetime.datetime):  Example: 2026-03-01T00:00:00Z.
         period_end_at (datetime.datetime):  Example: 2026-03-01T01:00:00Z.
         reserve_type (ReserveType): Reserve type
-        cursor (str | Unset):  Example: v1:AAAAAYwBAgMEBQYHCAkKCw==.
+        cursor (str | Unset): Opaque pagination cursor: pass the previous response's `nextCursor`
+            unchanged; do not parse or construct one. Omit to start from the beginning. Example:
+            v1:AAAAAYwBAgMEBQYHCAkKCw==.
         limit (int | Unset):  Default: 1000. Example: 1000.
         updated_since (datetime.datetime | Unset):  Example: 2025-01-02T09:15:00Z.
 
@@ -296,7 +302,9 @@ async def asyncio(
         period_start_at (datetime.datetime):  Example: 2026-03-01T00:00:00Z.
         period_end_at (datetime.datetime):  Example: 2026-03-01T01:00:00Z.
         reserve_type (ReserveType): Reserve type
-        cursor (str | Unset):  Example: v1:AAAAAYwBAgMEBQYHCAkKCw==.
+        cursor (str | Unset): Opaque pagination cursor: pass the previous response's `nextCursor`
+            unchanged; do not parse or construct one. Omit to start from the beginning. Example:
+            v1:AAAAAYwBAgMEBQYHCAkKCw==.
         limit (int | Unset):  Default: 1000. Example: 1000.
         updated_since (datetime.datetime | Unset):  Example: 2025-01-02T09:15:00Z.
 
