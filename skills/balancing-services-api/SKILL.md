@@ -67,7 +67,7 @@ All take `period-start-at` and `period-end-at`; the last column lists what else 
 | `GET /balancing/energy/cross-border-marginal-prices` | Experimental. Cross-border purchased marginal prices per MWh | `area`, `reserve-type` |
 | `GET /balancing/energy/cross-border-volumes` | Balancing energy exchanged over one border, both directions, split by activation type | `area`, `other-area`, `reserve-type` |
 | `GET /balancing/capacity/bids` | Capacity bid curves grouped by delivery period; each bid carries its `procurement` and `status` (`offered`/`accepted`) | `area`, `reserve-type` |
-| `GET /balancing/capacity/prices` | Capacity prices per MW per hour, grouped per procurement | `area`, `reserve-type` |
+| `GET /balancing/capacity/prices` | Capacity prices per MW per hour, grouped per procurement; optional `price-type` (`average`/`marginal`) | `area`, `reserve-type` |
 | `GET /balancing/capacity/procured-volumes` | Procured capacity in MW, grouped per procurement | `area`, `reserve-type` |
 | `GET /balancing/capacity/demand` | Experimental. Capacity the TSO set out to procure: `totalDemandInMw`, `localDemandInMw`, per procurement, with a `demandBasis` | `area`, `reserve-type` |
 | `GET /balancing/capacity/cross-zonal-allocation` | Allocated cross-zonal capacity over one border, both directions | `area`, `other-area`, `reserve-type` |

@@ -8,6 +8,7 @@ from ... import errors
 from ...client import AuthenticatedClient, Client
 from ...models.area import Area
 from ...models.balancing_capacity_prices_response import BalancingCapacityPricesResponse
+from ...models.price_type import PriceType
 from ...models.problem import Problem
 from ...models.reserve_type import ReserveType
 from ...types import UNSET, Response, Unset
@@ -19,6 +20,7 @@ def _get_kwargs(
     period_start_at: datetime.datetime,
     period_end_at: datetime.datetime,
     reserve_type: ReserveType,
+    price_type: PriceType | Unset = "average",
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
     updated_since: datetime.datetime | Unset = UNSET,
@@ -37,6 +39,12 @@ def _get_kwargs(
 
     json_reserve_type: str = reserve_type
     params["reserve-type"] = json_reserve_type
+
+    json_price_type: str | Unset = UNSET
+    if not isinstance(price_type, Unset):
+        json_price_type = price_type
+
+    params["price-type"] = json_price_type
 
     params["cursor"] = cursor
 
@@ -125,6 +133,7 @@ def sync_detailed(
     period_start_at: datetime.datetime,
     period_end_at: datetime.datetime,
     reserve_type: ReserveType,
+    price_type: PriceType | Unset = "average",
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
     updated_since: datetime.datetime | Unset = UNSET,
@@ -140,6 +149,7 @@ def sync_detailed(
         period_start_at (datetime.datetime):  Example: 2025-01-01T00:00:00Z.
         period_end_at (datetime.datetime):  Example: 2025-01-02T00:00:00Z.
         reserve_type (ReserveType): Reserve type
+        price_type (PriceType | Unset): Average or marginal price Default: 'average'.
         cursor (str | Unset): Opaque pagination cursor: pass the previous response's `nextCursor`
             unchanged; do not parse or construct one. Omit to start from the beginning. Example:
             v1:AAAAAYwBAgMEBQYHCAkKCw==.
@@ -159,6 +169,7 @@ def sync_detailed(
         period_start_at=period_start_at,
         period_end_at=period_end_at,
         reserve_type=reserve_type,
+        price_type=price_type,
         cursor=cursor,
         limit=limit,
         updated_since=updated_since,
@@ -178,6 +189,7 @@ def sync(
     period_start_at: datetime.datetime,
     period_end_at: datetime.datetime,
     reserve_type: ReserveType,
+    price_type: PriceType | Unset = "average",
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
     updated_since: datetime.datetime | Unset = UNSET,
@@ -193,6 +205,7 @@ def sync(
         period_start_at (datetime.datetime):  Example: 2025-01-01T00:00:00Z.
         period_end_at (datetime.datetime):  Example: 2025-01-02T00:00:00Z.
         reserve_type (ReserveType): Reserve type
+        price_type (PriceType | Unset): Average or marginal price Default: 'average'.
         cursor (str | Unset): Opaque pagination cursor: pass the previous response's `nextCursor`
             unchanged; do not parse or construct one. Omit to start from the beginning. Example:
             v1:AAAAAYwBAgMEBQYHCAkKCw==.
@@ -213,6 +226,7 @@ def sync(
         period_start_at=period_start_at,
         period_end_at=period_end_at,
         reserve_type=reserve_type,
+        price_type=price_type,
         cursor=cursor,
         limit=limit,
         updated_since=updated_since,
@@ -226,6 +240,7 @@ async def asyncio_detailed(
     period_start_at: datetime.datetime,
     period_end_at: datetime.datetime,
     reserve_type: ReserveType,
+    price_type: PriceType | Unset = "average",
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
     updated_since: datetime.datetime | Unset = UNSET,
@@ -241,6 +256,7 @@ async def asyncio_detailed(
         period_start_at (datetime.datetime):  Example: 2025-01-01T00:00:00Z.
         period_end_at (datetime.datetime):  Example: 2025-01-02T00:00:00Z.
         reserve_type (ReserveType): Reserve type
+        price_type (PriceType | Unset): Average or marginal price Default: 'average'.
         cursor (str | Unset): Opaque pagination cursor: pass the previous response's `nextCursor`
             unchanged; do not parse or construct one. Omit to start from the beginning. Example:
             v1:AAAAAYwBAgMEBQYHCAkKCw==.
@@ -260,6 +276,7 @@ async def asyncio_detailed(
         period_start_at=period_start_at,
         period_end_at=period_end_at,
         reserve_type=reserve_type,
+        price_type=price_type,
         cursor=cursor,
         limit=limit,
         updated_since=updated_since,
@@ -277,6 +294,7 @@ async def asyncio(
     period_start_at: datetime.datetime,
     period_end_at: datetime.datetime,
     reserve_type: ReserveType,
+    price_type: PriceType | Unset = "average",
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
     updated_since: datetime.datetime | Unset = UNSET,
@@ -292,6 +310,7 @@ async def asyncio(
         period_start_at (datetime.datetime):  Example: 2025-01-01T00:00:00Z.
         period_end_at (datetime.datetime):  Example: 2025-01-02T00:00:00Z.
         reserve_type (ReserveType): Reserve type
+        price_type (PriceType | Unset): Average or marginal price Default: 'average'.
         cursor (str | Unset): Opaque pagination cursor: pass the previous response's `nextCursor`
             unchanged; do not parse or construct one. Omit to start from the beginning. Example:
             v1:AAAAAYwBAgMEBQYHCAkKCw==.
@@ -313,6 +332,7 @@ async def asyncio(
             period_start_at=period_start_at,
             period_end_at=period_end_at,
             reserve_type=reserve_type,
+            price_type=price_type,
             cursor=cursor,
             limit=limit,
             updated_since=updated_since,
