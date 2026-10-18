@@ -84,6 +84,7 @@ from .imbalance_total_volume_history_response import ImbalanceTotalVolumeHistory
 from .imbalance_total_volumes import ImbalanceTotalVolumes
 from .imbalance_total_volumes_response import ImbalanceTotalVolumesResponse
 from .period import Period
+from .price_type import PriceType
 from .problem import Problem
 from .procurement import Procurement
 from .reserve_type import ReserveType
@@ -162,6 +163,7 @@ __all__ = (
     "ImbalanceTotalVolumes",
     "ImbalanceTotalVolumesResponse",
     "Period",
+    "PriceType",
     "Problem",
     "Procurement",
     "ReserveType",

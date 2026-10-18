@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Optional `price-type` parameter (`average`, the default, or `marginal`) on `/balancing/capacity/prices`; a cursor is bound to its price type
+- Experimental `priceType` field on each balancing capacity price
+
 ### Changed
 - The `cursor` parameter and `nextCursor` field descriptions state that cursors are opaque: pass `nextCursor` back unchanged as `cursor`, never parse or construct one. Documentation only; no wire or behaviour change
 

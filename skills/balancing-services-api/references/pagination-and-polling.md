@@ -32,7 +32,8 @@ Rules that are easy to get wrong:
 - **A request without `cursor` and `limit` returns the first page, not the whole window.** There is
   no mode that returns everything in one response.
 - **Repeat every other query parameter unchanged on each page.** The cursor carries the position
-  only; `area`, `reserve-type`, the period bounds and `updated-since` must be resent identically.
+  only; `area`, `reserve-type`, `price-type`, the period bounds and `updated-since` must be resent
+  identically.
 - **Cursors are opaque.** Never parse, construct, truncate or reuse one across endpoints. If a
   cursor is rejected, recover by restarting the drain with no cursor.
 - **Drive the loop off `hasMore`, not off `len(data)`.** A page can be shorter than `limit` and

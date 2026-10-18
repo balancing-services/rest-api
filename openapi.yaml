@@ -827,6 +827,16 @@ paths:
         - $ref: '#/components/parameters/period-start-at'
         - $ref: '#/components/parameters/period-end-at'
         - $ref: '#/components/parameters/reserve-type'
+        - name: price-type
+          in: query
+          description: >-
+            `average` (default): the average price paid. `marginal`: the clearing price, or the highest accepted
+            bid in a pay-as-bid auction; auctions without one are left out. A cursor is bound to its price type.
+          required: false
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/PriceType'
+            default: average
         - $ref: '#/components/parameters/cursor'
         - name: limit
           in: query
@@ -2581,6 +2591,15 @@ components:
           type: number
           description: Price per MW per hour in the specified currency
           example: 12.50
+        priceType:
+          x-experimental: true
+          allOf:
+            - $ref: '#/components/schemas/PriceType'
+          description: |
+            **Experimental** — may change or be removed without notice.
+
+            The requested price type.
+          example: average
 
     BalancingCapacityVolumesResponse:
       type: object
@@ -2871,6 +2890,13 @@ components:
       enum:
         - additive
         - substitutive
+
+    PriceType:
+      type: string
+      description: Average or marginal price
+      enum:
+        - average
+        - marginal
 
     ImbalanceDirection:
       type: string
