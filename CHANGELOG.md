@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.6.0] - 2026-10-19
+
 ### Added
 - Optional `price-type` parameter (`average`, the default, or `marginal`) on `/balancing/capacity/prices`; a cursor is bound to its price type
 - Experimental `priceType` field on each balancing capacity price
@@ -250,7 +252,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - UTC timestamp-based period filtering
 - OpenAPI 3.0.3 specification
 
-[Unreleased]: https://github.com/balancing-services/rest-api/compare/v2.5.0...HEAD
+[Unreleased]: https://github.com/balancing-services/rest-api/compare/v2.6.0...HEAD
+[2.6.0]: https://github.com/balancing-services/rest-api/compare/v2.5.0...v2.6.0
 [2.5.0]: https://github.com/balancing-services/rest-api/compare/v2.4.0...v2.5.0
 [2.4.0]: https://github.com/balancing-services/rest-api/compare/v2.3.0...v2.4.0
 [2.3.0]: https://github.com/balancing-services/rest-api/compare/v2.2.0...v2.3.0
