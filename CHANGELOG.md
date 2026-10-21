@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Experimental balancing capacity price forecast endpoint (`/balancing/capacity/prices/forecast`), serving for each day-ahead balancing capacity auction our forecast of its marginal (clearing) price — a point forecast (`pricePerMwPerHour`) and a predictive distribution (`quantiles`), comparable with `/balancing/capacity/prices` at `price-type=marginal` — see the endpoint description for the semantics
+
 ## [2.6.0] - 2026-10-19
 
 ### Added

@@ -9,6 +9,7 @@ from balancing_services import AuthenticatedClient, Client
 from balancing_services.api.default import (
     get_balancing_capacity_bids,
     get_balancing_capacity_demand,
+    get_balancing_capacity_price_forecasts,
     get_balancing_capacity_prices,
     get_balancing_capacity_procured_volumes,
     get_balancing_energy_activated_volume_history,
@@ -32,6 +33,9 @@ from balancing_services.api.default import (
     get_imbalance_total_volumes,
 )
 from balancing_services.models import (
+    BalancingCapacityPriceForecast,
+    BalancingCapacityPriceForecasts,
+    BalancingCapacityPriceForecastsResponse,
     BalancingEnergyActivatedVolumeHistory,
     BalancingEnergyActivatedVolumeHistoryResponse,
     BalancingEnergyActivatedVolumeRevision,
@@ -50,6 +54,7 @@ from balancing_services.models import (
     ImbalancePriceRevision,
     ImbalanceTotalVolumeHistory,
     ImbalanceTotalVolumeHistoryResponse,
+    PricePerMwPerHourQuantile,
     TotalImbalanceVolumeRevision,
 )
 from balancing_services.models.activation_type import ACTIVATION_TYPE_VALUES
@@ -245,8 +250,31 @@ class TestAPIEndpointsExist:
         assert hasattr(get_balancing_capacity_demand, "asyncio_detailed")
         assert hasattr(get_balancing_capacity_prices, "sync_detailed")
         assert hasattr(get_balancing_capacity_prices, "asyncio_detailed")
+        assert hasattr(get_balancing_capacity_price_forecasts, "sync_detailed")
+        assert hasattr(get_balancing_capacity_price_forecasts, "asyncio_detailed")
         assert hasattr(get_balancing_capacity_procured_volumes, "sync_detailed")
         assert hasattr(get_balancing_capacity_procured_volumes, "asyncio_detailed")
+
+    def test_balancing_capacity_price_forecast_models_exist(self):
+        """Test that the balancing capacity price forecast models are exported and shaped as expected."""
+        forecast = BalancingCapacityPriceForecast.from_dict(
+            {
+                "period": {
+                    "startAt": "2025-01-02T00:00:00Z",
+                    "endAt": "2025-01-02T01:00:00Z",
+                },
+                "madeAt": "2025-01-01T06:30:02Z",
+                "pricePerMwPerHour": 12.5,
+                "quantiles": [{"level": 0.5, "pricePerMwPerHour": 12.5}],
+            }
+        )
+        assert forecast.price_per_mw_per_hour == 12.5
+        assert forecast.made_at.isoformat() == "2025-01-01T06:30:02+00:00"
+        assert isinstance(forecast.quantiles[0], PricePerMwPerHourQuantile)
+        assert forecast.quantiles[0].level == 0.5
+        assert forecast.quantiles[0].price_per_mw_per_hour == 12.5
+        assert hasattr(BalancingCapacityPriceForecasts, "from_dict")
+        assert hasattr(BalancingCapacityPriceForecastsResponse, "from_dict")
 
     def test_day_ahead_energy_endpoints_exist(self):
         """Test that day-ahead energy endpoints are available."""

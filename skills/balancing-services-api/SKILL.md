@@ -68,6 +68,7 @@ All take `period-start-at` and `period-end-at`; the last column lists what else 
 | `GET /balancing/energy/cross-border-volumes` | Balancing energy exchanged over one border, both directions, split by activation type | `area`, `other-area`, `reserve-type` |
 | `GET /balancing/capacity/bids` | Capacity bid curves grouped by delivery period; each bid carries its `procurement` and `status` (`offered`/`accepted`) | `area`, `reserve-type` |
 | `GET /balancing/capacity/prices` | Capacity prices per MW per hour, grouped per procurement; optional `price-type` (`average`/`marginal`) | `area`, `reserve-type` |
+| `GET /balancing/capacity/prices/forecast` | Experimental. Forecasts of each day-ahead capacity auction's marginal (clearing) price — compare with `/balancing/capacity/prices` at `price-type=marginal` — grouped per procurement: the last forecast made before gate closure (`procuredAt`), a point forecast `pricePerMwPerHour` (today the median) plus `quantiles`, stamped `madeAt` | `area`, `reserve-type` |
 | `GET /balancing/capacity/procured-volumes` | Procured capacity in MW, grouped per procurement | `area`, `reserve-type` |
 | `GET /balancing/capacity/demand` | Experimental. Capacity the TSO set out to procure: `totalDemandInMw`, `localDemandInMw`, per procurement, with a `demandBasis` | `area`, `reserve-type` |
 | `GET /balancing/capacity/cross-zonal-allocation` | Allocated cross-zonal capacity over one border, both directions | `area`, `other-area`, `reserve-type` |
@@ -116,11 +117,11 @@ references/pagination-and-polling.md).
   when `hasMore` is true, merge entries on the group's dimensions plus the period rather than
   appending them. Bids within a period entry have no guaranteed order; sort by price yourself if
   you need the merit order.
-- **Capacity data nests the procurement.** Capacity prices, procured volumes and demand carry a
-  required `procurement` object with `procuredAt` inside it (not a flat field), and each capacity
-  bid carries its own `procurement` — so one period entry can mix bids from several procurement
-  rounds. `procuredAt` distinguishes yearly from hourly auctions and re-runs; treat it as part of
-  the group key.
+- **Capacity data nests the procurement.** Capacity prices, price forecasts, procured volumes and
+  demand carry a required `procurement` object with `procuredAt` inside it (not a flat field), and
+  each capacity bid carries its own `procurement` — so one period entry can mix bids from several
+  procurement rounds. `procuredAt` distinguishes yearly from hourly auctions and re-runs; treat it
+  as part of the group key.
 - **`activationType` has four values.** `direct` and `scheduled` apply to mFRR; `unspecified` is
   mFRR with no direct/scheduled breakdown published; `notApplicable` means the reserve type has no
   activation-type concept at all (FCR, aFRR, RR). Do not collapse `unspecified` into
@@ -130,9 +131,17 @@ references/pagination-and-polling.md).
   `localDemandInMw`. There are no unit-less aliases on v2.
 - **Capacity demand can double-count.** Sum only `additive` demand across procurements of one
   period; `substitutive` restates demand already covered by another procurement.
-- **Forecast quantiles are self-describing.** Each forecast on `/imbalance/prices/forecast` states
-  the grid it was made on — read `level` off every quantile rather than indexing by a position you
-  hardcoded. Levels are decimals strictly between 0 and 1 (0.5 the median).
+- **Forecast quantiles are self-describing.** Each forecast on `/imbalance/prices/forecast` and
+  `/balancing/capacity/prices/forecast` states the grid it was made on — read `level` off every
+  quantile rather than indexing by a position you hardcoded. Levels are decimals strictly between
+  0 and 1 (0.5 the median).
+- **Capacity price forecasts are replaced per auction.** An auction is an area, reserve type and
+  `procuredAt` — every direction, not one response group. Each new forecast made before its gate
+  closure replaces the auction's forecasts and withdraws the periods and directions it lacks,
+  without any `updated-since` signal; the last one can be stored just after the gate, so keep
+  reconciling until shortly after it. Within the window you polled, drop the stored forecasts of an auction
+  whose `madeAt` is older than the newest that auction delivered; an auction withdrawn from the
+  window entirely brings no newer `madeAt` and shows only in a re-fetch without `updated-since`.
 - **Currency varies by area** (`EUR`, `BGN`, `CHF`, `HUF`, `PLN`, `RON`, `UAH`) and is stated per
   group — never assume euros.
 

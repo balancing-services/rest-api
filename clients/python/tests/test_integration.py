@@ -11,6 +11,7 @@ from httpx import Response
 from balancing_services import AuthenticatedClient
 from balancing_services.api.default import (
     get_balancing_capacity_demand,
+    get_balancing_capacity_price_forecasts,
     get_balancing_energy_activated_volume_history,
     get_balancing_energy_bids,
     get_balancing_energy_demand,
@@ -29,6 +30,7 @@ from balancing_services.api.default import (
     get_imbalance_prices,
     get_imbalance_total_volume_history,
 )
+from balancing_services.models import BalancingCapacityPriceForecastsResponse, PricePerMwPerHourQuantile
 
 
 @pytest.fixture
@@ -2267,3 +2269,241 @@ async def test_async_get_balancing_energy_price_history(
     assert response.parsed is not None
     assert len(response.parsed.data[0].prices) == 2
     assert response.parsed.data[0].prices[-1].observed_at == datetime(2025, 1, 1, 1, 2, 11, tzinfo=timezone.utc)
+
+
+@pytest.fixture
+def mock_balancing_capacity_price_forecasts_response():
+    """Mock response data for balancing capacity price forecasts."""
+    return {
+        "queriedPeriod": {"startAt": "2025-01-02T00:00:00Z", "endAt": "2025-01-03T00:00:00Z"},
+        "hasMore": False,
+        "nextUpdatedSince": "2025-01-01T09:15:00Z",
+        "data": [
+            {
+                "area": "EE",
+                "eicCode": "10Y1001A1001A39I",
+                "reserveType": "aFRR",
+                "direction": "up",
+                "currency": "EUR",
+                "procurement": {"procuredAt": "2025-01-01T09:00:00Z"},
+                "forecasts": [
+                    {
+                        "period": {"startAt": "2025-01-02T00:00:00Z", "endAt": "2025-01-02T01:00:00Z"},
+                        "madeAt": "2025-01-01T06:30:02Z",
+                        "pricePerMwPerHour": 12.5,
+                        "quantiles": [
+                            {"level": 0.1, "pricePerMwPerHour": 4.0},
+                            {"level": 0.5, "pricePerMwPerHour": 12.5},
+                            {"level": 0.9, "pricePerMwPerHour": 31.0},
+                        ],
+                    },
+                    {
+                        "period": {"startAt": "2025-01-02T01:00:00Z", "endAt": "2025-01-02T02:00:00Z"},
+                        "madeAt": "2025-01-01T06:30:02Z",
+                        "pricePerMwPerHour": 10.0,
+                        "quantiles": [
+                            {"level": 0.1, "pricePerMwPerHour": 3.5},
+                            {"level": 0.5, "pricePerMwPerHour": 10.0},
+                            {"level": 0.9, "pricePerMwPerHour": 27.0},
+                        ],
+                    },
+                ],
+            }
+        ],
+    }
+
+
+@respx.mock
+def test_get_balancing_capacity_price_forecasts_success(
+    authenticated_client, mock_balancing_capacity_price_forecasts_response
+):
+    """Test successful balancing capacity price forecasts request."""
+    route = respx.get("https://api.balancing.services/v2/balancing/capacity/prices/forecast").mock(
+        return_value=Response(200, json=mock_balancing_capacity_price_forecasts_response)
+    )
+
+    response = get_balancing_capacity_price_forecasts.sync_detailed(
+        client=authenticated_client,
+        area="EE",
+        period_start_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
+        period_end_at=datetime(2025, 1, 3, 0, 0, 0, tzinfo=timezone.utc),
+        reserve_type="aFRR",
+    )
+
+    assert response.status_code == 200
+    assert response.parsed is not None
+    assert response.parsed.has_more is False
+    assert route.calls.last.request.url.params["reserve-type"] == "aFRR"
+    group = response.parsed.data[0]
+    assert group.area == "EE"
+    assert group.reserve_type == "aFRR"
+    assert group.direction == "up"
+    assert group.currency == "EUR"
+    assert group.procurement.procured_at == datetime(2025, 1, 1, 9, 0, 0, tzinfo=timezone.utc)
+
+    forecast = group.forecasts[0]
+    assert forecast.period.start_at == datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc)
+    assert forecast.made_at == datetime(2025, 1, 1, 6, 30, 2, tzinfo=timezone.utc)
+    assert forecast.price_per_mw_per_hour == 12.5
+    # Quantiles are level/price pairs, ascending by level - read the levels off the
+    # forecast rather than indexing by a hardcoded position.
+    levels = [quantile.level for quantile in forecast.quantiles]
+    assert levels == sorted(levels)
+    assert all(0 < level < 1 for level in levels)
+    median = next(quantile for quantile in forecast.quantiles if quantile.level == 0.5)
+    assert median.price_per_mw_per_hour == 12.5
+
+
+def test_balancing_capacity_price_forecasts_response_round_trip():
+    """Test that from_dict -> to_dict preserves a forecasts response, a null nextCursor included."""
+    payload = {
+        "queriedPeriod": {"startAt": "2025-01-02T00:00:00+00:00", "endAt": "2025-01-03T00:00:00+00:00"},
+        "data": [
+            {
+                "area": "EE",
+                "eicCode": "10Y1001A1001A39I",
+                "reserveType": "aFRR",
+                "direction": "down",
+                "currency": "EUR",
+                "procurement": {"procuredAt": "2025-01-01T09:00:00+00:00"},
+                "forecasts": [
+                    {
+                        "period": {"startAt": "2025-01-02T00:00:00+00:00", "endAt": "2025-01-02T01:00:00+00:00"},
+                        "madeAt": "2025-01-01T06:30:02+00:00",
+                        "pricePerMwPerHour": 8.0,
+                        "quantiles": [
+                            {"level": 0.1, "pricePerMwPerHour": 2.0},
+                            {"level": 0.5, "pricePerMwPerHour": 8.0},
+                            {"level": 0.9, "pricePerMwPerHour": 19.5},
+                        ],
+                    }
+                ],
+            }
+        ],
+        "hasMore": False,
+        "nextUpdatedSince": "2025-01-01T09:15:00+00:00",
+        "nextCursor": None,
+    }
+
+    parsed = BalancingCapacityPriceForecastsResponse.from_dict(payload)
+
+    assert parsed.next_cursor is None
+    assert isinstance(parsed.data[0].forecasts[0].quantiles[0], PricePerMwPerHourQuantile)
+    assert parsed.to_dict() == payload
+
+
+@respx.mock
+def test_get_balancing_capacity_price_forecasts_unserved_area_is_empty(authenticated_client):
+    """Test that an area or reserve type without forecast coverage returns an empty result, not an error."""
+    empty_response = {
+        "queriedPeriod": {"startAt": "2025-01-02T00:00:00Z", "endAt": "2025-01-03T00:00:00Z"},
+        "hasMore": False,
+        "nextUpdatedSince": "2025-01-01T09:15:00Z",
+        "data": [],
+    }
+
+    respx.get("https://api.balancing.services/v2/balancing/capacity/prices/forecast").mock(
+        return_value=Response(200, json=empty_response)
+    )
+
+    response = get_balancing_capacity_price_forecasts.sync_detailed(
+        client=authenticated_client,
+        area="FI",
+        period_start_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
+        period_end_at=datetime(2025, 1, 3, 0, 0, 0, tzinfo=timezone.utc),
+        reserve_type="mFRR",
+    )
+
+    assert response.status_code == 200
+    assert response.parsed is not None
+    assert response.parsed.data == []
+    assert response.parsed.has_more is False
+
+
+@respx.mock
+def test_get_balancing_capacity_price_forecasts_pagination(
+    authenticated_client, mock_balancing_capacity_price_forecasts_response
+):
+    """Test balancing capacity price forecasts pagination - cursor/limit/updated-since sent, nextCursor parsed."""
+    paginated_response = {
+        **mock_balancing_capacity_price_forecasts_response,
+        "hasMore": True,
+        "nextCursor": "v1:AAAAAYwBAgMEBQYHCAkKCw==",
+    }
+
+    route = respx.get("https://api.balancing.services/v2/balancing/capacity/prices/forecast").mock(
+        return_value=Response(200, json=paginated_response)
+    )
+
+    response = get_balancing_capacity_price_forecasts.sync_detailed(
+        client=authenticated_client,
+        area="EE",
+        period_start_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
+        period_end_at=datetime(2025, 1, 3, 0, 0, 0, tzinfo=timezone.utc),
+        reserve_type="aFRR",
+        cursor="v1:AAAAAYwBAgMEBQYHCAkKCw==",
+        limit=100,
+        updated_since=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
+    )
+
+    assert response.status_code == 200
+    assert response.parsed is not None
+    assert response.parsed.has_more is True
+    assert response.parsed.next_cursor == "v1:AAAAAYwBAgMEBQYHCAkKCw=="
+    assert response.parsed.next_updated_since == datetime(2025, 1, 1, 9, 15, 0, tzinfo=timezone.utc)
+    sent_url = route.calls.last.request.url
+    assert sent_url.params["cursor"] == "v1:AAAAAYwBAgMEBQYHCAkKCw=="
+    assert sent_url.params["limit"] == "100"
+    assert sent_url.params["updated-since"] == "2025-01-01T00:00:00+00:00"
+
+
+@respx.mock
+def test_get_balancing_capacity_price_forecasts_unauthorized(authenticated_client):
+    """Test unauthorized response (401) for balancing capacity price forecasts."""
+    error_response = {
+        "type": "unauthorized",
+        "title": "Unauthorized",
+        "status": 401,
+        "detail": "Invalid or missing authentication token",
+    }
+
+    respx.get("https://api.balancing.services/v2/balancing/capacity/prices/forecast").mock(
+        return_value=Response(401, json=error_response)
+    )
+
+    response = get_balancing_capacity_price_forecasts.sync_detailed(
+        client=authenticated_client,
+        area="EE",
+        period_start_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
+        period_end_at=datetime(2025, 1, 3, 0, 0, 0, tzinfo=timezone.utc),
+        reserve_type="aFRR",
+    )
+
+    assert response.status_code == 401
+    assert response.parsed is not None
+    assert response.parsed.status == 401
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_async_get_balancing_capacity_price_forecasts(
+    authenticated_client, mock_balancing_capacity_price_forecasts_response
+):
+    """Test async request for balancing capacity price forecasts."""
+    respx.get("https://api.balancing.services/v2/balancing/capacity/prices/forecast").mock(
+        return_value=Response(200, json=mock_balancing_capacity_price_forecasts_response)
+    )
+
+    response = await get_balancing_capacity_price_forecasts.asyncio_detailed(
+        client=authenticated_client,
+        area="EE",
+        period_start_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
+        period_end_at=datetime(2025, 1, 3, 0, 0, 0, tzinfo=timezone.utc),
+        reserve_type="aFRR",
+    )
+
+    assert response.status_code == 200
+    assert response.parsed is not None
+    assert len(response.parsed.data) == 1
+    assert len(response.parsed.data[0].forecasts) == 2
+    assert response.parsed.data[0].forecasts[1].price_per_mw_per_hour == 10.0
