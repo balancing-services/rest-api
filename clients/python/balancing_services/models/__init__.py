@@ -9,6 +9,11 @@ from .balancing_capacity_demand import BalancingCapacityDemand
 from .balancing_capacity_demands import BalancingCapacityDemands
 from .balancing_capacity_demands_response import BalancingCapacityDemandsResponse
 from .balancing_capacity_price import BalancingCapacityPrice
+from .balancing_capacity_price_forecast import BalancingCapacityPriceForecast
+from .balancing_capacity_price_forecasts import BalancingCapacityPriceForecasts
+from .balancing_capacity_price_forecasts_response import (
+    BalancingCapacityPriceForecastsResponse,
+)
 from .balancing_capacity_prices import BalancingCapacityPrices
 from .balancing_capacity_prices_response import BalancingCapacityPricesResponse
 from .balancing_capacity_volume import BalancingCapacityVolume
@@ -84,6 +89,7 @@ from .imbalance_total_volume_history_response import ImbalanceTotalVolumeHistory
 from .imbalance_total_volumes import ImbalanceTotalVolumes
 from .imbalance_total_volumes_response import ImbalanceTotalVolumesResponse
 from .period import Period
+from .price_per_mw_per_hour_quantile import PricePerMwPerHourQuantile
 from .price_type import PriceType
 from .problem import Problem
 from .procurement import Procurement
@@ -102,6 +108,9 @@ __all__ = (
     "BalancingCapacityDemands",
     "BalancingCapacityDemandsResponse",
     "BalancingCapacityPrice",
+    "BalancingCapacityPriceForecast",
+    "BalancingCapacityPriceForecasts",
+    "BalancingCapacityPriceForecastsResponse",
     "BalancingCapacityPrices",
     "BalancingCapacityPricesResponse",
     "BalancingCapacityVolume",
@@ -163,6 +172,7 @@ __all__ = (
     "ImbalanceTotalVolumes",
     "ImbalanceTotalVolumesResponse",
     "Period",
+    "PricePerMwPerHourQuantile",
     "PriceType",
     "Problem",
     "Procurement",

@@ -871,6 +871,71 @@ paths:
         '501':
           $ref: '#/components/responses/NotImplemented'
 
+  /balancing/capacity/prices/forecast:
+    get:
+      summary: Get balancing capacity price forecasts
+      description: |
+        **Experimental** - This endpoint is under active development and may change without notice.
+
+        Returns our forecast of the day-ahead balancing capacity auctions for the specified area and
+        reserve type, for the delivery periods within the given time period: for each auction, the
+        last forecast made before its gate closure (`procurement.procuredAt`). The forecast is of
+        the auction's marginal (clearing) price, so it compares with `/balancing/capacity/prices` at
+        `price-type=marginal`. Each forecast is a point forecast, `pricePerMwPerHour`, and a
+        predictive distribution — level/price pairs in `quantiles`, ascending by level — in the
+        market's currency per MW per hour. An area or reserve type without forecast coverage returns
+        an empty result rather than an error. Supports cursor-based pagination for large result
+        sets.
+
+        An auction is an area, reserve type and `procurement.procuredAt`, every direction. Each new
+        forecast made before its gate closure replaces the auction's forecasts and withdraws the
+        periods and directions it has no forecast for, with no `updated-since` signal. The last
+        forecast made before the gate can be stored just after it, so an auction's served forecast
+        settles shortly after its gate closure, once that forecast is stored. Within the window you
+        polled, drop the stored forecasts of an auction whose `madeAt` is older than the newest that
+        auction delivered; an auction a newer forecast withdrew from the window entirely brings no
+        newer `madeAt` and shows only in a re-fetch without `updated-since`.
+      operationId: getBalancingCapacityPriceForecasts
+      x-experimental: true
+      parameters:
+        - $ref: '#/components/parameters/area'
+        - $ref: '#/components/parameters/period-start-at'
+        - $ref: '#/components/parameters/period-end-at'
+        - $ref: '#/components/parameters/reserve-type'
+        - $ref: '#/components/parameters/cursor'
+        - name: limit
+          in: query
+          description: Maximum number of results to return (default 100, max 1000)
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+            default: 100
+            example: 100
+        - $ref: '#/components/parameters/updated-since'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BalancingCapacityPriceForecastsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '501':
+          $ref: '#/components/responses/NotImplemented'
+
   /balancing/cross-border/available-capacity:
     get:
       summary: Get cross-border available capacity
@@ -2600,6 +2665,117 @@ components:
 
             The requested price type.
           example: average
+
+    BalancingCapacityPriceForecastsResponse:
+      type: object
+      required:
+        - queriedPeriod
+        - data
+        - hasMore
+        - nextUpdatedSince
+      properties:
+        queriedPeriod:
+          $ref: '#/components/schemas/Period'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/BalancingCapacityPriceForecasts'
+        nextCursor:
+          type: string
+          description: Opaque cursor for the next page; pass it unchanged as `cursor`. Null if no more results.
+          example: 'v1:AAAAAYwBAgMEBQYHCAkKCw=='
+          nullable: true
+        hasMore:
+          type: boolean
+          description: Indicates whether there are more results available
+          example: false
+        nextUpdatedSince:
+          $ref: '#/components/schemas/NextUpdatedSince'
+
+    BalancingCapacityPriceForecasts:
+      type: object
+      required:
+        - area
+        - eicCode
+        - reserveType
+        - direction
+        - currency
+        - procurement
+        - forecasts
+      properties:
+        area:
+          $ref: '#/components/schemas/Area'
+        eicCode:
+          $ref: '#/components/schemas/EicCode'
+        reserveType:
+          $ref: '#/components/schemas/ReserveType'
+        direction:
+          $ref: '#/components/schemas/Direction'
+        currency:
+          $ref: '#/components/schemas/Currency'
+        procurement:
+          description: >-
+            The auction these forecasts were made for: its `procuredAt` is the auction's gate closure, the same as on
+            `/balancing/capacity/prices`.
+          allOf:
+            - $ref: '#/components/schemas/Procurement'
+        forecasts:
+          type: array
+          items:
+            $ref: '#/components/schemas/BalancingCapacityPriceForecast'
+
+    BalancingCapacityPriceForecast:
+      type: object
+      required:
+        - period
+        - madeAt
+        - pricePerMwPerHour
+        - quantiles
+      properties:
+        period:
+          $ref: '#/components/schemas/Period'
+        madeAt:
+          type: string
+          format: date-time
+          description: >-
+            When this forecast was made (UTC), before the auction's gate closure. All forecasts of one auction share
+            it across every page of one traversal — a first page and the pages reached through its cursors.
+          example: '2025-01-01T06:30:02Z'
+        pricePerMwPerHour:
+          type: number
+          description: >-
+            The point forecast of the price per MW per hour, in the group's currency — today the distribution's
+            median, its price at level 0.5.
+          example: 12.50
+        quantiles:
+          type: array
+          description: >-
+            The predictive distribution of the price, as one level/price pair per quantile level, ascending by level.
+            Each forecast states the grid it was made on — read the levels off it rather than indexing by a position
+            you hardcoded.
+          items:
+            $ref: '#/components/schemas/PricePerMwPerHourQuantile'
+
+    PricePerMwPerHourQuantile:
+      type: object
+      required:
+        - level
+        - pricePerMwPerHour
+      properties:
+        level:
+          type: number
+          description: >-
+            The quantile level, as a decimal strictly between 0 and 1 — 0.5 being the median, and the pair 0.1/0.9
+            bounding the central 80% interval.
+          minimum: 0
+          exclusiveMinimum: true
+          maximum: 1
+          exclusiveMaximum: true
+          example: 0.5
+        pricePerMwPerHour:
+          type: number
+          description: Forecast price per MW per hour at this level, in the group's currency
+          example: 12.50
 
     BalancingCapacityVolumesResponse:
       type: object
