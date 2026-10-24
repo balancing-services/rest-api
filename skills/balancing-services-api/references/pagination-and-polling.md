@@ -145,7 +145,7 @@ delivered whole), so its groups need not line up one-to-one with the groups of a
 
 ### Withdrawals and the unfiltered re-fetch
 
-A poller only sees rows that exist. Bids are one of two datasets where deletion is normal operation:
+A poller only sees rows that exist. Bids are the dataset where deletion is normal operation:
 a bid withdrawn at the source is deleted here without replacement, and no response ever names it.
 
 The withdrawal does move its bid set's change time, so the set's *surviving* bids are re-delivered.
@@ -155,12 +155,11 @@ changes mid-drain defers its remaining bids to the next poll — so a filtered p
 to carry a period's complete bid set. If bid-level accuracy matters, periodically re-fetch the full
 window without `updated-since` and reconcile.
 
-Capacity price forecasts (`/balancing/capacity/prices/forecast`) are the other. An auction is an
-area, reserve type and `procuredAt` — every direction, not one response group. Each new forecast
-run made before its gate closure replaces the auction's forecasts and withdraws the periods and
-directions it has no forecast for, without an `updated-since` signal; its surviving forecasts arrive
-with the run's newer `madeAt`. The last run can be stored just after the gate, so an auction settles
-shortly after its gate closure, not at it. So, within the window you polled, drop the stored forecasts of an
-auction whose `madeAt` is older than the newest that auction delivered — never outside that window.
-An auction a newer run withdrew from the window entirely brings no newer `madeAt` to drop by; only
-the unfiltered re-fetch shows that withdrawal.
+Capacity price forecasts (`/balancing/capacity/prices/forecast`) are not withdrawn by a later
+forecast. An auction is an area, reserve type and `procuredAt`, and can be forecast several times
+before its gate closure, from days ahead to shortly before it. Each new forecast made before the
+gate replaces the earlier one of its delivery period and direction; a forecast that lacks a period
+or direction leaves the earlier forecast of it served, so one auction's forecasts can carry
+different `madeAt`s. The last forecast can be stored just after the gate, so an auction's forecasts
+settle shortly after its gate closure, not at it. Upsert on area, reserve type, delivery period,
+`procuredAt` and direction.

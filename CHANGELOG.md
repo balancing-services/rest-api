@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- The balancing capacity price forecast endpoint (`/balancing/capacity/prices/forecast`) now serves, per delivery period and direction, the latest forecast made before the auction's gate closure: an auction can be forecast several times from days ahead, a later forecast lacking a period or direction no longer withdraws the earlier one, and the forecasts of one auction can carry different `madeAt`s. The endpoint and `madeAt` descriptions and the shipped skill's guidance are restated to match. No change to the response shape
+
 ## [2.7.0] - 2026-10-21
 
 ### Added
