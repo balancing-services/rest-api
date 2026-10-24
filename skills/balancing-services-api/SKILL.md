@@ -68,7 +68,7 @@ All take `period-start-at` and `period-end-at`; the last column lists what else 
 | `GET /balancing/energy/cross-border-volumes` | Balancing energy exchanged over one border, both directions, split by activation type | `area`, `other-area`, `reserve-type` |
 | `GET /balancing/capacity/bids` | Capacity bid curves grouped by delivery period; each bid carries its `procurement` and `status` (`offered`/`accepted`) | `area`, `reserve-type` |
 | `GET /balancing/capacity/prices` | Capacity prices per MW per hour, grouped per procurement; optional `price-type` (`average`/`marginal`) | `area`, `reserve-type` |
-| `GET /balancing/capacity/prices/forecast` | Experimental. Forecasts of each day-ahead capacity auction's marginal (clearing) price — compare with `/balancing/capacity/prices` at `price-type=marginal` — grouped per procurement: the last forecast made before gate closure (`procuredAt`), a point forecast `pricePerMwPerHour` (today the median) plus `quantiles`, stamped `madeAt` | `area`, `reserve-type` |
+| `GET /balancing/capacity/prices/forecast` | Experimental. Forecasts of each day-ahead capacity auction's marginal (clearing) price — compare with `/balancing/capacity/prices` at `price-type=marginal` — grouped per procurement: per delivery period and direction, the latest forecast made before gate closure (`procuredAt`), a point forecast `pricePerMwPerHour` (today the median) plus `quantiles`, stamped `madeAt` | `area`, `reserve-type` |
 | `GET /balancing/capacity/procured-volumes` | Procured capacity in MW, grouped per procurement | `area`, `reserve-type` |
 | `GET /balancing/capacity/demand` | Experimental. Capacity the TSO set out to procure: `totalDemandInMw`, `localDemandInMw`, per procurement, with a `demandBasis` | `area`, `reserve-type` |
 | `GET /balancing/capacity/cross-zonal-allocation` | Allocated cross-zonal capacity over one border, both directions | `area`, `other-area`, `reserve-type` |
@@ -135,13 +135,13 @@ references/pagination-and-polling.md).
   `/balancing/capacity/prices/forecast` states the grid it was made on — read `level` off every
   quantile rather than indexing by a position you hardcoded. Levels are decimals strictly between
   0 and 1 (0.5 the median).
-- **Capacity price forecasts are replaced per auction.** An auction is an area, reserve type and
-  `procuredAt` — every direction, not one response group. Each new forecast made before its gate
-  closure replaces the auction's forecasts and withdraws the periods and directions it lacks,
-  without any `updated-since` signal; the last one can be stored just after the gate, so keep
-  reconciling until shortly after it. Within the window you polled, drop the stored forecasts of an auction
-  whose `madeAt` is older than the newest that auction delivered; an auction withdrawn from the
-  window entirely brings no newer `madeAt` and shows only in a re-fetch without `updated-since`.
+- **Capacity price forecasts are replaced per period and direction.** An auction is an area,
+  reserve type and `procuredAt`, and can be forecast several times before its gate closure, from
+  days ahead to shortly before it. Each delivery period and direction serves its latest forecast
+  made before the gate; a later forecast lacking a period or direction never withdraws the earlier
+  one, so one auction's forecasts can carry different `madeAt`s. The last forecast can be stored
+  just after the gate, so keep polling until shortly after it. Upsert on area, reserve type, delivery
+  period, `procuredAt` and direction.
 - **Currency varies by area** (`EUR`, `BGN`, `CHF`, `HUF`, `PLN`, `RON`, `UAH`) and is stated per
   group — never assume euros.
 

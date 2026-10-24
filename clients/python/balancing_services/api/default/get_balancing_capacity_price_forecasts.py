@@ -138,23 +138,24 @@ def sync_detailed(
      **Experimental** - This endpoint is under active development and may change without notice.
 
     Returns our forecast of the day-ahead balancing capacity auctions for the specified area and
-    reserve type, for the delivery periods within the given time period: for each auction, the
-    last forecast made before its gate closure (`procurement.procuredAt`). The forecast is of
-    the auction's marginal (clearing) price, so it compares with `/balancing/capacity/prices` at
-    `price-type=marginal`. Each forecast is a point forecast, `pricePerMwPerHour`, and a
-    predictive distribution — level/price pairs in `quantiles`, ascending by level — in the
-    market's currency per MW per hour. An area or reserve type without forecast coverage returns
-    an empty result rather than an error. Supports cursor-based pagination for large result
-    sets.
+    reserve type, for the delivery periods within the given time period: for each delivery
+    period, direction and auction, the latest forecast made before the auction's gate closure
+    (`procurement.procuredAt`). The forecast is of the auction's marginal (clearing) price, so
+    it compares with `/balancing/capacity/prices` at `price-type=marginal`. Each forecast is a
+    point forecast, `pricePerMwPerHour`, and a predictive distribution — level/price pairs in
+    `quantiles`, ascending by level — in the market's currency per MW per hour. An area or
+    reserve type without forecast coverage returns an empty result rather than an error.
+    Supports cursor-based pagination for large result sets.
 
-    An auction is an area, reserve type and `procurement.procuredAt`, every direction. Each new
-    forecast made before its gate closure replaces the auction's forecasts and withdraws the
-    periods and directions it has no forecast for, with no `updated-since` signal. The last
-    forecast made before the gate can be stored just after it, so an auction's served forecast
-    settles shortly after its gate closure, once that forecast is stored. Within the window you
-    polled, drop the stored forecasts of an auction whose `madeAt` is older than the newest that
-    auction delivered; an auction a newer forecast withdrew from the window entirely brings no
-    newer `madeAt` and shows only in a re-fetch without `updated-since`.
+    An auction is an area, reserve type and `procurement.procuredAt`. An auction can be
+    forecast several times before its gate closure, from days ahead of it to shortly before it.
+    Each new forecast made before the gate replaces the earlier one of its delivery period and
+    direction; one that lacks a period or direction leaves the earlier forecast of it served, so
+    the forecasts of one auction can carry different `madeAt`s: a later forecast never
+    withdraws an earlier one. The last forecast made before the gate can be stored just after
+    it, so an auction's served forecasts settle shortly after its gate closure, once that
+    forecast is stored. Upsert on area, reserve type, delivery period, `procurement.procuredAt`
+    and direction.
 
     Args:
         area (Area): Area code
@@ -208,23 +209,24 @@ def sync(
      **Experimental** - This endpoint is under active development and may change without notice.
 
     Returns our forecast of the day-ahead balancing capacity auctions for the specified area and
-    reserve type, for the delivery periods within the given time period: for each auction, the
-    last forecast made before its gate closure (`procurement.procuredAt`). The forecast is of
-    the auction's marginal (clearing) price, so it compares with `/balancing/capacity/prices` at
-    `price-type=marginal`. Each forecast is a point forecast, `pricePerMwPerHour`, and a
-    predictive distribution — level/price pairs in `quantiles`, ascending by level — in the
-    market's currency per MW per hour. An area or reserve type without forecast coverage returns
-    an empty result rather than an error. Supports cursor-based pagination for large result
-    sets.
+    reserve type, for the delivery periods within the given time period: for each delivery
+    period, direction and auction, the latest forecast made before the auction's gate closure
+    (`procurement.procuredAt`). The forecast is of the auction's marginal (clearing) price, so
+    it compares with `/balancing/capacity/prices` at `price-type=marginal`. Each forecast is a
+    point forecast, `pricePerMwPerHour`, and a predictive distribution — level/price pairs in
+    `quantiles`, ascending by level — in the market's currency per MW per hour. An area or
+    reserve type without forecast coverage returns an empty result rather than an error.
+    Supports cursor-based pagination for large result sets.
 
-    An auction is an area, reserve type and `procurement.procuredAt`, every direction. Each new
-    forecast made before its gate closure replaces the auction's forecasts and withdraws the
-    periods and directions it has no forecast for, with no `updated-since` signal. The last
-    forecast made before the gate can be stored just after it, so an auction's served forecast
-    settles shortly after its gate closure, once that forecast is stored. Within the window you
-    polled, drop the stored forecasts of an auction whose `madeAt` is older than the newest that
-    auction delivered; an auction a newer forecast withdrew from the window entirely brings no
-    newer `madeAt` and shows only in a re-fetch without `updated-since`.
+    An auction is an area, reserve type and `procurement.procuredAt`. An auction can be
+    forecast several times before its gate closure, from days ahead of it to shortly before it.
+    Each new forecast made before the gate replaces the earlier one of its delivery period and
+    direction; one that lacks a period or direction leaves the earlier forecast of it served, so
+    the forecasts of one auction can carry different `madeAt`s: a later forecast never
+    withdraws an earlier one. The last forecast made before the gate can be stored just after
+    it, so an auction's served forecasts settle shortly after its gate closure, once that
+    forecast is stored. Upsert on area, reserve type, delivery period, `procurement.procuredAt`
+    and direction.
 
     Args:
         area (Area): Area code
@@ -273,23 +275,24 @@ async def asyncio_detailed(
      **Experimental** - This endpoint is under active development and may change without notice.
 
     Returns our forecast of the day-ahead balancing capacity auctions for the specified area and
-    reserve type, for the delivery periods within the given time period: for each auction, the
-    last forecast made before its gate closure (`procurement.procuredAt`). The forecast is of
-    the auction's marginal (clearing) price, so it compares with `/balancing/capacity/prices` at
-    `price-type=marginal`. Each forecast is a point forecast, `pricePerMwPerHour`, and a
-    predictive distribution — level/price pairs in `quantiles`, ascending by level — in the
-    market's currency per MW per hour. An area or reserve type without forecast coverage returns
-    an empty result rather than an error. Supports cursor-based pagination for large result
-    sets.
+    reserve type, for the delivery periods within the given time period: for each delivery
+    period, direction and auction, the latest forecast made before the auction's gate closure
+    (`procurement.procuredAt`). The forecast is of the auction's marginal (clearing) price, so
+    it compares with `/balancing/capacity/prices` at `price-type=marginal`. Each forecast is a
+    point forecast, `pricePerMwPerHour`, and a predictive distribution — level/price pairs in
+    `quantiles`, ascending by level — in the market's currency per MW per hour. An area or
+    reserve type without forecast coverage returns an empty result rather than an error.
+    Supports cursor-based pagination for large result sets.
 
-    An auction is an area, reserve type and `procurement.procuredAt`, every direction. Each new
-    forecast made before its gate closure replaces the auction's forecasts and withdraws the
-    periods and directions it has no forecast for, with no `updated-since` signal. The last
-    forecast made before the gate can be stored just after it, so an auction's served forecast
-    settles shortly after its gate closure, once that forecast is stored. Within the window you
-    polled, drop the stored forecasts of an auction whose `madeAt` is older than the newest that
-    auction delivered; an auction a newer forecast withdrew from the window entirely brings no
-    newer `madeAt` and shows only in a re-fetch without `updated-since`.
+    An auction is an area, reserve type and `procurement.procuredAt`. An auction can be
+    forecast several times before its gate closure, from days ahead of it to shortly before it.
+    Each new forecast made before the gate replaces the earlier one of its delivery period and
+    direction; one that lacks a period or direction leaves the earlier forecast of it served, so
+    the forecasts of one auction can carry different `madeAt`s: a later forecast never
+    withdraws an earlier one. The last forecast made before the gate can be stored just after
+    it, so an auction's served forecasts settle shortly after its gate closure, once that
+    forecast is stored. Upsert on area, reserve type, delivery period, `procurement.procuredAt`
+    and direction.
 
     Args:
         area (Area): Area code
@@ -341,23 +344,24 @@ async def asyncio(
      **Experimental** - This endpoint is under active development and may change without notice.
 
     Returns our forecast of the day-ahead balancing capacity auctions for the specified area and
-    reserve type, for the delivery periods within the given time period: for each auction, the
-    last forecast made before its gate closure (`procurement.procuredAt`). The forecast is of
-    the auction's marginal (clearing) price, so it compares with `/balancing/capacity/prices` at
-    `price-type=marginal`. Each forecast is a point forecast, `pricePerMwPerHour`, and a
-    predictive distribution — level/price pairs in `quantiles`, ascending by level — in the
-    market's currency per MW per hour. An area or reserve type without forecast coverage returns
-    an empty result rather than an error. Supports cursor-based pagination for large result
-    sets.
+    reserve type, for the delivery periods within the given time period: for each delivery
+    period, direction and auction, the latest forecast made before the auction's gate closure
+    (`procurement.procuredAt`). The forecast is of the auction's marginal (clearing) price, so
+    it compares with `/balancing/capacity/prices` at `price-type=marginal`. Each forecast is a
+    point forecast, `pricePerMwPerHour`, and a predictive distribution — level/price pairs in
+    `quantiles`, ascending by level — in the market's currency per MW per hour. An area or
+    reserve type without forecast coverage returns an empty result rather than an error.
+    Supports cursor-based pagination for large result sets.
 
-    An auction is an area, reserve type and `procurement.procuredAt`, every direction. Each new
-    forecast made before its gate closure replaces the auction's forecasts and withdraws the
-    periods and directions it has no forecast for, with no `updated-since` signal. The last
-    forecast made before the gate can be stored just after it, so an auction's served forecast
-    settles shortly after its gate closure, once that forecast is stored. Within the window you
-    polled, drop the stored forecasts of an auction whose `madeAt` is older than the newest that
-    auction delivered; an auction a newer forecast withdrew from the window entirely brings no
-    newer `madeAt` and shows only in a re-fetch without `updated-since`.
+    An auction is an area, reserve type and `procurement.procuredAt`. An auction can be
+    forecast several times before its gate closure, from days ahead of it to shortly before it.
+    Each new forecast made before the gate replaces the earlier one of its delivery period and
+    direction; one that lacks a period or direction leaves the earlier forecast of it served, so
+    the forecasts of one auction can carry different `madeAt`s: a later forecast never
+    withdraws an earlier one. The last forecast made before the gate can be stored just after
+    it, so an auction's served forecasts settle shortly after its gate closure, once that
+    forecast is stored. Upsert on area, reserve type, delivery period, `procurement.procuredAt`
+    and direction.
 
     Args:
         area (Area): Area code

@@ -20,9 +20,10 @@ class BalancingCapacityPriceForecast:
     """
     Attributes:
         period (Period):
-        made_at (datetime.datetime): When this forecast was made (UTC), before the auction's gate closure. All forecasts
-            of one auction share it across every page of one traversal — a first page and the pages reached through its
-            cursors. Example: 2025-01-01T06:30:02Z.
+        made_at (datetime.datetime): When this forecast was made (UTC), before the auction's gate closure. The forecasts
+            of one auction can differ in it, each delivery period and direction being its own latest forecast. Each
+            forecast's `madeAt` holds across every page of one traversal — a first page and the pages reached through its
+            cursors, which pin one snapshot. Example: 2025-01-01T06:30:02Z.
         price_per_mw_per_hour (float): The point forecast of the price per MW per hour, in the group's currency — today
             the distribution's median, its price at level 0.5. Example: 12.5.
         quantiles (list[PricePerMwPerHourQuantile]): The predictive distribution of the price, as one level/price pair
