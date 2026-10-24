@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.8.0] - 2026-10-24
+
 ### Changed
 - The balancing capacity price forecast endpoint (`/balancing/capacity/prices/forecast`) now serves, per delivery period and direction, the latest forecast made before the auction's gate closure: an auction can be forecast several times from days ahead, a later forecast lacking a period or direction no longer withdraws the earlier one, and the forecasts of one auction can carry different `madeAt`s. The endpoint and `madeAt` descriptions and the shipped skill's guidance are restated to match. No change to the response shape
 
@@ -260,7 +262,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - UTC timestamp-based period filtering
 - OpenAPI 3.0.3 specification
 
-[Unreleased]: https://github.com/balancing-services/rest-api/compare/v2.7.0...HEAD
+[Unreleased]: https://github.com/balancing-services/rest-api/compare/v2.8.0...HEAD
+[2.8.0]: https://github.com/balancing-services/rest-api/compare/v2.7.0...v2.8.0
 [2.7.0]: https://github.com/balancing-services/rest-api/compare/v2.6.0...v2.7.0
 [2.6.0]: https://github.com/balancing-services/rest-api/compare/v2.5.0...v2.6.0
 [2.5.0]: https://github.com/balancing-services/rest-api/compare/v2.4.0...v2.5.0
