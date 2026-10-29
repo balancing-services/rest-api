@@ -141,7 +141,8 @@ submitted to, so a single period entry can mix bids from several procurement rou
 ```
 
 If your storage keys capacity rows on `(area, reserveType, direction, period)`, add the procurement
-to the key.
+to the key — and for capacity prices also the experimental `isForStandardProduct` (treat it as null
+when absent), which tells apart the standard and the specific product of one auction.
 
 ## 5. `other-area` is now required on two border endpoints
 
@@ -290,7 +291,8 @@ Walk this against the customer's codebase, in order.
       and CSV headers that happen to share the names.
 - [ ] **`procuredAt`.** Grep for it; rewrite to `procurement.procuredAt`, add it to capacity bid
       parsing, and drop null-handling on capacity prices and procured volumes. Extend any storage
-      key that identifies a capacity row without the procurement.
+      key that identifies a capacity row without the procurement — for capacity prices, with
+      `isForStandardProduct` too (treating an absent one as null).
 - [ ] **`activationType`.** Grep for `not_applicable`. Decide, per site, whether it meant "no
       activation-type concept" (`notApplicable`) or "any mFRR without a breakdown"
       (`unspecified` too). Make the parse non-strict or add both values.

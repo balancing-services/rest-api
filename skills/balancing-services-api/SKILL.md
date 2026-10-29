@@ -121,7 +121,9 @@ references/pagination-and-polling.md).
   demand carry a required `procurement` object with `procuredAt` inside it (not a flat field), and
   each capacity bid carries its own `procurement` — so one period entry can mix bids from several
   procurement rounds. `procuredAt` distinguishes yearly from hourly auctions and re-runs; treat it
-  as part of the group key.
+  as part of the group key. On capacity prices, so is the experimental `isForStandardProduct`,
+  null included (treat it as null when absent): an auction procuring capacity for a standard and a
+  specific product serves them as two groups that differ only in it.
 - **`activationType` has four values.** `direct` and `scheduled` apply to mFRR; `unspecified` is
   mFRR with no direct/scheduled breakdown published; `notApplicable` means the reserve type has no
   activation-type concept at all (FCR, aFRR, RR). Do not collapse `unspecified` into
