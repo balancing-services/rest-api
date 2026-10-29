@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import TYPE_CHECKING, Any, TypeVar
+from typing import TYPE_CHECKING, Any, TypeVar, cast
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
@@ -11,6 +11,7 @@ from ..models.currency import Currency, check_currency
 from ..models.direction import Direction, check_direction
 from ..models.eic_code import EicCode, check_eic_code
 from ..models.reserve_type import ReserveType, check_reserve_type
+from ..types import UNSET, Unset
 
 if TYPE_CHECKING:
     from ..models.balancing_capacity_price import BalancingCapacityPrice
@@ -31,6 +32,13 @@ class BalancingCapacityPrices:
         currency (Currency): Currency code
         procurement (Procurement):
         prices (list[BalancingCapacityPrice]):
+        is_for_standard_product (bool | None | Unset): **Experimental** — may change or be removed without notice.
+
+            Indicates if the capacity is procured for a European standard balancing energy product: a provider
+            whose capacity bid wins must offer that energy on the standard product's platform (MARI for mFRR,
+            PICASSO for aFRR). Set for procurements where capacity for multiple products is procured, telling their
+            prices apart; may be null (or absent) otherwise. Absent and null are equivalent.
+             Example: True.
     """
 
     area: Area
@@ -40,6 +48,7 @@ class BalancingCapacityPrices:
     currency: Currency
     procurement: Procurement
     prices: list[BalancingCapacityPrice]
+    is_for_standard_product: bool | None | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -60,6 +69,12 @@ class BalancingCapacityPrices:
             prices_item = prices_item_data.to_dict()
             prices.append(prices_item)
 
+        is_for_standard_product: bool | None | Unset
+        if isinstance(self.is_for_standard_product, Unset):
+            is_for_standard_product = UNSET
+        else:
+            is_for_standard_product = self.is_for_standard_product
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
@@ -73,6 +88,8 @@ class BalancingCapacityPrices:
                 "prices": prices,
             }
         )
+        if is_for_standard_product is not UNSET:
+            field_dict["isForStandardProduct"] = is_for_standard_product
 
         return field_dict
 
@@ -101,6 +118,17 @@ class BalancingCapacityPrices:
 
             prices.append(prices_item)
 
+        def _parse_is_for_standard_product(data: object) -> bool | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(bool | None | Unset, data)
+
+        is_for_standard_product = _parse_is_for_standard_product(
+            d.pop("isForStandardProduct", UNSET)
+        )
+
         balancing_capacity_prices = cls(
             area=area,
             eic_code=eic_code,
@@ -109,6 +137,7 @@ class BalancingCapacityPrices:
             currency=currency,
             procurement=procurement,
             prices=prices,
+            is_for_standard_product=is_for_standard_product,
         )
 
         balancing_capacity_prices.additional_properties = d

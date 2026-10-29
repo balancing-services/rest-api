@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Experimental `isForStandardProduct` field on each balancing capacity price group of `/balancing/capacity/prices`: whether the capacity is procured for a European standard balancing energy product (MARI, PICASSO). Set only for Slovakia so far; null elsewhere
+
+### Changed
+- Slovakia's balancing capacity prices on `/balancing/capacity/prices` are split by `isForStandardProduct`: an mFRR auction's standard and specific product prices, previously served in one group, now come as two groups with the same area, reserve type, direction and procurement. A client keying capacity price groups on those fields alone must add `isForStandardProduct` (null outside Slovakia) to its key
+
 ## [2.8.0] - 2026-10-24
 
 ### Changed
