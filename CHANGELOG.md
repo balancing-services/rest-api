@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Experimental `isForStandardProduct` field on each balancing capacity volume group of `/balancing/capacity/procured-volumes` and each demand group of `/balancing/capacity/demand`, with the same meaning as on `/balancing/capacity/prices`
+
+### Changed
+- `isForStandardProduct` is now set for Czechia and France as well as Slovakia, on capacity prices, volumes and demand; null elsewhere, and always false for FCR. Groups it splits, each previously served as one group with the same area, reserve type, direction and procurement: Slovakia's mFRR procured volumes (as its prices since 2.9.0), Czechia's mFRR up prices and volumes (standard and specific product procured side by side) and France's mFRR up demand (RTE's need for the standard product beside the specific one). A client keying capacity volume or demand groups on those fields alone must add `isForStandardProduct` (treat absent as null) to its key
+
 ## [2.9.0] - 2026-10-29
 
 ### Added

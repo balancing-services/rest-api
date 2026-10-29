@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import TYPE_CHECKING, Any, TypeVar
+from typing import TYPE_CHECKING, Any, TypeVar, cast
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
@@ -11,6 +11,7 @@ from ..models.demand_basis import DemandBasis, check_demand_basis
 from ..models.direction import Direction, check_direction
 from ..models.eic_code import EicCode, check_eic_code
 from ..models.reserve_type import ReserveType, check_reserve_type
+from ..types import UNSET, Unset
 
 if TYPE_CHECKING:
     from ..models.balancing_capacity_demand import BalancingCapacityDemand
@@ -34,6 +35,13 @@ class BalancingCapacityDemands:
             already represented by another procurement of the same period (`substitutive`), e.g. a re-run after
             a failed auction. When summing a period's total requirement across procurements, sum additive demand only.
         demands (list[BalancingCapacityDemand]):
+        is_for_standard_product (bool | None | Unset): **Experimental** — may change or be removed without notice.
+
+            Indicates if the capacity is procured for a European standard balancing energy product: a provider
+            whose capacity bid wins must offer that energy on the standard product's platform (MARI for mFRR,
+            PICASSO for aFRR). Set for procurements where capacity for multiple products is procured, telling their
+            demands apart; may be null (or absent) otherwise. Absent and null are equivalent.
+             Example: True.
     """
 
     area: Area
@@ -43,6 +51,7 @@ class BalancingCapacityDemands:
     procurement: Procurement
     demand_basis: DemandBasis
     demands: list[BalancingCapacityDemand]
+    is_for_standard_product: bool | None | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -63,6 +72,12 @@ class BalancingCapacityDemands:
             demands_item = demands_item_data.to_dict()
             demands.append(demands_item)
 
+        is_for_standard_product: bool | None | Unset
+        if isinstance(self.is_for_standard_product, Unset):
+            is_for_standard_product = UNSET
+        else:
+            is_for_standard_product = self.is_for_standard_product
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
@@ -76,6 +91,8 @@ class BalancingCapacityDemands:
                 "demands": demands,
             }
         )
+        if is_for_standard_product is not UNSET:
+            field_dict["isForStandardProduct"] = is_for_standard_product
 
         return field_dict
 
@@ -104,6 +121,17 @@ class BalancingCapacityDemands:
 
             demands.append(demands_item)
 
+        def _parse_is_for_standard_product(data: object) -> bool | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(bool | None | Unset, data)
+
+        is_for_standard_product = _parse_is_for_standard_product(
+            d.pop("isForStandardProduct", UNSET)
+        )
+
         balancing_capacity_demands = cls(
             area=area,
             eic_code=eic_code,
@@ -112,6 +140,7 @@ class BalancingCapacityDemands:
             procurement=procurement,
             demand_basis=demand_basis,
             demands=demands,
+            is_for_standard_product=is_for_standard_product,
         )
 
         balancing_capacity_demands.additional_properties = d

@@ -2836,6 +2836,18 @@ components:
           $ref: '#/components/schemas/ReserveType'
         direction:
           $ref: '#/components/schemas/Direction'
+        isForStandardProduct:
+          x-experimental: true
+          type: boolean
+          nullable: true
+          description: |
+            **Experimental** — may change or be removed without notice.
+
+            Indicates if the capacity is procured for a European standard balancing energy product: a provider
+            whose capacity bid wins must offer that energy on the standard product's platform (MARI for mFRR,
+            PICASSO for aFRR). Set for procurements where capacity for multiple products is procured, telling their
+            volumes apart; may be null (or absent) otherwise. Absent and null are equivalent.
+          example: true
         procurement:
           description: The procurement these volumes came from.
           allOf:
@@ -2903,6 +2915,18 @@ components:
           $ref: '#/components/schemas/ReserveType'
         direction:
           $ref: '#/components/schemas/Direction'
+        isForStandardProduct:
+          x-experimental: true
+          type: boolean
+          nullable: true
+          description: |
+            **Experimental** — may change or be removed without notice.
+
+            Indicates if the capacity is procured for a European standard balancing energy product: a provider
+            whose capacity bid wins must offer that energy on the standard product's platform (MARI for mFRR,
+            PICASSO for aFRR). Set for procurements where capacity for multiple products is procured, telling their
+            demands apart; may be null (or absent) otherwise. Absent and null are equivalent.
+          example: true
         procurement:
           $ref: '#/components/schemas/Procurement'
         demandBasis:
