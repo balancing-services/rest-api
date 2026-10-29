@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.9.0] - 2026-10-29
+
 ### Added
 - Experimental `isForStandardProduct` field on each balancing capacity price group of `/balancing/capacity/prices`: whether the capacity is procured for a European standard balancing energy product (MARI, PICASSO). Set only for Slovakia so far; null elsewhere
 
@@ -268,7 +270,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - UTC timestamp-based period filtering
 - OpenAPI 3.0.3 specification
 
-[Unreleased]: https://github.com/balancing-services/rest-api/compare/v2.8.0...HEAD
+[Unreleased]: https://github.com/balancing-services/rest-api/compare/v2.9.0...HEAD
+[2.9.0]: https://github.com/balancing-services/rest-api/compare/v2.8.0...v2.9.0
 [2.8.0]: https://github.com/balancing-services/rest-api/compare/v2.7.0...v2.8.0
 [2.7.0]: https://github.com/balancing-services/rest-api/compare/v2.6.0...v2.7.0
 [2.6.0]: https://github.com/balancing-services/rest-api/compare/v2.5.0...v2.6.0
