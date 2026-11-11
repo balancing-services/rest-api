@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import TYPE_CHECKING, Any, TypeVar
+from typing import TYPE_CHECKING, Any, TypeVar, cast
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
@@ -11,6 +11,7 @@ from ..models.currency import Currency, check_currency
 from ..models.direction import Direction, check_direction
 from ..models.eic_code import EicCode, check_eic_code
 from ..models.reserve_type import ReserveType, check_reserve_type
+from ..types import UNSET, Unset
 
 if TYPE_CHECKING:
     from ..models.balancing_capacity_price_forecast import (
@@ -33,6 +34,16 @@ class BalancingCapacityPriceForecasts:
         currency (Currency): Currency code
         procurement (Procurement):
         forecasts (list[BalancingCapacityPriceForecast]):
+        is_for_standard_product (bool | None | Unset): **Experimental** — may change or be removed without notice.
+
+            Indicates if the forecasts are for a European standard balancing energy product (MARI for mFRR, PICASSO
+            for aFRR), as `isForStandardProduct` does on `/balancing/capacity/prices`: true for the standard product,
+            false for a specific one. Set where the area's auctions procure capacity for several products of the
+            reserve type and the forecast states which product it is of, so a direction forecast for two products
+            comes back as two series; compare each with the prices of the same `isForStandardProduct`. May be null (or
+            absent) otherwise: the forecast doesn't tell the products apart, and compares with its direction's prices
+            whatever their `isForStandardProduct`. Absent and null are equivalent.
+             Example: True.
     """
 
     area: Area
@@ -42,6 +53,7 @@ class BalancingCapacityPriceForecasts:
     currency: Currency
     procurement: Procurement
     forecasts: list[BalancingCapacityPriceForecast]
+    is_for_standard_product: bool | None | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -62,6 +74,12 @@ class BalancingCapacityPriceForecasts:
             forecasts_item = forecasts_item_data.to_dict()
             forecasts.append(forecasts_item)
 
+        is_for_standard_product: bool | None | Unset
+        if isinstance(self.is_for_standard_product, Unset):
+            is_for_standard_product = UNSET
+        else:
+            is_for_standard_product = self.is_for_standard_product
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
@@ -75,6 +93,8 @@ class BalancingCapacityPriceForecasts:
                 "forecasts": forecasts,
             }
         )
+        if is_for_standard_product is not UNSET:
+            field_dict["isForStandardProduct"] = is_for_standard_product
 
         return field_dict
 
@@ -107,6 +127,17 @@ class BalancingCapacityPriceForecasts:
 
             forecasts.append(forecasts_item)
 
+        def _parse_is_for_standard_product(data: object) -> bool | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(bool | None | Unset, data)
+
+        is_for_standard_product = _parse_is_for_standard_product(
+            d.pop("isForStandardProduct", UNSET)
+        )
+
         balancing_capacity_price_forecasts = cls(
             area=area,
             eic_code=eic_code,
@@ -115,6 +146,7 @@ class BalancingCapacityPriceForecasts:
             currency=currency,
             procurement=procurement,
             forecasts=forecasts,
+            is_for_standard_product=is_for_standard_product,
         )
 
         balancing_capacity_price_forecasts.additional_properties = d

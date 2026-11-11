@@ -158,8 +158,9 @@ window without `updated-since` and reconcile.
 Capacity price forecasts (`/balancing/capacity/prices/forecast`) are not withdrawn by a later
 forecast. An auction is an area, reserve type and `procuredAt`, and can be forecast several times
 before its gate closure, from days ahead to shortly before it. Each new forecast made before the
-gate replaces the earlier one of its delivery period and direction; a forecast that lacks a period
-or direction leaves the earlier forecast of it served, so one auction's forecasts can carry
-different `madeAt`s. The last forecast can be stored just after the gate, so an auction's forecasts
-settle shortly after its gate closure, not at it. Upsert on area, reserve type, delivery period,
-`procuredAt` and direction.
+gate replaces the earlier one of its delivery period, direction and product; a forecast that lacks
+a period, direction or product leaves the earlier forecast of it served, so one auction's forecasts
+can carry different `madeAt`s. The last forecast can be stored just after the gate, so an auction's
+forecasts settle shortly after its gate closure, not at it. Upsert on area, reserve type, delivery
+period, `procuredAt`, direction and the experimental `isForStandardProduct` (treat it as null when
+absent), which tells apart the standard and the specific product of one auction.

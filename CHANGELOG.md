@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Experimental `isForStandardProduct` field on each balancing capacity price forecast group of `/balancing/capacity/prices/forecast`, with the same meaning as on `/balancing/capacity/prices`: where an auction procures capacity for a standard and a specific product, a direction can be forecast for both, as two groups that differ only in it. A forecast without it doesn't tell the products apart and compares with its direction's prices whatever their `isForStandardProduct`
+
+### Changed
+- Capacity price forecasts are replaced per delivery period, direction and product (`isForStandardProduct`); the endpoint, `madeAt` and shipped skill descriptions are restated to match. The field is set, history included, on Slovakia's and Czechia's mFRR (true) and France's mFRR (up false, down true); null elsewhere. No direction is forecast for two products yet. A client keying forecast groups on area, reserve type, direction and procurement alone must add `isForStandardProduct` (treat absent as null) to its key, and replace the groups it stored without it: re-fetch those areas' forecasts without `updated-since`, as setting the field on stored history did not change their stamps, and drop the groups stored under the old key
+
 ## [2.10.0] - 2026-10-29
 
 ### Added
