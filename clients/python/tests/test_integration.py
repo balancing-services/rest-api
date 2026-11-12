@@ -11,6 +11,7 @@ from httpx import Response
 from balancing_services import AuthenticatedClient
 from balancing_services.api.default import (
     get_balancing_capacity_demand,
+    get_balancing_capacity_price_forecast_history,
     get_balancing_capacity_price_forecasts,
     get_balancing_energy_activated_volume_history,
     get_balancing_energy_bids,
@@ -2507,3 +2508,190 @@ async def test_async_get_balancing_capacity_price_forecasts(
     assert len(response.parsed.data) == 1
     assert len(response.parsed.data[0].forecasts) == 2
     assert response.parsed.data[0].forecasts[1].price_per_mw_per_hour == 10.0
+
+
+@pytest.fixture
+def mock_balancing_capacity_price_forecast_history_response():
+    """Mock response data for the balancing capacity price forecast history: one period forecast three times."""
+    period = {"startAt": "2025-01-02T00:00:00Z", "endAt": "2025-01-02T01:00:00Z"}
+
+    def entry(made_at: str, price: float, low: float, high: float) -> dict:
+        return {
+            "period": period,
+            "madeAt": made_at,
+            "pricePerMwPerHour": price,
+            "quantiles": [{"level": 0.1, "pricePerMwPerHour": low}, {"level": 0.9, "pricePerMwPerHour": high}],
+        }
+
+    return {
+        "queriedPeriod": {"startAt": "2025-01-02T00:00:00Z", "endAt": "2025-01-03T00:00:00Z"},
+        "hasMore": False,
+        "nextUpdatedSince": "2025-01-01T09:15:00Z",
+        "data": [
+            {
+                "area": "EE",
+                "eicCode": "10Y1001A1001A39I",
+                "reserveType": "aFRR",
+                "direction": "up",
+                "currency": "EUR",
+                "procurement": {"procuredAt": "2025-01-01T09:00:00Z"},
+                "isForStandardProduct": None,
+                "forecasts": [
+                    entry("2024-12-30T06:30:02Z", 15.0, 5.0, 35.0),
+                    entry("2025-01-01T05:30:01Z", 15.0, 5.0, 35.0),
+                    entry("2025-01-01T08:30:02Z", 12.5, 4.0, 31.0),
+                ],
+            }
+        ],
+    }
+
+
+@respx.mock
+def test_get_balancing_capacity_price_forecast_history_success(
+    authenticated_client, mock_balancing_capacity_price_forecast_history_response
+):
+    """Test a forecast history request: the history URL is requested and several entries of one period parse."""
+    route = respx.get("https://api.balancing.services/v2/balancing/capacity/prices/forecast/history").mock(
+        return_value=Response(200, json=mock_balancing_capacity_price_forecast_history_response)
+    )
+
+    response = get_balancing_capacity_price_forecast_history.sync_detailed(
+        client=authenticated_client,
+        area="EE",
+        period_start_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
+        period_end_at=datetime(2025, 1, 3, 0, 0, 0, tzinfo=timezone.utc),
+        reserve_type="aFRR",
+    )
+
+    assert response.status_code == 200
+    assert response.parsed is not None
+    assert route.called
+    assert route.calls.last.request.url.params["reserve-type"] == "aFRR"
+    group = response.parsed.data[0]
+    assert group.procurement.procured_at == datetime(2025, 1, 1, 9, 0, 0, tzinfo=timezone.utc)
+    assert group.is_for_standard_product is None
+    assert {forecast.period.start_at for forecast in group.forecasts} == {
+        datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc)
+    }
+    assert [forecast.made_at for forecast in group.forecasts] == [
+        datetime(2024, 12, 30, 6, 30, 2, tzinfo=timezone.utc),
+        datetime(2025, 1, 1, 5, 30, 1, tzinfo=timezone.utc),
+        datetime(2025, 1, 1, 8, 30, 2, tzinfo=timezone.utc),
+    ]
+    assert [forecast.price_per_mw_per_hour for forecast in group.forecasts] == [15.0, 15.0, 12.5]
+
+
+@respx.mock
+def test_get_balancing_capacity_price_forecast_history_unserved_area_is_empty(authenticated_client):
+    """Test that an area or reserve type without forecast coverage returns an empty history, not an error."""
+    empty_response = {
+        "queriedPeriod": {"startAt": "2025-01-02T00:00:00Z", "endAt": "2025-01-03T00:00:00Z"},
+        "hasMore": False,
+        "nextUpdatedSince": "2025-01-01T09:15:00Z",
+        "data": [],
+    }
+
+    respx.get("https://api.balancing.services/v2/balancing/capacity/prices/forecast/history").mock(
+        return_value=Response(200, json=empty_response)
+    )
+
+    response = get_balancing_capacity_price_forecast_history.sync_detailed(
+        client=authenticated_client,
+        area="FI",
+        period_start_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
+        period_end_at=datetime(2025, 1, 3, 0, 0, 0, tzinfo=timezone.utc),
+        reserve_type="mFRR",
+    )
+
+    assert response.status_code == 200
+    assert response.parsed is not None
+    assert response.parsed.data == []
+    assert response.parsed.has_more is False
+
+
+@respx.mock
+def test_get_balancing_capacity_price_forecast_history_pagination(
+    authenticated_client, mock_balancing_capacity_price_forecast_history_response
+):
+    """Test forecast history pagination - cursor/limit/updated-since sent, nextCursor parsed."""
+    paginated_response = {
+        **mock_balancing_capacity_price_forecast_history_response,
+        "hasMore": True,
+        "nextCursor": "v1:AAAAAYwBAgMEBQYHCAkKCw==",
+    }
+
+    route = respx.get("https://api.balancing.services/v2/balancing/capacity/prices/forecast/history").mock(
+        return_value=Response(200, json=paginated_response)
+    )
+
+    response = get_balancing_capacity_price_forecast_history.sync_detailed(
+        client=authenticated_client,
+        area="EE",
+        period_start_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
+        period_end_at=datetime(2025, 1, 3, 0, 0, 0, tzinfo=timezone.utc),
+        reserve_type="aFRR",
+        cursor="v1:AAAAAYwBAgMEBQYHCAkKCw==",
+        limit=1000,
+        updated_since=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
+    )
+
+    assert response.status_code == 200
+    assert response.parsed is not None
+    assert response.parsed.has_more is True
+    assert response.parsed.next_cursor == "v1:AAAAAYwBAgMEBQYHCAkKCw=="
+    assert response.parsed.next_updated_since == datetime(2025, 1, 1, 9, 15, 0, tzinfo=timezone.utc)
+    sent_url = route.calls.last.request.url
+    assert sent_url.params["cursor"] == "v1:AAAAAYwBAgMEBQYHCAkKCw=="
+    assert sent_url.params["limit"] == "1000"
+    assert sent_url.params["updated-since"] == "2025-01-01T00:00:00+00:00"
+
+
+@respx.mock
+def test_get_balancing_capacity_price_forecast_history_unauthorized(authenticated_client):
+    """Test unauthorized response (401) for the balancing capacity price forecast history."""
+    error_response = {
+        "type": "unauthorized",
+        "title": "Unauthorized",
+        "status": 401,
+        "detail": "Invalid or missing authentication token",
+    }
+
+    respx.get("https://api.balancing.services/v2/balancing/capacity/prices/forecast/history").mock(
+        return_value=Response(401, json=error_response)
+    )
+
+    response = get_balancing_capacity_price_forecast_history.sync_detailed(
+        client=authenticated_client,
+        area="EE",
+        period_start_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
+        period_end_at=datetime(2025, 1, 3, 0, 0, 0, tzinfo=timezone.utc),
+        reserve_type="aFRR",
+    )
+
+    assert response.status_code == 401
+    assert response.parsed is not None
+    assert response.parsed.status == 401
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_async_get_balancing_capacity_price_forecast_history(
+    authenticated_client, mock_balancing_capacity_price_forecast_history_response
+):
+    """Test async request for the balancing capacity price forecast history."""
+    respx.get("https://api.balancing.services/v2/balancing/capacity/prices/forecast/history").mock(
+        return_value=Response(200, json=mock_balancing_capacity_price_forecast_history_response)
+    )
+
+    response = await get_balancing_capacity_price_forecast_history.asyncio_detailed(
+        client=authenticated_client,
+        area="EE",
+        period_start_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
+        period_end_at=datetime(2025, 1, 3, 0, 0, 0, tzinfo=timezone.utc),
+        reserve_type="aFRR",
+    )
+
+    assert response.status_code == 200
+    assert response.parsed is not None
+    assert len(response.parsed.data[0].forecasts) == 3
+    assert response.parsed.data[0].forecasts[-1].made_at == datetime(2025, 1, 1, 8, 30, 2, tzinfo=timezone.utc)

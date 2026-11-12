@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Experimental balancing capacity price forecast history endpoint (`/balancing/capacity/prices/forecast/history`), serving every forecast made before an auction's gate closure rather than the latest alone, e.g. to benchmark your own forecasts — see the endpoint description for the semantics
+
+### Changed
+- The `madeAt` description on the balancing capacity price forecast is shortened. Documentation only; no change on the wire
+
 ## [2.11.0] - 2026-11-11
 
 ### Added

@@ -9,6 +9,7 @@ from balancing_services import AuthenticatedClient, Client
 from balancing_services.api.default import (
     get_balancing_capacity_bids,
     get_balancing_capacity_demand,
+    get_balancing_capacity_price_forecast_history,
     get_balancing_capacity_price_forecasts,
     get_balancing_capacity_prices,
     get_balancing_capacity_procured_volumes,
@@ -252,6 +253,8 @@ class TestAPIEndpointsExist:
         assert hasattr(get_balancing_capacity_prices, "asyncio_detailed")
         assert hasattr(get_balancing_capacity_price_forecasts, "sync_detailed")
         assert hasattr(get_balancing_capacity_price_forecasts, "asyncio_detailed")
+        assert hasattr(get_balancing_capacity_price_forecast_history, "sync_detailed")
+        assert hasattr(get_balancing_capacity_price_forecast_history, "asyncio_detailed")
         assert hasattr(get_balancing_capacity_procured_volumes, "sync_detailed")
         assert hasattr(get_balancing_capacity_procured_volumes, "asyncio_detailed")
 
