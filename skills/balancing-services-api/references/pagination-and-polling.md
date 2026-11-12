@@ -164,3 +164,6 @@ can carry different `madeAt`s. The last forecast can be stored just after the ga
 forecasts settle shortly after its gate closure, not at it. Upsert on area, reserve type, delivery
 period, `procuredAt`, direction and the experimental `isForStandardProduct` (treat it as null when
 absent), which tells apart the standard and the specific product of one auction.
+
+Their history (`/balancing/capacity/prices/forecast/history`) withdraws nothing either: each new
+forecast adds an entry. Upsert on the forecast endpoint's key above plus `madeAt`.

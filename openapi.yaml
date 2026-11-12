@@ -940,6 +940,59 @@ paths:
         '501':
           $ref: '#/components/responses/NotImplemented'
 
+  /balancing/capacity/prices/forecast/history:
+    get:
+      summary: Get the history of the balancing capacity price forecasts
+      description: |
+        **Experimental** - This endpoint is under active development and may change without notice.
+
+        Returns every forecast made before an auction's gate closure (`procurement.procuredAt`),
+        where `/balancing/capacity/prices/forecast` returns only the latest. Same parameters and
+        response shape; a delivery period appears once per forecast, ordered by `madeAt`.
+
+        For the forecast as of a given time, take a period's last entry with `madeAt` at or before
+        it. Upsert on the `/balancing/capacity/prices/forecast` key plus `madeAt`.
+      operationId: getBalancingCapacityPriceForecastHistory
+      x-experimental: true
+      parameters:
+        - $ref: '#/components/parameters/area'
+        - $ref: '#/components/parameters/period-start-at'
+        - $ref: '#/components/parameters/period-end-at'
+        - $ref: '#/components/parameters/reserve-type'
+        - $ref: '#/components/parameters/cursor'
+        - name: limit
+          in: query
+          description: Maximum number of results to return (default 100, max 1000)
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+            default: 100
+            example: 100
+        - $ref: '#/components/parameters/updated-since'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BalancingCapacityPriceForecastsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '501':
+          $ref: '#/components/responses/NotImplemented'
+
   /balancing/cross-border/available-capacity:
     get:
       summary: Get cross-border available capacity
@@ -2768,11 +2821,7 @@ components:
         madeAt:
           type: string
           format: date-time
-          description: >-
-            When this forecast was made (UTC), before the auction's gate closure. The forecasts of one auction can
-            differ in it, each delivery period, direction and product being its own latest forecast. Each forecast's `madeAt`
-            holds across every page of one traversal — a first page and the pages reached through its cursors, which
-            pin one snapshot.
+          description: When this forecast was made (UTC).
           example: '2025-01-01T06:30:02Z'
         pricePerMwPerHour:
           type: number

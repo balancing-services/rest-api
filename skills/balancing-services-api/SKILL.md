@@ -69,6 +69,7 @@ All take `period-start-at` and `period-end-at`; the last column lists what else 
 | `GET /balancing/capacity/bids` | Capacity bid curves grouped by delivery period; each bid carries its `procurement` and `status` (`offered`/`accepted`) | `area`, `reserve-type` |
 | `GET /balancing/capacity/prices` | Capacity prices per MW per hour, grouped per procurement; optional `price-type` (`average`/`marginal`) | `area`, `reserve-type` |
 | `GET /balancing/capacity/prices/forecast` | Experimental. Forecasts of each day-ahead capacity auction's marginal (clearing) price — compare with `/balancing/capacity/prices` at `price-type=marginal` — grouped per procurement: per delivery period, direction and product (`isForStandardProduct`), the latest forecast made before gate closure (`procuredAt`), a point forecast `pricePerMwPerHour` (today the median) plus `quantiles`, stamped `madeAt` | `area`, `reserve-type` |
+| `GET /balancing/capacity/prices/forecast/history` | Experimental. Every forecast made before the gate, where `/balancing/capacity/prices/forecast` returns only the latest. Same shape; a delivery period appears once per forecast, ordered by `madeAt` | `area`, `reserve-type` |
 | `GET /balancing/capacity/procured-volumes` | Procured capacity in MW, grouped per procurement | `area`, `reserve-type` |
 | `GET /balancing/capacity/demand` | Experimental. Capacity the TSO set out to procure: `totalDemandInMw`, `localDemandInMw`, per procurement, with a `demandBasis` | `area`, `reserve-type` |
 | `GET /balancing/capacity/cross-zonal-allocation` | Allocated cross-zonal capacity over one border, both directions | `area`, `other-area`, `reserve-type` |
@@ -135,9 +136,9 @@ references/pagination-and-polling.md).
 - **Capacity demand can double-count.** Sum only `additive` demand across procurements of one
   period; `substitutive` restates demand already covered by another procurement.
 - **Forecast quantiles are self-describing.** Each forecast on `/imbalance/prices/forecast` and
-  `/balancing/capacity/prices/forecast` states the grid it was made on — read `level` off every
-  quantile rather than indexing by a position you hardcoded. Levels are decimals strictly between
-  0 and 1 (0.5 the median).
+  `/balancing/capacity/prices/forecast` (and its `/history`) states the grid it was made on — read
+  `level` off every quantile rather than indexing by a position you hardcoded. Levels are decimals
+  strictly between 0 and 1 (0.5 the median).
 - **Capacity price forecasts are replaced per period, direction and product.** An auction is an
   area, reserve type and `procuredAt`, and can be forecast several times before its gate closure,
   from days ahead to shortly before it. Each delivery period, direction and product serves its
@@ -148,6 +149,11 @@ references/pagination-and-polling.md).
   `isForStandardProduct` (treat it as null when absent). Compare a forecast with the prices of the
   same `isForStandardProduct`, or, where the forecast's is null, with its direction's prices
   whatever theirs.
+- **Pick from the capacity price forecast history client-side.**
+  `/balancing/capacity/prices/forecast/history` has no parameter for a time or a round. For the
+  forecast as of T, take a period's last entry with `madeAt` ≤ T; for the forecast at a lead
+  before the gate, the last with `madeAt` ≤ `procuredAt` − lead. Upsert on the forecast
+  endpoint's key plus `madeAt`.
 - **Currency varies by area** (`EUR`, `BGN`, `CHF`, `HUF`, `PLN`, `RON`, `UAH`) and is stated per
   group — never assume euros.
 
