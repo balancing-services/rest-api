@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.12.0] - 2026-11-12
+
 ### Added
 - Experimental balancing capacity price forecast history endpoint (`/balancing/capacity/prices/forecast/history`), serving every forecast made before an auction's gate closure rather than the latest alone, e.g. to benchmark your own forecasts — see the endpoint description for the semantics
 
@@ -292,7 +294,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - UTC timestamp-based period filtering
 - OpenAPI 3.0.3 specification
 
-[Unreleased]: https://github.com/balancing-services/rest-api/compare/v2.11.0...HEAD
+[Unreleased]: https://github.com/balancing-services/rest-api/compare/v2.12.0...HEAD
+[2.12.0]: https://github.com/balancing-services/rest-api/compare/v2.11.0...v2.12.0
 [2.11.0]: https://github.com/balancing-services/rest-api/compare/v2.10.0...v2.11.0
 [2.10.0]: https://github.com/balancing-services/rest-api/compare/v2.9.0...v2.10.0
 [2.9.0]: https://github.com/balancing-services/rest-api/compare/v2.8.0...v2.9.0
