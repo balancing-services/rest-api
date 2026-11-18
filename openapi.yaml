@@ -3257,7 +3257,7 @@ components:
       type: string
       description: |
         Status of a capacity bid:
-        - offered: Bid was offered but not accepted
+        - offered: Bid was offered
         - accepted: Bid was accepted (at least partially accepted)
       enum:
         - offered

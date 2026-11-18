@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- The `offered` capacity bid status no longer claims the bid was not accepted. Documentation only
+
 ## [2.12.0] - 2026-11-12
 
 ### Added
