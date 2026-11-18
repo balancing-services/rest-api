@@ -1,6 +1,6 @@
 """Tests for the experimental isForStandardProduct field on capacity groups.
 
-Each balancing capacity price, volume, demand and price forecast group
+Each balancing capacity bid, price, volume, demand and price forecast group
 carries an optional, nullable ``isForStandardProduct`` flag. Absent yields the
 ``UNSET`` sentinel, an explicit null yields ``None``. These tests pin that distinction, the
 round-trip through ``to_dict`` and backward compatibility with payloads that
@@ -11,6 +11,7 @@ from typing import Any
 
 import pytest
 
+from balancing_services.models.balancing_capacity_bids import BalancingCapacityBids
 from balancing_services.models.balancing_capacity_demands import BalancingCapacityDemands
 from balancing_services.models.balancing_capacity_price_forecasts import BalancingCapacityPriceForecasts
 from balancing_services.models.balancing_capacity_prices import BalancingCapacityPrices
@@ -18,14 +19,15 @@ from balancing_services.models.balancing_capacity_volumes import BalancingCapaci
 from balancing_services.types import Unset
 
 GroupModel = (
-    type[BalancingCapacityPrices]
+    type[BalancingCapacityBids]
+    | type[BalancingCapacityPrices]
     | type[BalancingCapacityVolumes]
     | type[BalancingCapacityDemands]
     | type[BalancingCapacityPriceForecasts]
 )
 
 
-@pytest.fixture(params=["prices", "volumes", "demands", "forecasts"])
+@pytest.fixture(params=["bids", "prices", "volumes", "demands", "forecasts"])
 def model(request: pytest.FixtureRequest) -> GroupModel:
     """Each capacity group model that carries isForStandardProduct."""
     return GROUP_MODELS[request.param]
@@ -66,6 +68,7 @@ class TestIsForStandardProductRoundTrip:
 # Helper functions
 
 GROUP_MODELS: dict[str, GroupModel] = {
+    "bids": BalancingCapacityBids,
     "prices": BalancingCapacityPrices,
     "volumes": BalancingCapacityVolumes,
     "demands": BalancingCapacityDemands,
@@ -79,26 +82,43 @@ GROUP_HEADER: dict[str, Any] = {
     "eicCode": "10YSK-SEPS-----K",
     "reserveType": "mFRR",
     "direction": "up",
-    "procurement": {"procuredAt": "2025-01-01T10:00:00+00:00"},
 }
 
+PROCUREMENT: dict[str, Any] = {"procuredAt": "2025-01-01T10:00:00+00:00"}
+
 BASE_GROUPS: dict[GroupModel, dict[str, Any]] = {
+    BalancingCapacityBids: {
+        **GROUP_HEADER,
+        "currency": "EUR",
+        "periods": [
+            {
+                "period": PERIOD,
+                "bids": [
+                    {"capacityInMw": 50.0, "pricePerMwPerHour": 12.5, "status": "accepted", "procurement": PROCUREMENT}
+                ],
+            }
+        ],
+    },
     BalancingCapacityPrices: {
         **GROUP_HEADER,
+        "procurement": PROCUREMENT,
         "currency": "EUR",
         "prices": [{"period": PERIOD, "pricePerMwPerHour": 12.5}],
     },
     BalancingCapacityVolumes: {
         **GROUP_HEADER,
+        "procurement": PROCUREMENT,
         "volumes": [{"period": PERIOD, "volumeInMw": 100.0}],
     },
     BalancingCapacityDemands: {
         **GROUP_HEADER,
+        "procurement": PROCUREMENT,
         "demandBasis": "additive",
         "demands": [{"period": PERIOD, "totalDemandInMw": 120.0, "localDemandInMw": 80.0}],
     },
     BalancingCapacityPriceForecasts: {
         **GROUP_HEADER,
+        "procurement": PROCUREMENT,
         "currency": "EUR",
         "forecasts": [
             {
@@ -114,6 +134,12 @@ BASE_GROUPS: dict[GroupModel, dict[str, Any]] = {
 
 def make_group(
     model: GroupModel, overrides: dict[str, Any] | None = None
-) -> BalancingCapacityPrices | BalancingCapacityVolumes | BalancingCapacityDemands | BalancingCapacityPriceForecasts:
+) -> (
+    BalancingCapacityBids
+    | BalancingCapacityPrices
+    | BalancingCapacityVolumes
+    | BalancingCapacityDemands
+    | BalancingCapacityPriceForecasts
+):
     """Create a capacity group of the given model from a happy-path payload with the given overrides."""
     return model.from_dict({**BASE_GROUPS[model], **(overrides or {})})

@@ -134,9 +134,10 @@ def sync_detailed(
      Returns balancing capacity bids for the specified area within the given time period. Prices are
     in the specified currency per MW per hour.
 
-    Bids are grouped by their shared dimensions (area, reserve type, direction, currency), and inside
-    each group by delivery period: each entry of `periods` states the period once and carries that
-    period's bids. Period entries ascend by period start within their group. Each bid carries the
+    Bids are grouped by their shared dimensions (area, reserve type, direction, currency,
+    `isForStandardProduct`), and inside each group by delivery period: each entry of `periods` states
+    the period once and carries that period's bids. Period entries ascend by period start within
+    their group. Each bid carries the
     procurement it was submitted to (`procurement.procuredAt`) — a single period entry can mix bids
     from multiple procurement rounds.
 
@@ -204,9 +205,10 @@ def sync(
      Returns balancing capacity bids for the specified area within the given time period. Prices are
     in the specified currency per MW per hour.
 
-    Bids are grouped by their shared dimensions (area, reserve type, direction, currency), and inside
-    each group by delivery period: each entry of `periods` states the period once and carries that
-    period's bids. Period entries ascend by period start within their group. Each bid carries the
+    Bids are grouped by their shared dimensions (area, reserve type, direction, currency,
+    `isForStandardProduct`), and inside each group by delivery period: each entry of `periods` states
+    the period once and carries that period's bids. Period entries ascend by period start within
+    their group. Each bid carries the
     procurement it was submitted to (`procurement.procuredAt`) — a single period entry can mix bids
     from multiple procurement rounds.
 
@@ -269,9 +271,10 @@ async def asyncio_detailed(
      Returns balancing capacity bids for the specified area within the given time period. Prices are
     in the specified currency per MW per hour.
 
-    Bids are grouped by their shared dimensions (area, reserve type, direction, currency), and inside
-    each group by delivery period: each entry of `periods` states the period once and carries that
-    period's bids. Period entries ascend by period start within their group. Each bid carries the
+    Bids are grouped by their shared dimensions (area, reserve type, direction, currency,
+    `isForStandardProduct`), and inside each group by delivery period: each entry of `periods` states
+    the period once and carries that period's bids. Period entries ascend by period start within
+    their group. Each bid carries the
     procurement it was submitted to (`procurement.procuredAt`) — a single period entry can mix bids
     from multiple procurement rounds.
 
@@ -337,9 +340,10 @@ async def asyncio(
      Returns balancing capacity bids for the specified area within the given time period. Prices are
     in the specified currency per MW per hour.
 
-    Bids are grouped by their shared dimensions (area, reserve type, direction, currency), and inside
-    each group by delivery period: each entry of `periods` states the period once and carries that
-    period's bids. Period entries ascend by period start within their group. Each bid carries the
+    Bids are grouped by their shared dimensions (area, reserve type, direction, currency,
+    `isForStandardProduct`), and inside each group by delivery period: each entry of `periods` states
+    the period once and carries that period's bids. Period entries ascend by period start within
+    their group. Each bid carries the
     procurement it was submitted to (`procurement.procuredAt`) — a single period entry can mix bids
     from multiple procurement rounds.
 
