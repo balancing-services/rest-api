@@ -122,8 +122,8 @@ references/pagination-and-polling.md).
   demand carry a required `procurement` object with `procuredAt` inside it (not a flat field), and
   each capacity bid carries its own `procurement` — so one period entry can mix bids from several
   procurement rounds. `procuredAt` distinguishes yearly from hourly auctions and re-runs; treat it
-  as part of the group key. On capacity prices, price forecasts, procured volumes and demand, so is
-  the experimental `isForStandardProduct`, null included (treat it as null when absent): a
+  as part of the group key. So is the experimental `isForStandardProduct` on every capacity group
+  whose schema in `openapi.yaml` has it, null included (treat it as null when absent): a
   procurement of capacity for a standard and a specific product serves them as two groups that
   differ only in it (on price forecasts, a group per product forecast).
 - **`activationType` has four values.** `direct` and `scheduled` apply to mFRR; `unspecified` is

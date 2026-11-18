@@ -7,8 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Experimental `isForStandardProduct` field on each balancing capacity bid group of `/balancing/capacity/bids`, with the same meaning as on `/balancing/capacity/prices`; the endpoint description names it among the grouping dimensions
+
 ### Changed
 - The `offered` capacity bid status no longer claims the bid was not accepted. Documentation only
+- Capacity bid groups are now split by `isForStandardProduct`, set as on capacity prices, volumes and demand: for Slovakia, Czechia and France (false for their FCR), null elsewhere. In those areas, a procurement's standard and specific product bids, previously served as two groups with the same area, reserve type, direction and currency and nothing to tell them apart (e.g. Czechia's mFRR up), are now told apart by the field. Elsewhere no delivery period has bids for two products; an area's bids from before and after a change of product (e.g. Hungary's aFRR from October 2026), previously two such groups, now share one. A client keying capacity bid groups on area, reserve type, direction and currency alone must add `isForStandardProduct` (treat absent as null) to its key, and replace the groups it stored for those three areas without it: re-fetch them without `updated-since`, as the change did not move their change times, and drop the groups stored under the old key
 
 ## [2.12.0] - 2026-11-12
 

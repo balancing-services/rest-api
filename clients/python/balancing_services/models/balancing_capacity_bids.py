@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import TYPE_CHECKING, Any, TypeVar
+from typing import TYPE_CHECKING, Any, TypeVar, cast
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
@@ -11,6 +11,7 @@ from ..models.currency import Currency, check_currency
 from ..models.direction import Direction, check_direction
 from ..models.eic_code import EicCode, check_eic_code
 from ..models.reserve_type import ReserveType, check_reserve_type
+from ..types import UNSET, Unset
 
 if TYPE_CHECKING:
     from ..models.balancing_capacity_bid_period import BalancingCapacityBidPeriod
@@ -31,6 +32,13 @@ class BalancingCapacityBids:
         periods (list[BalancingCapacityBidPeriod]): One entry per delivery period for this group, ascending by period
             start. When a page ends inside a delivery period (`hasMore` is true), the next page continues the same entry —
             merge entries on the group's dimensions plus the period when accumulating pages.
+        is_for_standard_product (bool | None | Unset): **Experimental** — may change or be removed without notice.
+
+            Indicates if the capacity is procured for a European standard balancing energy product: a provider
+            whose capacity bid wins must offer that energy on the standard product's platform (MARI for mFRR,
+            PICASSO for aFRR). Set for procurements where capacity for multiple products is procured, telling their
+            bids apart; may be null (or absent) otherwise. Absent and null are equivalent.
+             Example: True.
     """
 
     area: Area
@@ -39,6 +47,7 @@ class BalancingCapacityBids:
     direction: Direction
     currency: Currency
     periods: list[BalancingCapacityBidPeriod]
+    is_for_standard_product: bool | None | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -57,6 +66,12 @@ class BalancingCapacityBids:
             periods_item = periods_item_data.to_dict()
             periods.append(periods_item)
 
+        is_for_standard_product: bool | None | Unset
+        if isinstance(self.is_for_standard_product, Unset):
+            is_for_standard_product = UNSET
+        else:
+            is_for_standard_product = self.is_for_standard_product
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
@@ -69,6 +84,8 @@ class BalancingCapacityBids:
                 "periods": periods,
             }
         )
+        if is_for_standard_product is not UNSET:
+            field_dict["isForStandardProduct"] = is_for_standard_product
 
         return field_dict
 
@@ -94,6 +111,17 @@ class BalancingCapacityBids:
 
             periods.append(periods_item)
 
+        def _parse_is_for_standard_product(data: object) -> bool | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(bool | None | Unset, data)
+
+        is_for_standard_product = _parse_is_for_standard_product(
+            d.pop("isForStandardProduct", UNSET)
+        )
+
         balancing_capacity_bids = cls(
             area=area,
             eic_code=eic_code,
@@ -101,6 +129,7 @@ class BalancingCapacityBids:
             direction=direction,
             currency=currency,
             periods=periods,
+            is_for_standard_product=is_for_standard_product,
         )
 
         balancing_capacity_bids.additional_properties = d
