@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.13.0] - 2026-11-18
+
 ### Added
 - Experimental `isForStandardProduct` field on each balancing capacity bid group of `/balancing/capacity/bids`, with the same meaning as on `/balancing/capacity/prices`; the endpoint description names it among the grouping dimensions
 
@@ -301,7 +303,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - UTC timestamp-based period filtering
 - OpenAPI 3.0.3 specification
 
-[Unreleased]: https://github.com/balancing-services/rest-api/compare/v2.12.0...HEAD
+[Unreleased]: https://github.com/balancing-services/rest-api/compare/v2.13.0...HEAD
+[2.13.0]: https://github.com/balancing-services/rest-api/compare/v2.12.0...v2.13.0
 [2.12.0]: https://github.com/balancing-services/rest-api/compare/v2.11.0...v2.12.0
 [2.11.0]: https://github.com/balancing-services/rest-api/compare/v2.10.0...v2.11.0
 [2.10.0]: https://github.com/balancing-services/rest-api/compare/v2.9.0...v2.10.0
